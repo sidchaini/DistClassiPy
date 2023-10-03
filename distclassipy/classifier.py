@@ -6,7 +6,6 @@ from sklearn.base import BaseEstimator, ClassifierMixin
 from sklearn.utils.validation import check_X_y, check_array, check_is_fitted
 from sklearn.utils.multiclass import unique_labels
 from sklearn.preprocessing import StandardScaler, MinMaxScaler
-from sklearn.feature_selection import SequentialFeatureSelector
 from sklearn.neighbors import KernelDensity
 
 class DistanceMetricClassifier(BaseEstimator, ClassifierMixin):
@@ -23,9 +22,9 @@ class DistanceMetricClassifier(BaseEstimator, ClassifierMixin):
         If True, classifier is scaled in terms of standard deviations.
     
     """
-    def __init__(self, metric="euclidean", scale_std=True, n_feat_select=None,
-                 canonical_stat="median", calculate_kde=True, 
-                 calculate_1d_dist=True, n_jobs=-1):
+    def __init__(self, metric: str or callable="euclidean", scale_std: bool=True,
+                 canonical_stat: str="median", calculate_kde: bool=True, 
+                 calculate_1d_dist: bool=True, n_jobs: int=-1):
         """
         Initialize the classifier with the given parameters.
         
@@ -35,8 +34,6 @@ class DistanceMetricClassifier(BaseEstimator, ClassifierMixin):
             The distance metric to use.
         scale_std : bool, optional
             If True, classifier is scaled in terms of standard deviations.
-        n_feat_select : int, optional
-            The number of features to select.
         canonical_stat : str, optional
             The statistical measure to use for creating the training template.
         calculate_kde : bool, optional
@@ -49,13 +46,12 @@ class DistanceMetricClassifier(BaseEstimator, ClassifierMixin):
         self.metric = metric
         self.scale_std = scale_std
         self.canonical_stat = canonical_stat
-        self.n_feat_select = n_feat_select
         self.calculate_kde = calculate_kde
         self.calculate_1d_dist = calculate_1d_dist
         self.n_jobs = n_jobs
         self.distance_calculator = Distance()
 
-    def fit(self, X, y, feat_labels=None):
+    def fit(self, X: np.array, y: np.array, feat_labels: list[str]=None):
         """
         Fit the classifier to the data.
         
@@ -69,17 +65,6 @@ class DistanceMetricClassifier(BaseEstimator, ClassifierMixin):
             The feature labels.
         """
         X, y = check_X_y(X, y)
-        if self.n_feat_select:
-            feat_selector = SequentialFeatureSelector(
-                DistanceMetricClassifier(
-                    metric=self.metric, scale_std=self.scale_std,
-                    n_feat_select=None, canonical_stat=self.canonical_stat
-                    ),
-                n_features_to_select=self.n_feat_select, direction="forward", n_jobs=self.n_jobs
-                ).fit(X, y)
-            self.keep_indices = feat_selector.get_support()
-            X = X[:, self.keep_indices]
-
         self.classes_ = unique_labels(y)
         self.n_features_in_ = X.shape[1]
         
@@ -129,7 +114,7 @@ class DistanceMetricClassifier(BaseEstimator, ClassifierMixin):
         
         return self
 
-    def predict(self, X):
+    def predict(self, X: np.array):
         """
         Predict the class labels for the provided data.
         
@@ -141,9 +126,6 @@ class DistanceMetricClassifier(BaseEstimator, ClassifierMixin):
         check_is_fitted(self, 'is_fitted_')
         X = check_array(X)
         
-        if self.n_feat_select:
-            X = X[:, self.keep_indices]
-
         if not self.scale_std:
             dist_arr = distance.cdist(
                     XA=X,
@@ -187,7 +169,7 @@ class DistanceMetricClassifier(BaseEstimator, ClassifierMixin):
 
         
 
-    def predict_and_analyse(self, X):
+    def predict_and_analyse(self, X: np.array):
         """
         Predict the class labels for the provided data and perform analysis.
         
@@ -199,9 +181,6 @@ class DistanceMetricClassifier(BaseEstimator, ClassifierMixin):
         check_is_fitted(self, 'is_fitted_')
         X = check_array(X)
         
-        if self.n_feat_select:
-            X = X[:, self.keep_indices]
-
         if not self.scale_std:
             dist_arr = distance.cdist(
                     XA=X,
@@ -269,7 +248,7 @@ class DistanceMetricClassifier(BaseEstimator, ClassifierMixin):
         return y_pred
 
     
-    def calculate_confidence(self, method="distance_inverse"):
+    def calculate_confidence(self, method: str="distance_inverse"):
         """
         Calculate the confidence for each prediction.
         
