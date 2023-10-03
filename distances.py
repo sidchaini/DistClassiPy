@@ -1,9 +1,7 @@
-# Original Author: Andrzej Zielezinski
-# Retrieved: 20 November 2022
-# Original URL: https://github.com/aziele/statistical-distances/blob/04412b3155c59fc7238b3d8ecf6f3723ac5befff/distance.py
+# This code is based on the work of Andrzej Zielezinski, originally retrieved on 20 November 2022 from
+# https://github.com/aziele/statistical-distances/blob/04412b3155c59fc7238b3d8ecf6f3723ac5befff/distance.py
 #
-# Modified by: Siddharth Chaini
-# Date: 27 November 2022
+# It has been modified by Siddharth Chaini on 27 November 2022.
 #
 # Licensed GNU General Public License v3.0;
 # you may not use this file except in compliance with the License.
@@ -16,20 +14,19 @@
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 # See the License for the specific language governing permissions and
 # limitations under the License.
-
-# Comments by Siddharth Chaini(SC): 
-#     I made the following changes:
-#         a) Added the following distances were added from scratch:
-#             1. Meehl distance
-#             2. Sorensen distance
-#             3. Ruzicka distance
-#             4. Inner product distance
-#             5. Harmonic mean distance
-#             6. Fidelity
-#             7. Minimimum Symmetric Chi Squared
-#             8. Probabilistic Symmetric Chi Squared (MAYBE HERE)
-#         b) Added this code to all functions:
-#             u,v = np.asarray(u), np.asarray(v)
+#
+# Modifications by Siddharth Chaini include the addition of the following distance measures:
+#     1. Meehl distance
+#     2. Sorensen distance
+#     3. Ruzicka distance
+#     4. Inner product distance
+#     5. Harmonic mean distance
+#     6. Fidelity
+#     7. Minimimum Symmetric Chi Squared
+#     8. Probabilistic Symmetric Chi Squared
+#
+# In addition, the following code was added to all functions for array conversion:
+#     u,v = np.asarray(u), np.asarray(v)
 #
 # Todos: 
 #     ALSO COMPARE RUNTIME OF THIS v/s custom v/s Tschopp
