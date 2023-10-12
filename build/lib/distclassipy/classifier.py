@@ -1,7 +1,7 @@
 import numpy as np
 import pandas as pd
 from scipy.spatial import distance
-from distances import Distance
+from .distances import Distance
 from sklearn.base import BaseEstimator, ClassifierMixin
 from sklearn.utils.validation import check_X_y, check_array, check_is_fitted
 from sklearn.utils.multiclass import unique_labels
