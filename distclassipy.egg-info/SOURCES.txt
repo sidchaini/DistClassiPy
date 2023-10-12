@@ -1,0 +1,14 @@
+LICENSE
+README.md
+setup.py
+distclassipy/__init__.py
+distclassipy/classifier.py
+distclassipy/distances.py
+distclassipy.egg-info/PKG-INFO
+distclassipy.egg-info/SOURCES.txt
+distclassipy.egg-info/dependency_links.txt
+distclassipy.egg-info/requires.txt
+distclassipy.egg-info/top_level.txt
+tests/__init__.py
+tests/test_classifier.py
+tests/test_distances.py
