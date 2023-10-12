@@ -10,17 +10,16 @@ from sklearn.neighbors import KernelDensity
 
 class DistanceMetricClassifier(BaseEstimator, ClassifierMixin):
     """
-    A distance metric classifier based on scikit-learn.
+    This class implements a distance metric classifier based on scikit-learn. The classifier uses a specified distance metric to classify data points based on their distance to a training template. The training template is created using a specified statistical measure (e.g., median or mean). The classifier can be scaled in terms of standard deviations.
     
     Parameters
     ----------
     canonical_stat : str, optional
-        The statistical measure to use for creating the training template.
+        The statistical measure to use for creating the training template. Default is 'median'.
     metric : str or callable, optional
-        The distance metric to use.
+        The distance metric to use. Default is 'euclidean'.
     scale_std : bool, optional
-        If True, classifier is scaled in terms of standard deviations.
-    
+        If True, classifier is scaled in terms of standard deviations. Default is True.
     """
     def __init__(self, metric: str or callable="euclidean", scale_std: bool=True,
                  canonical_stat: str="median", calculate_kde: bool=True, 
@@ -31,17 +30,17 @@ class DistanceMetricClassifier(BaseEstimator, ClassifierMixin):
         Parameters
         ----------
         metric : str or callable, optional
-            The distance metric to use.
+            The distance metric to use. Default is 'euclidean'.
         scale_std : bool, optional
-            If True, classifier is scaled in terms of standard deviations.
+            If True, classifier is scaled in terms of standard deviations. Default is True.
         canonical_stat : str, optional
-            The statistical measure to use for creating the training template.
+            The statistical measure to use for creating the training template. Default is 'median'.
         calculate_kde : bool, optional
-            If True, calculate the kernel density estimate.
+            If True, calculate the kernel density estimate. Default is True.
         calculate_1d_dist : bool, optional
-            If True, calculate the 1-dimensional distance.
+            If True, calculate the 1-dimensional distance. Default is True.
         n_jobs : int, optional
-            The number of jobs to run in parallel.
+            The number of jobs to run in parallel. Default is -1 (use all processors).
         """
         self.metric = metric
         self.scale_std = scale_std
@@ -53,7 +52,7 @@ class DistanceMetricClassifier(BaseEstimator, ClassifierMixin):
 
     def fit(self, X: np.array, y: np.array, feat_labels: list[str]=None):
         """
-        Fit the classifier to the data.
+        Fit the classifier to the data. This involves creating the training template and optionally calculating the kernel density estimate and 1-dimensional distance.
         
         Parameters
         ----------
@@ -62,7 +61,7 @@ class DistanceMetricClassifier(BaseEstimator, ClassifierMixin):
         y : array-like of shape (n_samples,)
             The target values.
         feat_labels : list of str, optional
-            The feature labels.
+            The feature labels. If not provided, default labels representing feature number will be used.
         """
         X, y = check_X_y(X, y)
         self.classes_ = unique_labels(y)
@@ -116,7 +115,7 @@ class DistanceMetricClassifier(BaseEstimator, ClassifierMixin):
 
     def predict(self, X: np.array):
         """
-        Predict the class labels for the provided data.
+        Predict the class labels for the provided data. The prediction is based on the distance of each data point to the training template.
         
         Parameters
         ----------
@@ -154,7 +153,7 @@ class DistanceMetricClassifier(BaseEstimator, ClassifierMixin):
     
     def set_metric_fn(self):
         """
-        Set the metric function.
+        Set the metric function. If the metric is a string, the function will look for a corresponding function in scipy.spatial.distance or distances.Distance. If the metric is a function, it will be used directly.
         """
         if not callable(self.metric) or isinstance(self.metric, str):
             if hasattr(distance, self.metric):
@@ -171,7 +170,7 @@ class DistanceMetricClassifier(BaseEstimator, ClassifierMixin):
 
     def predict_and_analyse(self, X: np.array):
         """
-        Predict the class labels for the provided data and perform analysis.
+        Predict the class labels for the provided data and perform analysis. The analysis includes calculating the distance of each data point to the training template, and optionally calculating the kernel density estimate and 1-dimensional distance.
         
         Parameters
         ----------
@@ -250,12 +249,12 @@ class DistanceMetricClassifier(BaseEstimator, ClassifierMixin):
     
     def calculate_confidence(self, method: str="distance_inverse"):
         """
-        Calculate the confidence for each prediction.
+        Calculate the confidence for each prediction. The confidence is calculated based on the distance of each data point to the training template, and optionally the kernel density estimate and 1-dimensional distance.
         
         Parameters
         ----------
         method : str, optional
-            The method to use for calculating confidence.
+            The method to use for calculating confidence. Default is 'distance_inverse'.
         """
         check_is_fitted(self, 'is_fitted_')
         if not hasattr(self, 'analyis_'):
