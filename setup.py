@@ -9,7 +9,7 @@ setup(
     description="A python package for a distance-based classifier which can use several different distance metrics.",
     long_description=open('README.md').read(),
     long_description_content_type="text/markdown",
-    url="https://github.com/sidchaini/distclassipy",
+    url="https://github.com/sidchaini/DistClassiPy",
     classifiers=[
         "License :: OSI Approved :: MIT License",
         "Programming Language :: Python :: 3",
