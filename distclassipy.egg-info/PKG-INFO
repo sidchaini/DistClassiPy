@@ -1,8 +1,8 @@
 Metadata-Version: 2.1
 Name: distclassipy
-Version: 0.1
+Version: 0.0.1
 Summary: A python package for a distance-based classifier which can use several different distance metrics.
-Home-page: https://github.com/sidchaini/distclassipy
+Home-page: https://github.com/sidchaini/DistClassiPy
 Author: Siddharth Chaini
 Author-email: sidchaini@gmail.com
 Classifier: License :: OSI Approved :: MIT License
