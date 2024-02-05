@@ -2,10 +2,12 @@ import unittest
 import numpy as np
 from distclassipy import classifier
 
+
 class TestClassifier(unittest.TestCase):
     """
     Unit test for the Classifier class.
     """
+
     def setUp(self):
         """
         Set up the test case.
@@ -52,9 +54,9 @@ class TestClassifier(unittest.TestCase):
         confidence = self.clf.calculate_confidence(X)
         self.assertIsInstance(confidence, np.ndarray)
 
-if __name__ == '__main__':
+
+if __name__ == "__main__":
     """
     Main entry point for the test module.
     """
     unittest.main()
-
