@@ -1,5 +1,6 @@
 LICENSE
 README.md
+pyproject.toml
 setup.py
 distclassipy/__init__.py
 distclassipy/classifier.py
