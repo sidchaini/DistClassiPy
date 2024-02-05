@@ -15,7 +15,7 @@ License-File: LICENSE
 Requires-Dist: numpy
 Requires-Dist: pandas
 Requires-Dist: scipy
-Requires-Dist: sklearn
+Requires-Dist: scikit-learn
 
 # DistClassiPy
 A python package for a distance-based classifier which can use several different distance metrics.
