@@ -1,21 +1,25 @@
 Metadata-Version: 2.1
 Name: distclassipy
-Version: 0.0.1
+Version: 0.0.2
 Summary: A python package for a distance-based classifier which can use several different distance metrics.
 Home-page: https://github.com/sidchaini/DistClassiPy
 Author: Siddharth Chaini
 Author-email: sidchaini@gmail.com
+Classifier: Development Status :: 3 - Alpha
+Classifier: Intended Audience :: Developers
+Classifier: Intended Audience :: Education
+Classifier: Intended Audience :: Science/Research
 Classifier: License :: OSI Approved :: MIT License
 Classifier: Programming Language :: Python :: 3
-Classifier: Programming Language :: Python :: 3.6
-Classifier: Programming Language :: Python :: 3.7
-Classifier: Programming Language :: Python :: 3.8
+Classifier: Programming Language :: Python :: 3.12
+Classifier: Programming Language :: Python :: 3.13
 Description-Content-Type: text/markdown
 License-File: LICENSE
-Requires-Dist: numpy
-Requires-Dist: pandas
-Requires-Dist: scipy
-Requires-Dist: scikit-learn
+Requires-Dist: joblib>=1.3.2
+Requires-Dist: numpy>=1.26.3
+Requires-Dist: pandas>=2.2.0
+Requires-Dist: scikit-learn>=1.4.0
+Requires-Dist: scipy>=1.12.0
 
 # DistClassiPy
 A python package for a distance-based classifier which can use several different distance metrics.
