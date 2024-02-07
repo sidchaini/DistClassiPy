@@ -253,6 +253,8 @@ class DistanceMetricClassifier(BaseEstimator, ClassifierMixin):
                     ).ravel()
                     sum_1d_dists = sum_1d_dists + dists / self.df_std_.loc[cl, feat]
                 confs = 1 / sum_1d_dists
+                # Add epsilon later
+                # confs = 1 / (sum_1d_dists + np.finfo(float).eps)
                 conf_cl.append(confs)
             conf_cl = np.array(conf_cl)
             self.conf_cl_ = conf_cl
