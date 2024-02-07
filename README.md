@@ -23,11 +23,20 @@ predictions = clf.predict(new_data)
 - Easy integration with existing data processing pipelines
 - Efficient and scalable for large datasets
 
+## Documentation
+
+For more detailed information about the package and its functionalities, please refer to the [official documentation](https://github.com/sidchaini/DistClassiPy).
+
 ## Contributing
-Contributions are welcome! Please check our [GitHub issues](https://github.com/sidchaini/DistClassiPy/issues) for ways to contribute or open a pull request.
+Contributions are welcome! If you have suggestions for improvements or bug fixes, please feel free to open an [issue](https://github.com/sidchaini/DistClassiPy/issues) or submit a [pull request](https://github.com/sidchaini/DistClassiPy/pulls).
 
 ## License
 DistClassiPy is released under the [GNU General Public License v3.0](https://www.gnu.org/licenses/gpl-3.0.en.html). See the LICENSE file for more details.
+
+## Citation
+
+If you use DistClassiPy in your research or project, please consider citing the package. You can find citation information in the [CITATION.md](https://github.com/sidchaini/DistClassiPy/CITATION.md) file.
+
 
 ## Contact
 For any queries, please reach out to Siddharth Chaini at sidchaini@gmail.com.
