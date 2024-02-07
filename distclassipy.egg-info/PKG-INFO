@@ -1,6 +1,6 @@
 Metadata-Version: 2.1
 Name: distclassipy
-Version: 0.0.5
+Version: 0.0.6
 Summary: A python package for a distance-based classifier which can use several different distance metrics.
 Author-email: Siddharth Chaini <sidchaini@gmail.com>
 License:                     GNU GENERAL PUBLIC LICENSE
@@ -684,7 +684,7 @@ Classifier: Development Status :: 3 - Alpha
 Classifier: Intended Audience :: Developers
 Classifier: Intended Audience :: Education
 Classifier: Intended Audience :: Science/Research
-Classifier: License :: OSI Approved :: MIT License
+Classifier: License :: OSI Approved :: GNU General Public License v3 (GPLv3)
 Classifier: Programming Language :: Python :: 3.10
 Classifier: Programming Language :: Python :: 3.11
 Classifier: Programming Language :: Python :: 3.12
