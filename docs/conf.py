@@ -9,7 +9,7 @@
 project = "DistClassiPy"
 copyright = "2024, Siddharth Chaini"
 author = "Siddharth Chaini"
-release = "0.0.5"
+release = "0.0.7"
 
 # -- General configuration ---------------------------------------------------
 # https://www.sphinx-doc.org/en/master/usage/configuration.html#general-configuration
