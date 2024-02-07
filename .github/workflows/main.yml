@@ -1,0 +1,38 @@
+name: CI
+
+# We can specify which Github events will trigger a CI build
+on: push
+
+# now define a single job 'build' (but could define more)
+jobs:
+
+  build:
+
+    # we can also specify the OS to run tests on
+    runs-on: ubuntu-latest
+
+    # a job is a seq of steps
+    steps:
+
+    # Next we need to checkout out repository, and set up Python
+    # A 'name' is just an optional label shown in the log - helpful to clarify progress - and can be anything
+    - name: Checkout repository
+      uses: actions/checkout@v3
+
+    - name: Set up Python 3.11
+      uses: actions/setup-python@v3
+      with:
+        python-version: "3.11"
+
+    - name: Install Python dependencies
+      run: |
+        python3 -m pip install --upgrade pip
+        python3 -m pip install distclassipy pytest pytest-cov
+
+    - name: Test classifier with PyTest
+      run: |
+        python3 -m pytest tests/test_classifier.py --cov=distclassipy.classifier --cov-report term-missing
+
+    - name: Test distances with PyTest
+      run: |
+        python3 -m pytest tests/test_distances.py --cov=distclassipy.distances --cov-report term-missing
