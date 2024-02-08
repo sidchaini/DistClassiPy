@@ -25,7 +25,6 @@ class DistanceMetricClassifier(BaseEstimator, ClassifierMixin):
         canonical_stat: str = "median",
         calculate_kde: bool = True,
         calculate_1d_dist: bool = True,
-        distance_calculator: Callable = None,
         n_jobs: int = -1,
     ):
         """
@@ -52,8 +51,6 @@ class DistanceMetricClassifier(BaseEstimator, ClassifierMixin):
         self.calculate_kde = calculate_kde
         self.calculate_1d_dist = calculate_1d_dist
         self.n_jobs = n_jobs
-        if self.distance_calculator is None:
-            self.distance_calculator = Distance()
 
     def fit(self, X: np.array, y: np.array, feat_labels: list[str] = None):
         """Fit the classifier to the data.
@@ -165,8 +162,8 @@ class DistanceMetricClassifier(BaseEstimator, ClassifierMixin):
         if not callable(self.metric) or isinstance(self.metric, str):
             if hasattr(distance, self.metric):
                 self.metric_fn_ = getattr(distance, self.metric)
-            elif hasattr(self.distance_calculator, self.metric):
-                self.metric_fn_ = getattr(self.distance_calculator, self.metric)
+            elif hasattr(Distance(), self.metric):
+                self.metric_fn_ = getattr(Distance(), self.metric)
             else:
                 raise ValueError(
                     f"{self.metric} metric not found. Either pass a string of the name of a metric in scipy.spatial.distance or distances.Distance, or, pass a metric function directly."
