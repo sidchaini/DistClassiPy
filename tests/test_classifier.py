@@ -10,6 +10,13 @@ def test_init():
     assert clf.scale_std is True
 
 
+# Test classifier estimator compatibility with scikit-learn
+def test_estimator_compatibility():
+    from sklearn.utils.estimator_checks import check_estimator
+
+    check_estimator(DistanceMetricClassifier())
+
+
 # Test fitting the classifier to a dataset
 def test_fit():
     X = np.array([[1, 2], [3, 4], [5, 6]])  # Sample feature set
