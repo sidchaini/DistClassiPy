@@ -1,0 +1,1146 @@
+<!DOCTYPE html>
+
+<html lang="en" data-content_root="./">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="generator" content="Docutils 0.19: https://docutils.sourceforge.io/" />
+
+    <title>Distance module &#8212; DistClassiPy 0.0.8 documentation</title>
+    <link rel="stylesheet" type="text/css" href="_static/pygments.css?v=d1102ebc" />
+    <link rel="stylesheet" type="text/css" href="_static/alabaster.css?v=12dfc556" />
+    <script src="_static/documentation_options.js?v=53b53b71"></script>
+    <script src="_static/doctools.js?v=888ff710"></script>
+    <script src="_static/sphinx_highlight.js?v=dc90522c"></script>
+    <link rel="index" title="Index" href="genindex.html" />
+    <link rel="search" title="Search" href="search.html" />
+    <link rel="prev" title="DistanceMetricClassifier module" href="classifier.html" />
+   
+  <link rel="stylesheet" href="_static/custom.css" type="text/css" />
+  
+
+  
+  
+
+  </head><body>
+  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          
+
+          <div class="body" role="main">
+            
+  <section id="module-distclassipy.distances">
+<span id="distance-module"></span><h1>Distance module<a class="headerlink" href="#module-distclassipy.distances" title="Link to this heading">¶</a></h1>
+<p>A module providing a variety of distance metrics to calculate the distance between two points.</p>
+<p>This module includes implementations of various distance metrics, including both common and less
+common measures. It allows for the calculation of distances between data points in a vectorized
+manner using numpy arrays.
+This code is based on the work of Andrzej Zielezinski, originally retrieved on 20 November 2022 from
+<a class="reference external" href="https://github.com/aziele/statistical-distances/blob/04412b3155c59fc7238b3d8ecf6f3723ac5befff/distance.py">https://github.com/aziele/statistical-distances/blob/04412b3155c59fc7238b3d8ecf6f3723ac5befff/distance.py</a></p>
+<p>It has been modified by Siddharth Chaini on 27 November 2022.</p>
+<p>Licensed GNU General Public License v3.0;
+you may not use this file except in compliance with the License.
+You may obtain a copy of the License at</p>
+<blockquote>
+<div><p><a class="reference external" href="https://www.gnu.org/licenses/gpl-3.0.en.html">https://www.gnu.org/licenses/gpl-3.0.en.html</a></p>
+</div></blockquote>
+<p>Unless required by applicable law or agreed to in writing, software
+distributed under the License is distributed on an “AS IS” BASIS,
+WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+See the License for the specific language governing permissions and
+limitations under the License.</p>
+<dl class="simple">
+<dt>Modifications by Siddharth Chaini include the addition of the following distance measures:</dt><dd><ol class="arabic simple">
+<li><p>Meehl distance</p></li>
+<li><p>Sorensen distance</p></li>
+<li><p>Ruzicka distance</p></li>
+<li><p>Inner product distance</p></li>
+<li><p>Harmonic mean distance</p></li>
+<li><p>Fidelity</p></li>
+<li><p>Minimimum Symmetric Chi Squared</p></li>
+<li><p>Probabilistic Symmetric Chi Squared</p></li>
+</ol>
+</dd>
+<dt>In addition, the following code was added to all functions for array conversion:</dt><dd><p>u,v = np.asarray(u), np.asarray(v)</p>
+</dd>
+<dt>Todos:</dt><dd><p>ALSO COMPARE RUNTIME OF THIS v/s custom v/s Tschopp</p>
+</dd>
+</dl>
+<dl class="py class">
+<dt class="sig sig-object py" id="distclassipy.distances.Distance">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">distclassipy.distances.</span></span><span class="sig-name descname"><span class="pre">Distance</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">epsilon</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#distclassipy.distances.Distance" title="Link to this definition">¶</a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></p>
+<dl class="py method">
+<dt class="sig sig-object py" id="distclassipy.distances.Distance.acc">
+<span class="sig-name descname"><span class="pre">acc</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">u</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">v</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#distclassipy.distances.Distance.acc" title="Link to this definition">¶</a></dt>
+<dd><p>Calculate the average of Cityblock/Manhattan and Chebyshev distances.</p>
+<p>This function computes the ACC distance, also known as the Average distance, between two
+vectors u and v. It is the average of the Cityblock (or Manhattan) and Chebyshev distances.</p>
+<p>Parameters:
+- u, v: Input vectors between which the distance is to be calculated.</p>
+<p>Returns:
+- The ACC distance between the two vectors.</p>
+<p>References:
+1. Krause EF (2012) Taxicab Geometry An Adventure in Non-Euclidean Geometry. Dover Publications.
+2. Sung-Hyuk C (2007) Comprehensive Survey on Distance/Similarity Measures between Probability</p>
+<blockquote>
+<div><p>Density Functions. International Journal of Mathematical Models and Methods in Applied Sciences.
+vol. 1(4), pp. 300-307.</p>
+</div></blockquote>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="distclassipy.distances.Distance.add_chisq">
+<span class="sig-name descname"><span class="pre">add_chisq</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">u</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">v</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#distclassipy.distances.Distance.add_chisq" title="Link to this definition">¶</a></dt>
+<dd><p>Compute the Additive Symmetric Chi-square distance between two vectors.</p>
+<p>The Additive Symmetric Chi-square distance is a measure that can be used to compare two vectors.
+This function calculates it based on the input vectors u and v.</p>
+<p>Parameters:
+- u, v: Input vectors between which the distance is to be calculated.</p>
+<p>Returns:
+- The Additive Symmetric Chi-square distance between the two vectors.</p>
+<p>References:
+1. Sung-Hyuk C (2007) Comprehensive Survey on Distance/Similarity Measures between Probability</p>
+<blockquote>
+<div><p>Density Functions. International Journal of Mathematical Models and Methods in Applied Sciences.
+vol. 1(4), pp. 300-307.</p>
+</div></blockquote>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="distclassipy.distances.Distance.bhattacharyya">
+<span class="sig-name descname"><span class="pre">bhattacharyya</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">u</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">v</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#distclassipy.distances.Distance.bhattacharyya" title="Link to this definition">¶</a></dt>
+<dd><p>Calculate the Bhattacharyya distance between two vectors.</p>
+<p>Returns a distance value between 0 and 1.</p>
+<p>Parameters:
+- u, v: Input vectors between which the distance is to be calculated.</p>
+<p>Returns:
+- The Bhattacharyya distance between the two vectors.</p>
+<p>References:
+1. Bhattacharyya A (1947) On a measure of divergence between two</p>
+<blockquote>
+<div><p>statistical populations defined by probability distributions,
+Bull. Calcutta Math. Soc., 35, 99–109.</p>
+</div></blockquote>
+<ol class="arabic simple" start="2">
+<li><p>Sung-Hyuk C. (2007) Comprehensive Survey on Distance/Similarity
+Measures between Probability Density Functions. International
+Journal of Mathematical Models and Methods in Applied Sciences.
+1(4), 300-307.</p></li>
+<li><p><a class="reference external" href="https://en.wikipedia.org/wiki/Bhattacharyya_distance">https://en.wikipedia.org/wiki/Bhattacharyya_distance</a></p></li>
+</ol>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="distclassipy.distances.Distance.braycurtis">
+<span class="sig-name descname"><span class="pre">braycurtis</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">u</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">v</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#distclassipy.distances.Distance.braycurtis" title="Link to this definition">¶</a></dt>
+<dd><p>Calculate the Bray-Curtis distance between two vectors.</p>
+<p>The Bray-Curtis distance is a measure of dissimilarity between two non-negative vectors,
+often used in ecology to measure the compositional dissimilarity between two sites based on counts
+of species at both sites. It is closely related to the Sørensen distance and is also known as
+Bray-Curtis dissimilarity.</p>
+<p class="rubric">Notes</p>
+<p>When used for comparing two probability density functions (pdfs),
+the Bray-Curtis distance equals the Cityblock distance divided by 2.</p>
+<p>Parameters:
+- u, v: Input vectors between which the distance is to be calculated.</p>
+<p>Returns:
+- The Bray-Curtis distance between the two vectors.</p>
+<p class="rubric">References</p>
+<ol class="arabic simple">
+<li><p>Bray JR, Curtis JT (1957) An ordination of the upland forest of
+southern Wisconsin. Ecological Monographs, 27, 325-349.</p></li>
+<li><p>Sung-Hyuk C. (2007) Comprehensive Survey on Distance/Similarity
+Measures between Probability Density Functions. International
+Journal of Mathematical Models and Methods in Applied Sciences.
+1(4), 300-307.</p></li>
+<li><p><a class="reference external" href="https://en.wikipedia.org/wiki/Bray">https://en.wikipedia.org/wiki/Bray</a>–Curtis_dissimilarity</p></li>
+</ol>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="distclassipy.distances.Distance.canberra">
+<span class="sig-name descname"><span class="pre">canberra</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">u</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">v</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#distclassipy.distances.Distance.canberra" title="Link to this definition">¶</a></dt>
+<dd><p>Calculate the Canberra distance between two vectors.</p>
+<p>The Canberra distance is a weighted version of the Manhattan distance, used in numerical analysis.</p>
+<p class="rubric">Notes</p>
+<p>When <cite>u[i]</cite> and <cite>v[i]</cite> are 0 for given i, then the fraction 0/0 = 0
+is used in the calculation.</p>
+<p>Parameters:
+- u, v: Input vectors between which the distance is to be calculated.</p>
+<p>Returns:
+- The Canberra distance between the two vectors.</p>
+<p class="rubric">References</p>
+<ol class="arabic simple">
+<li><p>Sung-Hyuk C. (2007) Comprehensive Survey on Distance/Similarity
+Measures between Probability Density Functions. International
+Journal of Mathematical Models and Methods in Applied Sciences.
+1(4), 300-307.</p></li>
+</ol>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="distclassipy.distances.Distance.chebyshev">
+<span class="sig-name descname"><span class="pre">chebyshev</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">u</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">v</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#distclassipy.distances.Distance.chebyshev" title="Link to this definition">¶</a></dt>
+<dd><p>Calculate the Chebyshev distance between two vectors.</p>
+<p>The Chebyshev distance is a metric defined on a vector space where the distance between two vectors
+is the greatest of their differences along any coordinate dimension.</p>
+<dl class="simple">
+<dt>Synonyms:</dt><dd><p>Chessboard distance
+King-move metric
+Maximum value distance
+Minimax approximation</p>
+</dd>
+</dl>
+<p>Parameters:
+- u, v: Input vectors between which the distance is to be calculated.</p>
+<p>Returns:
+- The Chebyshev distance between the two vectors.</p>
+<p class="rubric">References</p>
+<ol class="arabic simple">
+<li><p>Sung-Hyuk C. (2007) Comprehensive Survey on Distance/Similarity
+Measures between Probability Density Functions. International
+Journal of Mathematical Models and Methods in Applied Sciences.
+1(4), 300-307.</p></li>
+</ol>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="distclassipy.distances.Distance.chebyshev_min">
+<span class="sig-name descname"><span class="pre">chebyshev_min</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">u</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">v</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#distclassipy.distances.Distance.chebyshev_min" title="Link to this definition">¶</a></dt>
+<dd><p>Calculate the minimum value distance between two vectors.</p>
+<p>This measure represents a custom approach by Zielezinski to distance measurement, focusing on the minimum absolute difference.</p>
+<p>Parameters:
+- u, v: Input vectors between which the distance is to be calculated.</p>
+<p>Returns:
+- The minimum value distance between the two vectors.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="distclassipy.distances.Distance.cityblock">
+<span class="sig-name descname"><span class="pre">cityblock</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">u</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">v</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#distclassipy.distances.Distance.cityblock" title="Link to this definition">¶</a></dt>
+<dd><p>Calculate the Cityblock (Manhattan) distance between two vectors.</p>
+<p>Parameters:
+- u, v: Input vectors between which the distance is to be calculated.</p>
+<p>Returns:
+- The Cityblock distance between the two vectors.</p>
+<p class="rubric">References</p>
+<ol class="arabic simple">
+<li><p>Sung-Hyuk C. (2007) Comprehensive Survey on Distance/Similarity
+Measures between Probability Density Functions. International
+Journal of Mathematical Models and Methods in Applied Sciences.
+1(4):300-307.</p></li>
+</ol>
+<dl class="simple">
+<dt>Synonyms:</dt><dd><p>City block distance
+Manhattan distance
+Rectilinear distance
+Taxicab norm</p>
+</dd>
+</dl>
+<p class="rubric">Notes</p>
+<p>Cityblock distance between two probability density functions
+(pdfs) equals:
+1. Non-intersection distance multiplied by 2.
+2. Gower distance multiplied by vector length.
+3. Bray-Curtis distance multiplied by 2.
+4. Google distance multiplied by 2.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="distclassipy.distances.Distance.clark">
+<span class="sig-name descname"><span class="pre">clark</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">u</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">v</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#distclassipy.distances.Distance.clark" title="Link to this definition">¶</a></dt>
+<dd><p>Calculate the Clark distance between two vectors.</p>
+<p>The Clark distance equals the square root of half of the divergence.</p>
+<p class="rubric">Notes</p>
+<p>When <cite>u[i]</cite> and <cite>v[i]</cite> are 0 for given i, then the fraction 0/0 = 0
+is used in the calculation.</p>
+<p>Parameters:
+- u, v: Input vectors between which the distance is to be calculated.</p>
+<p>Returns:
+- The Clark distance between the two vectors.</p>
+<p class="rubric">References</p>
+<ol class="arabic simple">
+<li><p>Sung-Hyuk C. (2007) Comprehensive Survey on Distance/Similarity
+Measures between Probability Density Functions. International
+Journal of Mathematical Models and Methods in Applied Sciences.
+1(4), 300-307.</p></li>
+</ol>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="distclassipy.distances.Distance.correlation_pearson">
+<span class="sig-name descname"><span class="pre">correlation_pearson</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">u</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">v</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#distclassipy.distances.Distance.correlation_pearson" title="Link to this definition">¶</a></dt>
+<dd><p>Calculate the Pearson correlation distance between two vectors.</p>
+<p>Returns a distance value between 0 and 2.</p>
+<p>Parameters:
+- u, v: Input vectors between which the distance is to be calculated.</p>
+<p>Returns:
+- The Pearson correlation distance between the two vectors.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="distclassipy.distances.Distance.cosine">
+<span class="sig-name descname"><span class="pre">cosine</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">u</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">v</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#distclassipy.distances.Distance.cosine" title="Link to this definition">¶</a></dt>
+<dd><p>Calculate the cosine distance between two vectors.</p>
+<p>Parameters:
+- u, v: Input vectors between which the distance is to be calculated.</p>
+<p>Returns:
+- The cosine distance between the two vectors.</p>
+<p class="rubric">References</p>
+<ol class="arabic simple">
+<li><p>SciPy.</p></li>
+</ol>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="distclassipy.distances.Distance.czekanowski">
+<span class="sig-name descname"><span class="pre">czekanowski</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">u</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">v</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#distclassipy.distances.Distance.czekanowski" title="Link to this definition">¶</a></dt>
+<dd><p>Calculate the Czekanowski distance between two vectors.</p>
+<p>Parameters:
+- u, v: Input vectors between which the distance is to be calculated.</p>
+<p>Returns:
+- The Czekanowski distance between the two vectors.</p>
+<p class="rubric">References</p>
+<ol class="arabic simple">
+<li><p>Sung-Hyuk C. (2007) Comprehensive Survey on Distance/Similarity
+Measures between Probability Density Functions. International
+Journal of Mathematical Models and Methods in Applied Sciences.
+1(4), 300-307.</p></li>
+</ol>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="distclassipy.distances.Distance.dice">
+<span class="sig-name descname"><span class="pre">dice</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">u</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">v</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#distclassipy.distances.Distance.dice" title="Link to this definition">¶</a></dt>
+<dd><p>Calculate the Dice dissimilarity between two vectors.</p>
+<dl class="simple">
+<dt>Synonyms:</dt><dd><p>Sorensen distance</p>
+</dd>
+</dl>
+<p>Parameters:
+- u, v: Input vectors between which the distance is to be calculated.</p>
+<p>Returns:
+- The Dice dissimilarity between the two vectors.</p>
+<p class="rubric">References</p>
+<ol class="arabic simple">
+<li><p>Dice LR (1945) Measures of the amount of ecologic association
+between species. Ecology. 26, 297-302.</p></li>
+<li><p>Sung-Hyuk C. (2007) Comprehensive Survey on Distance/Similarity
+Measures between Probability Density Functions. International
+Journal of Mathematical Models and Methods in Applied Sciences.
+1(4), 300-307.</p></li>
+</ol>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="distclassipy.distances.Distance.divergence">
+<span class="sig-name descname"><span class="pre">divergence</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">u</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">v</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#distclassipy.distances.Distance.divergence" title="Link to this definition">¶</a></dt>
+<dd><p>Calculate the divergence between two vectors.</p>
+<p>Divergence equals squared Clark distance multiplied by 2.</p>
+<p>Parameters:
+- u, v: Input vectors between which the distance is to be calculated.</p>
+<p>Returns:
+- The divergence between the two vectors.</p>
+<p class="rubric">References</p>
+<ol class="arabic simple">
+<li><p>Sung-Hyuk C. (2007) Comprehensive Survey on Distance/Similarity
+Measures between Probability Density Functions. International
+Journal of Mathematical Models and Methods in Applied Sciences.
+1(4), 300-307.</p></li>
+</ol>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="distclassipy.distances.Distance.euclidean">
+<span class="sig-name descname"><span class="pre">euclidean</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">u</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">v</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#distclassipy.distances.Distance.euclidean" title="Link to this definition">¶</a></dt>
+<dd><p>Calculate the Euclidean distance between two vectors.</p>
+<p>The Euclidean distance is the “ordinary” straight-line distance between two points in Euclidean space.</p>
+<p>Parameters:
+- u, v: Input vectors between which the distance is to be calculated.</p>
+<p>Returns:
+- The Euclidean distance between the two vectors.</p>
+<p class="rubric">References</p>
+<ol class="arabic simple">
+<li><p>Sung-Hyuk C. (2007) Comprehensive Survey on Distance/Similarity
+Measures between Probability Density Functions. International
+Journal of Mathematical Models and Methods in Applied Sciences.
+1(4), 300-307.</p></li>
+</ol>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="distclassipy.distances.Distance.fidelity">
+<span class="sig-name descname"><span class="pre">fidelity</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">u</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">v</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#distclassipy.distances.Distance.fidelity" title="Link to this definition">¶</a></dt>
+<dd><p>Calculate the fidelity distance between two vectors.</p>
+<p>The fidelity distance measures the similarity between two probability distributions.</p>
+<p>Parameters:
+- u, v: Input vectors between which the distance is to be calculated.</p>
+<p>Returns:
+- The fidelity distance between the two vectors.</p>
+<p class="rubric">Notes</p>
+<p>Added by SC.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="distclassipy.distances.Distance.google">
+<span class="sig-name descname"><span class="pre">google</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">u</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">v</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#distclassipy.distances.Distance.google" title="Link to this definition">¶</a></dt>
+<dd><p>Calculate the Normalized Google Distance (NGD) between two vectors.</p>
+<p>NGD is a measure of similarity derived from the number of hits returned by the Google search engine for a given set of keywords.</p>
+<p>Parameters:
+- u, v: Input vectors between which the distance is to be calculated.</p>
+<p>Returns:
+- The Normalized Google Distance between the two vectors.</p>
+<p class="rubric">Notes</p>
+<p>When used for comparing two probability density functions (pdfs),
+Google distance equals half of Cityblock distance.</p>
+<p class="rubric">References</p>
+<ol class="arabic simple">
+<li><p>Lee &amp; Rashid (2008) Information Technology, ITSim 2008.
+doi:10.1109/ITSIM.2008.4631601.</p></li>
+</ol>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="distclassipy.distances.Distance.gower">
+<span class="sig-name descname"><span class="pre">gower</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">u</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">v</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#distclassipy.distances.Distance.gower" title="Link to this definition">¶</a></dt>
+<dd><p>Calculate the Gower distance between two vectors.</p>
+<p>The Gower distance equals the Cityblock distance divided by the vector length.</p>
+<p>Parameters:
+- u, v: Input vectors between which the distance is to be calculated.</p>
+<p>Returns:
+- The Gower distance between the two vectors.</p>
+<p class="rubric">References</p>
+<ol class="arabic simple">
+<li><p>Gower JC. (1971) General Coefficient of Similarity
+and Some of Its Properties, Biometrics 27, 857-874.</p></li>
+<li><p>Sung-Hyuk C. (2007) Comprehensive Survey on Distance/Similarity
+Measures between Probability Density Functions. International
+Journal of Mathematical Models and Methods in Applied Sciences.
+1(4), 300-307.</p></li>
+</ol>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="distclassipy.distances.Distance.hellinger">
+<span class="sig-name descname"><span class="pre">hellinger</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">u</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">v</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#distclassipy.distances.Distance.hellinger" title="Link to this definition">¶</a></dt>
+<dd><p>Calculate the Hellinger distance between two vectors.</p>
+<p>The Hellinger distance is a measure of similarity between two probability distributions.</p>
+<p>Parameters:
+- u, v: Input vectors between which the distance is to be calculated.</p>
+<p>Returns:
+- The Hellinger distance between the two vectors.</p>
+<p class="rubric">Notes</p>
+<p>This implementation produces values two times larger than values
+obtained by Hellinger distance described in Wikipedia and also
+in <a class="reference external" href="https://gist.github.com/larsmans/3116927">https://gist.github.com/larsmans/3116927</a>.</p>
+<p class="rubric">References</p>
+<ol class="arabic simple">
+<li><p>Sung-Hyuk C. (2007) Comprehensive Survey on Distance/Similarity
+Measures between Probability Density Functions. International
+Journal of Mathematical Models and Methods in Applied Sciences.
+1(4), 300-307.</p></li>
+</ol>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="distclassipy.distances.Distance.inner">
+<span class="sig-name descname"><span class="pre">inner</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">u</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">v</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#distclassipy.distances.Distance.inner" title="Link to this definition">¶</a></dt>
+<dd><p>Calculate the inner product distance between two vectors.</p>
+<p>The inner product distance is a measure of similarity between two vectors, based on their inner product.</p>
+<p>Parameters:
+- u, v: Input vectors between which the distance is to be calculated.</p>
+<p>Returns:
+- The inner product distance between the two vectors.</p>
+<p class="rubric">Notes</p>
+<p>Added by SC.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="distclassipy.distances.Distance.jaccard">
+<span class="sig-name descname"><span class="pre">jaccard</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">u</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">v</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#distclassipy.distances.Distance.jaccard" title="Link to this definition">¶</a></dt>
+<dd><p>Calculate the Jaccard distance between two vectors.</p>
+<p>The Jaccard distance measures dissimilarity between sample sets.</p>
+<p>Parameters:
+- u, v: Input vectors between which the distance is to be calculated.</p>
+<p>Returns:
+- The Jaccard distance between the two vectors.</p>
+<p class="rubric">References</p>
+<ol class="arabic simple">
+<li><p>Sung-Hyuk C. (2007) Comprehensive Survey on Distance/Similarity
+Measures between Probability Density Functions. International
+Journal of Mathematical Models and Methods in Applied Sciences.
+1(4), 300-307.</p></li>
+</ol>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="distclassipy.distances.Distance.jeffreys">
+<span class="sig-name descname"><span class="pre">jeffreys</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">u</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">v</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#distclassipy.distances.Distance.jeffreys" title="Link to this definition">¶</a></dt>
+<dd><p>Calculate the Jeffreys divergence between two vectors.</p>
+<p>The Jeffreys divergence is a symmetric version of the Kullback-Leibler divergence.</p>
+<p>Parameters:
+- u, v: Input vectors between which the divergence is to be calculated.</p>
+<p>Returns:
+- The Jeffreys divergence between the two vectors.</p>
+<p class="rubric">References</p>
+<ol class="arabic simple">
+<li><p>Jeffreys H (1946) An Invariant Form for the Prior Probability
+in Estimation Problems. Proc.Roy.Soc.Lon., Ser. A 186, 453-461.</p></li>
+<li><p>Sung-Hyuk C. (2007) Comprehensive Survey on Distance/Similarity
+Measures between Probability Density Functions. International
+Journal of Mathematical Models and Methods in Applied Sciences.
+1(4), 300-307.</p></li>
+</ol>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="distclassipy.distances.Distance.jensen_difference">
+<span class="sig-name descname"><span class="pre">jensen_difference</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">u</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">v</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#distclassipy.distances.Distance.jensen_difference" title="Link to this definition">¶</a></dt>
+<dd><p>Calculate the Jensen difference between two vectors.</p>
+<p>The Jensen difference is considered similar to the Jensen-Shannon divergence.</p>
+<p>Parameters:
+- u, v: Input vectors between which the distance is to be calculated.</p>
+<p>Returns:
+- The Jensen difference between the two vectors.</p>
+<p class="rubric">Notes</p>
+<ol class="arabic simple">
+<li><p>Equals half of Topsøe distance</p></li>
+<li><p>Equals squared jensenshannon_distance.</p></li>
+</ol>
+<p class="rubric">References</p>
+<ol class="arabic simple">
+<li><p>Sung-Hyuk C. (2007) Comprehensive Survey on Distance/Similarity
+Measures between Probability Density Functions. International
+Journal of Mathematical Models and Methods in Applied Sciences.
+1(4), 300-307.</p></li>
+</ol>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="distclassipy.distances.Distance.jensenshannon_divergence">
+<span class="sig-name descname"><span class="pre">jensenshannon_divergence</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">u</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">v</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#distclassipy.distances.Distance.jensenshannon_divergence" title="Link to this definition">¶</a></dt>
+<dd><p>Calculate the Jensen-Shannon divergence between two vectors.</p>
+<p>The Jensen-Shannon divergence is a symmetric and finite measure of similarity between two probability distributions.</p>
+<p>Parameters:
+- u, v: Input vectors between which the divergence is to be calculated.</p>
+<p>Returns:
+- The Jensen-Shannon divergence between the two vectors.</p>
+<p class="rubric">References</p>
+<ol class="arabic simple">
+<li><p>Lin J. (1991) Divergence measures based on the Shannon entropy.
+IEEE Transactions on Information Theory, 37(1):145–151.</p></li>
+<li><p>Sung-Hyuk C. (2007) Comprehensive Survey on Distance/Similarity
+Measures between Probability Density Functions. International
+Journal of Mathematical Models and Methods in Applied Sciences.
+1(4), 300-307.</p></li>
+</ol>
+<dl class="simple">
+<dt>Comments:</dt><dd><p>Equals Jensen difference in Sung-Hyuk (2007):
+u = np.where(u==0, self.epsilon, u)
+v = np.where(v==0, self.epsilon, v)
+el1 = (u * np.log(u) + v * np.log(v)) / 2
+el2 = (u + v)/2
+el3 = np.log(el2)
+return np.sum(el1 - el2 * el3)</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="distclassipy.distances.Distance.k_divergence">
+<span class="sig-name descname"><span class="pre">k_divergence</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">u</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">v</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#distclassipy.distances.Distance.k_divergence" title="Link to this definition">¶</a></dt>
+<dd><p>Calculate the K divergence between two vectors.</p>
+<p>Parameters:
+- u, v: Input vectors between which the divergence is to be calculated.</p>
+<p>Returns:
+- The K divergence between the two vectors.</p>
+<p class="rubric">References</p>
+<ol class="arabic simple">
+<li><p>Sung-Hyuk C. (2007) Comprehensive Survey on Distance/Similarity
+Measures between Probability Density Functions. International
+Journal of Mathematical Models and Methods in Applied Sciences.
+1(4), 300-307.</p></li>
+</ol>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="distclassipy.distances.Distance.kl_divergence">
+<span class="sig-name descname"><span class="pre">kl_divergence</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">u</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">v</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#distclassipy.distances.Distance.kl_divergence" title="Link to this definition">¶</a></dt>
+<dd><p>Calculate the Kullback-Leibler divergence between two vectors.</p>
+<p>The Kullback-Leibler divergence measures the difference between two probability distributions.</p>
+<p>Parameters:
+- u, v: Input vectors between which the divergence is to be calculated.</p>
+<p>Returns:
+- The Kullback-Leibler divergence between the two vectors.</p>
+<p class="rubric">References</p>
+<ol class="arabic simple">
+<li><p>Kullback S, Leibler RA (1951) On information and sufficiency.
+Ann. Math. Statist. 22:79–86</p></li>
+<li><p>Sung-Hyuk C. (2007) Comprehensive Survey on Distance/Similarity
+Measures between Probability Density Functions. International
+Journal of Mathematical Models and Methods in Applied Sciences.
+1(4):300-307.</p></li>
+</ol>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="distclassipy.distances.Distance.kulczynski">
+<span class="sig-name descname"><span class="pre">kulczynski</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">u</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">v</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#distclassipy.distances.Distance.kulczynski" title="Link to this definition">¶</a></dt>
+<dd><p>Calculate the Kulczynski distance between two vectors.</p>
+<p>Parameters:
+- u, v: Input vectors between which the distance is to be calculated.</p>
+<p>Returns:
+- The Kulczynski distance between the two vectors.</p>
+<p class="rubric">References</p>
+<ol class="arabic simple">
+<li><p>Sung-Hyuk C. (2007) Comprehensive Survey on Distance/Similarity
+Measures between Probability Density Functions. International
+Journal of Mathematical Models and Methods in Applied Sciences.
+1(4):300-307.</p></li>
+</ol>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="distclassipy.distances.Distance.kumarjohnson">
+<span class="sig-name descname"><span class="pre">kumarjohnson</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">u</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">v</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#distclassipy.distances.Distance.kumarjohnson" title="Link to this definition">¶</a></dt>
+<dd><p>Calculate the Kumar-Johnson distance between two vectors.</p>
+<p>Parameters:
+- u, v: Input vectors between which the distance is to be calculated.</p>
+<p>Returns:
+- The Kumar-Johnson distance between the two vectors.</p>
+<p class="rubric">References</p>
+<ol class="arabic simple">
+<li><p>Kumar P, Johnson A. (2005) On a symmetric divergence measure
+and information inequalities, Journal of Inequalities in pure
+and applied Mathematics. 6(3).</p></li>
+<li><p>Sung-Hyuk C. (2007) Comprehensive Survey on Distance/Similarity
+Measures between Probability Density Functions. International
+Journal of Mathematical Models and Methods in Applied Sciences.
+1(4):300-307.</p></li>
+</ol>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="distclassipy.distances.Distance.lorentzian">
+<span class="sig-name descname"><span class="pre">lorentzian</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">u</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">v</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#distclassipy.distances.Distance.lorentzian" title="Link to this definition">¶</a></dt>
+<dd><p>Calculate the Lorentzian distance between two vectors.</p>
+<p>Parameters:
+- u, v: Input vectors between which the distance is to be calculated.</p>
+<p>Returns:
+- The Lorentzian distance between the two vectors.</p>
+<p class="rubric">References</p>
+<ol class="arabic simple">
+<li><p>Sung-Hyuk C. (2007) Comprehensive Survey on Distance/Similarity
+Measures between Probability Density Functions. International
+Journal of Mathematical Models and Methods in Applied Sciences.
+1(4):300-307.</p></li>
+</ol>
+<p class="rubric">Notes</p>
+<p>One (1) is added to guarantee the non-negativity property and to
+eschew the log of zero.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="distclassipy.distances.Distance.marylandbridge">
+<span class="sig-name descname"><span class="pre">marylandbridge</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">u</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">v</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#distclassipy.distances.Distance.marylandbridge" title="Link to this definition">¶</a></dt>
+<dd><p>Calculate the Maryland Bridge distance between two vectors.</p>
+<p>Parameters:
+- u, v: Input vectors between which the distance is to be calculated.</p>
+<p>Returns:
+- The Maryland Bridge distance between the two vectors.</p>
+<p class="rubric">References</p>
+<ol class="arabic simple">
+<li><p>Deza M, Deza E (2009) Encyclopedia of Distances.
+Springer-Verlag Berlin Heidelberg. 1-590.</p></li>
+</ol>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="distclassipy.distances.Distance.matusita">
+<span class="sig-name descname"><span class="pre">matusita</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">u</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">v</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#distclassipy.distances.Distance.matusita" title="Link to this definition">¶</a></dt>
+<dd><p>Calculate the Matusita distance between two vectors.</p>
+<p>Parameters:
+- u, v: Input vectors between which the distance is to be calculated.</p>
+<p>Returns:
+- The Matusita distance between the two vectors.</p>
+<p class="rubric">References</p>
+<ol class="arabic simple">
+<li><p>Sung-Hyuk C. (2007) Comprehensive Survey on Distance/Similarity
+Measures between Probability Density Functions. International
+Journal of Mathematical Models and Methods in Applied Sciences.
+1(4):300-307.</p></li>
+</ol>
+<p class="rubric">Notes</p>
+<p>Equals square root of Squared-chord distance.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="distclassipy.distances.Distance.max_symmetric_chisq">
+<span class="sig-name descname"><span class="pre">max_symmetric_chisq</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">u</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">v</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#distclassipy.distances.Distance.max_symmetric_chisq" title="Link to this definition">¶</a></dt>
+<dd><p>Calculate the maximum symmetric chi-square distance between two vectors.</p>
+<p>Parameters:
+- u, v: Input vectors between which the distance is to be calculated.</p>
+<p>Returns:
+- The maximum symmetric chi-square distance between the two vectors.</p>
+<p class="rubric">References</p>
+<ol class="arabic simple">
+<li><p>Sung-Hyuk C. (2007) Comprehensive Survey on Distance/Similarity
+Measures between Probability Density Functions. International
+Journal of Mathematical Models and Methods in Applied Sciences.
+1(4):300-307.</p></li>
+</ol>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="distclassipy.distances.Distance.meehl">
+<span class="sig-name descname"><span class="pre">meehl</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">u</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">v</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#distclassipy.distances.Distance.meehl" title="Link to this definition">¶</a></dt>
+<dd><p>Calculate the Meehl distance between two vectors.</p>
+<p>Parameters:
+- u, v: Input vectors between which the distance is to be calculated.</p>
+<p>Returns:
+- The Meehl distance between the two vectors.</p>
+<p class="rubric">Notes</p>
+<p>Added by SC.</p>
+<p class="rubric">References</p>
+<ol class="arabic simple">
+<li><p>Deza M. and Deza E. (2013) Encyclopedia of Distances.
+Berlin, Heidelberg: Springer Berlin Heidelberg.
+<a class="reference external" href="https://doi.org/10.1007/978-3-642-30958-8">https://doi.org/10.1007/978-3-642-30958-8</a>.</p></li>
+</ol>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="distclassipy.distances.Distance.min_symmetric_chisq">
+<span class="sig-name descname"><span class="pre">min_symmetric_chisq</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">u</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">v</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#distclassipy.distances.Distance.min_symmetric_chisq" title="Link to this definition">¶</a></dt>
+<dd><p>Calculate the minimum symmetric chi-square distance between two vectors.</p>
+<p>Parameters:
+- u, v: Input vectors between which the distance is to be calculated.</p>
+<p>Returns:
+- The minimum symmetric chi-square distance between the two vectors.</p>
+<p class="rubric">Notes</p>
+<p>Added by SC.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="distclassipy.distances.Distance.minkowski">
+<span class="sig-name descname"><span class="pre">minkowski</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">u</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">v</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">p</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">2</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#distclassipy.distances.Distance.minkowski" title="Link to this definition">¶</a></dt>
+<dd><p>Calculate the Minkowski distance between two vectors.</p>
+<p>Parameters:
+- u, v: Input vectors between which the distance is to be calculated.
+- p: The order of the norm of the difference.</p>
+<p>Returns:
+- The Minkowski distance between the two vectors.</p>
+<p class="rubric">Notes</p>
+<p>When p goes to infinite, the Chebyshev distance is derived.</p>
+<p class="rubric">References</p>
+<ol class="arabic simple">
+<li><p>Sung-Hyuk C. (2007) Comprehensive Survey on Distance/Similarity
+Measures between Probability Density Functions. International
+Journal of Mathematical Models and Methods in Applied Sciences.
+1(4):300-307.</p></li>
+</ol>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="distclassipy.distances.Distance.motyka">
+<span class="sig-name descname"><span class="pre">motyka</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">u</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">v</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#distclassipy.distances.Distance.motyka" title="Link to this definition">¶</a></dt>
+<dd><p>Calculate the Motyka distance between two vectors.</p>
+<p>Parameters:
+- u, v: Input vectors between which the distance is to be calculated.</p>
+<p>Returns:
+- The Motyka distance between the two vectors.</p>
+<p class="rubric">Notes</p>
+<p>The distance between identical vectors is not equal to 0 but 0.5.</p>
+<p class="rubric">References</p>
+<ol class="arabic simple">
+<li><p>Sung-Hyuk C. (2007) Comprehensive Survey on Distance/Similarity
+Measures between Probability Density Functions. International
+Journal of Mathematical Models and Methods in Applied Sciences.
+1(4), 300-307.</p></li>
+</ol>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="distclassipy.distances.Distance.neyman_chisq">
+<span class="sig-name descname"><span class="pre">neyman_chisq</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">u</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">v</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#distclassipy.distances.Distance.neyman_chisq" title="Link to this definition">¶</a></dt>
+<dd><p>Calculate the Neyman chi-square distance between two vectors.</p>
+<p>Parameters:
+- u, v: Input vectors between which the distance is to be calculated.</p>
+<p>Returns:
+- The Neyman chi-square distance between the two vectors.</p>
+<p class="rubric">References</p>
+<ol class="arabic simple">
+<li><p>Neyman J (1949) Contributions to the theory of the chi^2 test.
+In Proceedings of the First Berkley Symposium on Mathematical
+Statistics and Probability.</p></li>
+<li><p>Sung-Hyuk C. (2007) Comprehensive Survey on Distance/Similarity
+Measures between Probability Density Functions. International
+Journal of Mathematical Models and Methods in Applied Sciences.
+1(4), 300-307.</p></li>
+</ol>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="distclassipy.distances.Distance.nonintersection">
+<span class="sig-name descname"><span class="pre">nonintersection</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">u</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">v</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#distclassipy.distances.Distance.nonintersection" title="Link to this definition">¶</a></dt>
+<dd><p>Calculate the Nonintersection distance between two vectors.</p>
+<p>Parameters:
+- u, v: Input vectors between which the distance is to be calculated.</p>
+<p>Returns:
+- The Nonintersection distance between the two vectors.</p>
+<p class="rubric">References</p>
+<ol class="arabic simple">
+<li><p>Sung-Hyuk C. (2007) Comprehensive Survey on Distance/Similarity
+Measures between Probability Density Functions. International
+Journal of Mathematical Models and Methods in Applied Sciences.
+1(4), 300-307.</p></li>
+</ol>
+<p class="rubric">Notes</p>
+<p>When used for comparing two probability density functions (pdfs),
+Nonintersection distance equals half of Cityblock distance.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="distclassipy.distances.Distance.pearson_chisq">
+<span class="sig-name descname"><span class="pre">pearson_chisq</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">u</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">v</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#distclassipy.distances.Distance.pearson_chisq" title="Link to this definition">¶</a></dt>
+<dd><p>Calculate the Pearson chi-square divergence between two vectors.</p>
+<p>Parameters:
+- u, v: Input vectors between which the divergence is to be calculated.</p>
+<p>Returns:
+- The Pearson chi-square divergence between the two vectors.</p>
+<p class="rubric">References</p>
+<ol class="arabic simple">
+<li><p>Pearson K. (1900) On the Criterion that a given system of
+deviations from the probable in the case of correlated system
+of variables is such that it can be reasonable supposed to have
+arisen from random sampling, Phil. Mag. 50, 157-172.</p></li>
+<li><p>Sung-Hyuk C. (2007) Comprehensive Survey on Distance/Similarity
+Measures between Probability Density Functions. International
+Journal of Mathematical Models and Methods in Applied Sciences.
+1(4), 300-307.</p></li>
+</ol>
+<p class="rubric">Notes</p>
+<p>Pearson chi-square divergence is asymmetric.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="distclassipy.distances.Distance.penroseshape">
+<span class="sig-name descname"><span class="pre">penroseshape</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">u</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">v</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#distclassipy.distances.Distance.penroseshape" title="Link to this definition">¶</a></dt>
+<dd><p>Calculate the Penrose shape distance between two vectors.</p>
+<p>Parameters:
+- u, v: Input vectors between which the distance is to be calculated.</p>
+<p>Returns:
+- The Penrose shape distance between the two vectors.</p>
+<p class="rubric">References</p>
+<ol class="arabic simple">
+<li><p>Deza M, Deza E (2009) Encyclopedia of Distances.
+Springer-Verlag Berlin Heidelberg. 1-590.</p></li>
+</ol>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="distclassipy.distances.Distance.prob_chisq">
+<span class="sig-name descname"><span class="pre">prob_chisq</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">u</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">v</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#distclassipy.distances.Distance.prob_chisq" title="Link to this definition">¶</a></dt>
+<dd><p>Calculate the Probabilistic chi-square distance between two vectors.</p>
+<p>Parameters:
+- u, v: Input vectors between which the distance is to be calculated.</p>
+<p>Returns:
+- The Probabilistic chi-square distance between the two vectors.</p>
+<p class="rubric">Notes</p>
+<p>Added by SC.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="distclassipy.distances.Distance.ruzicka">
+<span class="sig-name descname"><span class="pre">ruzicka</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">u</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">v</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#distclassipy.distances.Distance.ruzicka" title="Link to this definition">¶</a></dt>
+<dd><p>Calculate the Ruzicka distance between two vectors.</p>
+<p>Parameters:
+- u, v: Input vectors between which the distance is to be calculated.</p>
+<p>Returns:
+- The Ruzicka distance between the two vectors.</p>
+<p class="rubric">Notes</p>
+<p>Added by SC.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="distclassipy.distances.Distance.soergel">
+<span class="sig-name descname"><span class="pre">soergel</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">u</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">v</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#distclassipy.distances.Distance.soergel" title="Link to this definition">¶</a></dt>
+<dd><p>Calculate the Soergel distance between two vectors.</p>
+<p>Parameters:
+- u, v: Input vectors between which the distance is to be calculated.</p>
+<p>Returns:
+- The Soergel distance between the two vectors.</p>
+<p class="rubric">Notes</p>
+<p>Equals Tanimoto distance.</p>
+<p class="rubric">References</p>
+<ol class="arabic simple">
+<li><p>Sung-Hyuk C. (2007) Comprehensive Survey on Distance/Similarity
+Measures between Probability Density Functions. International
+Journal of Mathematical Models and Methods in Applied Sciences.
+1(4), 300-307.</p></li>
+</ol>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="distclassipy.distances.Distance.sorensen">
+<span class="sig-name descname"><span class="pre">sorensen</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">u</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">v</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#distclassipy.distances.Distance.sorensen" title="Link to this definition">¶</a></dt>
+<dd><p>Calculate the Sorensen distance between two vectors.</p>
+<p>Parameters:
+- u, v: Input vectors between which the distance is to be calculated.</p>
+<p>Returns:
+- The Sorensen distance between the two vectors.</p>
+<p class="rubric">Notes</p>
+<p>The Sorensen distance equals the Manhattan distance divided by the sum of the two vectors.</p>
+<p>Added by SC.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="distclassipy.distances.Distance.squared_chisq">
+<span class="sig-name descname"><span class="pre">squared_chisq</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">u</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">v</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#distclassipy.distances.Distance.squared_chisq" title="Link to this definition">¶</a></dt>
+<dd><p>Calculate the Squared chi-square distance between two vectors.</p>
+<p>Parameters:
+- u, v: Input vectors between which the distance is to be calculated.</p>
+<p>Returns:
+- The Squared chi-square distance between the two vectors.</p>
+<p class="rubric">References</p>
+<ol class="arabic simple">
+<li><p>Sung-Hyuk C. (2007) Comprehensive Survey on Distance/Similarity
+Measures between Probability Density Functions. International
+Journal of Mathematical Models and Methods in Applied Sciences.
+1(4), 300-307.</p></li>
+</ol>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="distclassipy.distances.Distance.squared_euclidean">
+<span class="sig-name descname"><span class="pre">squared_euclidean</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">u</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">v</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#distclassipy.distances.Distance.squared_euclidean" title="Link to this definition">¶</a></dt>
+<dd><p>Calculate the Squared Euclidean distance between two vectors.</p>
+<p>Parameters:
+- u, v: Input vectors between which the distance is to be calculated.</p>
+<p>Returns:
+- The Squared Euclidean distance between the two vectors.</p>
+<p class="rubric">References</p>
+<ol class="arabic simple">
+<li><p>Gavin DG et al. (2003) A statistical approach to evaluating
+distance metrics and analog assignments for pollen records.
+Quaternary Research 60:356–367.</p></li>
+<li><p>Sung-Hyuk C. (2007) Comprehensive Survey on Distance/Similarity
+Measures between Probability Density Functions. International
+Journal of Mathematical Models and Methods in Applied Sciences.
+1(4), 300-307.</p></li>
+</ol>
+<p class="rubric">Notes</p>
+<p>Equals to squared Euclidean distance.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="distclassipy.distances.Distance.squaredchord">
+<span class="sig-name descname"><span class="pre">squaredchord</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">u</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">v</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#distclassipy.distances.Distance.squaredchord" title="Link to this definition">¶</a></dt>
+<dd><p>Calculate the Squared-chord distance between two vectors.</p>
+<p>Parameters:
+- u, v: Input vectors between which the distance is to be calculated.</p>
+<p>Returns:
+- The Squared-chord distance between the two vectors.</p>
+<p class="rubric">References</p>
+<ol class="arabic simple">
+<li><p>Gavin DG et al. (2003) A statistical approach to evaluating
+distance metrics and analog assignments for pollen records.
+Quaternary Research 60:356–367.</p></li>
+<li><p>Sung-Hyuk C. (2007) Comprehensive Survey on Distance/Similarity
+Measures between Probability Density Functions. International
+Journal of Mathematical Models and Methods in Applied Sciences.
+1(4), 300-307.</p></li>
+</ol>
+<p class="rubric">Notes</p>
+<p>Equals to squared Matusita distance.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="distclassipy.distances.Distance.taneja">
+<span class="sig-name descname"><span class="pre">taneja</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">u</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">v</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#distclassipy.distances.Distance.taneja" title="Link to this definition">¶</a></dt>
+<dd><p>Calculate the Taneja distance between two vectors.</p>
+<p>Parameters:
+- u, v: Input vectors between which the distance is to be calculated.</p>
+<p>Returns:
+- The Taneja distance between the two vectors.</p>
+<p class="rubric">References</p>
+<ol class="arabic simple">
+<li><p>Taneja IJ. (1995), New Developments in Generalized Information
+Measures, Chapter in: Advances in Imaging and Electron Physics,
+Ed. P.W. Hawkes, 91, 37-135.</p></li>
+<li><p>Sung-Hyuk C. (2007) Comprehensive Survey on Distance/Similarity
+Measures between Probability Density Functions. International
+Journal of Mathematical Models and Methods in Applied Sciences.
+1(4), 300-307.</p></li>
+</ol>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="distclassipy.distances.Distance.tanimoto">
+<span class="sig-name descname"><span class="pre">tanimoto</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">u</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">v</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#distclassipy.distances.Distance.tanimoto" title="Link to this definition">¶</a></dt>
+<dd><p>Calculate the Tanimoto distance between two vectors.</p>
+<p>Parameters:
+- u, v: Input vectors between which the distance is to be calculated.</p>
+<p>Returns:
+- The Tanimoto distance between the two vectors.</p>
+<p class="rubric">References</p>
+<ol class="arabic simple">
+<li><p>Sung-Hyuk C. (2007) Comprehensive Survey on Distance/Similarity
+Measures between Probability Density Functions. International
+Journal of Mathematical Models and Methods in Applied Sciences.
+1(4), 300-307.</p></li>
+</ol>
+<p class="rubric">Notes</p>
+<p>Equals Soergel distance.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="distclassipy.distances.Distance.topsoe">
+<span class="sig-name descname"><span class="pre">topsoe</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">u</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">v</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#distclassipy.distances.Distance.topsoe" title="Link to this definition">¶</a></dt>
+<dd><p>Calculate the Topsøe distance between two vectors.</p>
+<p>Parameters:
+- u, v: Input vectors between which the distance is to be calculated.</p>
+<p>Returns:
+- The Topsøe distance between the two vectors.</p>
+<p class="rubric">References</p>
+<ol class="arabic simple">
+<li><p>Sung-Hyuk C (2007) Comprehensive Survey on Distance/Similarity
+Measures between Probability Density Functions. International
+Journal of Mathematical Models and Methods in Applied Sciences.
+1(4), 300-307.</p></li>
+</ol>
+<p class="rubric">Notes</p>
+<p>Equals two times Jensen-Shannon divergence.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="distclassipy.distances.Distance.vicis_symmetric_chisq">
+<span class="sig-name descname"><span class="pre">vicis_symmetric_chisq</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">u</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">v</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#distclassipy.distances.Distance.vicis_symmetric_chisq" title="Link to this definition">¶</a></dt>
+<dd><p>Calculate the Vicis Symmetric chi-square distance between two vectors.</p>
+<p>Parameters:
+- u, v: Input vectors between which the distance is to be calculated.</p>
+<p>Returns:
+- The Vicis Symmetric chi-square distance between the two vectors.</p>
+<p class="rubric">References</p>
+<ol class="arabic simple">
+<li><p>Sung-Hyuk C (2007) Comprehensive Survey on Distance/Similarity
+Measures between Probability Density Functions. International
+Journal of Mathematical Models and Methods in Applied Sciences.
+1(4), 300-307</p></li>
+</ol>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="distclassipy.distances.Distance.vicis_wave_hedges">
+<span class="sig-name descname"><span class="pre">vicis_wave_hedges</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">u</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">v</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#distclassipy.distances.Distance.vicis_wave_hedges" title="Link to this definition">¶</a></dt>
+<dd><p>Calculate the Vicis-Wave Hedges distance between two vectors.</p>
+<p>Parameters:
+- u, v: Input vectors between which the distance is to be calculated.</p>
+<p>Returns:
+- The Vicis-Wave Hedges distance between the two vectors.</p>
+<p class="rubric">References</p>
+<ol class="arabic simple">
+<li><p>Sung-Hyuk C (2007) Comprehensive Survey on Distance/Similarity
+Measures between Probability Density Functions. International
+Journal of Mathematical Models and Methods in Applied Sciences.
+1(4), 300-307.</p></li>
+</ol>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="distclassipy.distances.Distance.wave_hedges">
+<span class="sig-name descname"><span class="pre">wave_hedges</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">u</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">v</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#distclassipy.distances.Distance.wave_hedges" title="Link to this definition">¶</a></dt>
+<dd><p>Calculate the Wave Hedges distance between two vectors.</p>
+<p>Parameters:
+- u, v: Input vectors between which the distance is to be calculated.</p>
+<p>Returns:
+- The Wave Hedges distance between the two vectors.</p>
+<p class="rubric">References</p>
+<ol class="arabic simple">
+<li><p>Sung-Hyuk C (2007) Comprehensive Survey on Distance/Similarity
+Measures between Probability Density Functions. International
+Journal of Mathematical Models and Methods in Applied Sciences.
+1(4), 300-307</p></li>
+</ol>
+</dd></dl>
+
+</dd></dl>
+
+</section>
+
+
+          </div>
+          
+        </div>
+      </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
+        <div class="sphinxsidebarwrapper">
+<h1 class="logo"><a href="index.html">DistClassiPy</a></h1>
+
+
+
+
+
+
+
+
+<h3>Navigation</h3>
+<p class="caption" role="heading"><span class="caption-text">API Reference</span></p>
+<ul class="current">
+<li class="toctree-l1"><a class="reference internal" href="classifier.html">DistanceMetricClassifier module</a></li>
+<li class="toctree-l1 current"><a class="current reference internal" href="#">Distance module</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="#distclassipy.distances.Distance"><code class="docutils literal notranslate"><span class="pre">Distance</span></code></a></li>
+</ul>
+</li>
+</ul>
+
+<div class="relations">
+<h3>Related Topics</h3>
+<ul>
+  <li><a href="index.html">Documentation overview</a><ul>
+      <li>Previous: <a href="classifier.html" title="previous chapter">DistanceMetricClassifier module</a></li>
+  </ul></li>
+</ul>
+</div>
+<div id="searchbox" style="display: none" role="search">
+  <h3 id="searchlabel">Quick search</h3>
+    <div class="searchformwrapper">
+    <form class="search" action="search.html" method="get">
+      <input type="text" name="q" aria-labelledby="searchlabel" autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false"/>
+      <input type="submit" value="Go" />
+    </form>
+    </div>
+</div>
+<script>document.getElementById('searchbox').style.display = "block"</script>
+
+
+
+
+
+
+
+
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="footer">
+      &#169;2024, Siddharth Chaini.
+      
+      |
+      Powered by <a href="https://www.sphinx-doc.org/">Sphinx 7.2.6</a>
+      &amp; <a href="https://alabaster.readthedocs.io">Alabaster 0.7.16</a>
+      
+      |
+      <a href="_sources/distances.rst.txt"
+          rel="nofollow">Page source</a>
+    </div>
+
+    
+
+    
+  </body>
+</html>
