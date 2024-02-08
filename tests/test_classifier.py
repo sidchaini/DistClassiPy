@@ -14,7 +14,7 @@ def test_init():
 def test_estimator_compatibility():
     from sklearn.utils.estimator_checks import check_estimator
 
-    check_estimator(DistanceMetricClassifier())
+    assert check_estimator(DistanceMetricClassifier())
 
 
 # Test fitting the classifier to a dataset
