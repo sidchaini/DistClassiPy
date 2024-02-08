@@ -1,3 +1,5 @@
+# Guide: https://shrra.github.io/python-intermediate-development/23-continuous-integration-automated-testing/index.html
+
 name: CI
 
 # We can specify which Github events will trigger a CI build
