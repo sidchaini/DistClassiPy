@@ -25,6 +25,7 @@ class DistanceMetricClassifier(BaseEstimator, ClassifierMixin):
         canonical_stat: str = "median",
         calculate_kde: bool = True,
         calculate_1d_dist: bool = True,
+        distance_calculator: Callable = None,
         n_jobs: int = -1,
     ):
         """
@@ -51,7 +52,8 @@ class DistanceMetricClassifier(BaseEstimator, ClassifierMixin):
         self.calculate_kde = calculate_kde
         self.calculate_1d_dist = calculate_1d_dist
         self.n_jobs = n_jobs
-        self.distance_calculator = Distance()
+        if self.distance_calculator is None:
+            self.distance_calculator = Distance()
 
     def fit(self, X: np.array, y: np.array, feat_labels: list[str] = None):
         """Fit the classifier to the data.
