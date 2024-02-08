@@ -25,7 +25,7 @@ predictions = clf.predict(new_data)
 
 ## Documentation
 
-For more detailed information about the package and its functionalities, please refer to the [official documentation](https://github.com/sidchaini/DistClassiPy).
+For more detailed information about the package and its functionalities, please refer to the [official documentation](https://sidchaini.github.io/DistClassiPy/).
 
 ## Contributing
 Contributions are welcome! If you have suggestions for improvements or bug fixes, please feel free to open an [issue](https://github.com/sidchaini/DistClassiPy/issues) or submit a [pull request](https://github.com/sidchaini/DistClassiPy/pulls).
@@ -35,7 +35,7 @@ DistClassiPy is released under the [GNU General Public License v3.0](https://www
 
 ## Citation
 
-If you use DistClassiPy in your research or project, please consider citing the package. You can find citation information in the [CITATION.md](https://github.com/sidchaini/DistClassiPy/CITATION.md) file.
+If you use DistClassiPy in your research or project, please consider citing the package. You can find citation information in the [CITATION.cff](https://github.com/sidchaini/DistClassiPy/CITATION.cff) file.
 
 
 ## Contact
