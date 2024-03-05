@@ -75,8 +75,7 @@ class DistanceMetricClassifier(BaseEstimator, ClassifierMixin):
 
         canonical_list = []
         for cur_class in self.classes_:
-            cur_X = X[np.argwhere(y == cur_class)]
-            # REPLACE with cur_X = X[y == cur_class] IN LATER RELEASE
+            cur_X = X[y == cur_class]
             if self.canonical_stat == "median":
                 canonical_list.append(np.median(cur_X, axis=0).ravel())
             elif self.canonical_stat == "mean":
