@@ -76,6 +76,7 @@ class DistanceMetricClassifier(BaseEstimator, ClassifierMixin):
         canonical_list = []
         for cur_class in self.classes_:
             cur_X = X[np.argwhere(y == cur_class)]
+            # REPLACE with cur_X = X[y == cur_class] IN LATER RELEASE
             if self.canonical_stat == "median":
                 canonical_list.append(np.median(cur_X, axis=0).ravel())
             elif self.canonical_stat == "mean":
@@ -137,9 +138,10 @@ class DistanceMetricClassifier(BaseEstimator, ClassifierMixin):
 
         else:
             dist_arr_list = []
-            wtdf = 1 / self.df_std_
-            wtdf = wtdf.replace([np.inf, -np.inf], np.nan)
-            wtdf = wtdf.fillna(0)
+            # Clip to avoid zero error later
+            wtdf = 1 / np.clip(self.df_std_, a_min=np.finfo(float).eps, a_max=None)
+            # wtdf = wtdf.replace([np.inf, -np.inf], np.nan)
+            # wtdf = wtdf.fillna(0)
 
             for cl in self.classes_:
                 XB = self.df_canonical_.loc[cl].to_numpy().reshape(1, -1)
@@ -166,9 +168,8 @@ class DistanceMetricClassifier(BaseEstimator, ClassifierMixin):
                 self.metric_fn_ = getattr(Distance(), self.metric)
             else:
                 raise ValueError(
-                    f"{self.metric} metric not found. Either pass a string of the name of a metric in scipy.spatial.distance or distances.Distance, or, pass a metric function directly."
+                    f"{self.metric} metric not found. Please pass a string of the name of a metric in scipy.spatial.distance or distances.Distance, or pass a metric function directly. For a list of available metrics, see: https://sidchaini.github.io/DistClassiPy/distances.html or https://docs.scipy.org/doc/scipy/reference/spatial.distance.html"
                 )
-
         else:
             self.metric_fn_ = self.metric
 
