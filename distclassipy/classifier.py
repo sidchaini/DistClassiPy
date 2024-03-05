@@ -21,11 +21,11 @@ class DistanceMetricClassifier(BaseEstimator, ClassifierMixin):
     def __init__(
         self,
         metric: str | Callable = "euclidean",
-        scale_std: bool = True,
-        canonical_stat: str = "median",
+        scale: bool = True,
+        central_stat: str = "median",
+        dispersion_stat: str = "std",
         calculate_kde: bool = True,
         calculate_1d_dist: bool = True,
-        n_jobs: int = -1,
     ):
         """
         Initialize the classifier with specified parameters.
@@ -34,23 +34,23 @@ class DistanceMetricClassifier(BaseEstimator, ClassifierMixin):
         ----------
         metric : str or callable, optional
             The distance metric to use. Default is 'euclidean'.
-        scale_std : bool, optional
+        scale : bool, optional
             If True, classifier is scaled in terms of standard deviations. Default is True.
-        canonical_stat : str, optional
-            The statistical measure to use for creating the training template. Default is 'median'.
+        central_stat : str, optional
+            The statistical measure to calculate the central tendency of the training template('median' or 'mean')
+        dispersion_stat : str, optional
+            The statistical measure to calculate the dispersion of the training template ('iqr' or 'std').
         calculate_kde : bool, optional
             If True, calculate the kernel density estimate. Default is True.
         calculate_1d_dist : bool, optional
             If True, calculate the 1-dimensional distance. Default is True.
-        n_jobs : int, optional
-            The number of jobs to run in parallel. Default is -1 (use all processors).
         """
         self.metric = metric
-        self.scale_std = scale_std
-        self.canonical_stat = canonical_stat
+        self.scale = scale
+        self.central_stat = central_stat
+        self.dispersion_stat = dispersion_stat
         self.calculate_kde = calculate_kde
         self.calculate_1d_dist = calculate_1d_dist
-        self.n_jobs = n_jobs
 
     def fit(self, X: np.array, y: np.array, feat_labels: list[str] = None):
         """Fit the classifier to the data.
@@ -73,19 +73,19 @@ class DistanceMetricClassifier(BaseEstimator, ClassifierMixin):
         if feat_labels is None:
             feat_labels = [f"Feature_{x}" for x in range(X.shape[1])]
 
-        canonical_list = []
+        centroid_list = []
         for cur_class in self.classes_:
             cur_X = X[y == cur_class]
-            if self.canonical_stat == "median":
-                canonical_list.append(np.median(cur_X, axis=0).ravel())
-            elif self.canonical_stat == "mean":
-                canonical_list.append(np.mean(cur_X, axis=0).ravel())
-        df_canonical = pd.DataFrame(
-            data=np.array(canonical_list), index=self.classes_, columns=feat_labels
+            if self.central_stat == "median":
+                centroid_list.append(np.median(cur_X, axis=0).ravel())
+            elif self.central_stat == "mean":
+                centroid_list.append(np.mean(cur_X, axis=0).ravel())
+        df_centroid = pd.DataFrame(
+            data=np.array(centroid_list), index=self.classes_, columns=feat_labels
         )
-        self.df_canonical_ = df_canonical
+        self.df_centroid_ = df_centroid
 
-        if self.scale_std:
+        if self.scale and self.dispersion_stat == "std":
             std_list = []
             for cur_class in self.classes_:
                 cur_X = X[y == cur_class]
@@ -95,6 +95,21 @@ class DistanceMetricClassifier(BaseEstimator, ClassifierMixin):
                 data=np.array(std_list), index=self.classes_, columns=feat_labels
             )
             self.df_std_ = df_std
+        elif self.scale and self.dispersion_stat == "iqr":
+
+            iqr_list = []
+
+            for cur_class in self.classes_:
+                cur_X = X[y == cur_class]
+                # Note we're using ddof=1 because we're dealing with a sample. See more: https://stackoverflow.com/a/46083501/10743245
+                iqr_list.append(
+                    np.quantile(cur_X, q=0.75, axis=0).ravel()
+                    - np.quantile(cur_X, q=0.25, axis=0).ravel()
+                )
+            df_iqr = pd.DataFrame(
+                data=np.array(iqr_list), index=self.classes_, columns=feat_labels
+            )
+            self.df_iqr_ = df_iqr
 
         if self.calculate_kde:
             self.set_metric_fn()
@@ -130,20 +145,22 @@ class DistanceMetricClassifier(BaseEstimator, ClassifierMixin):
         check_is_fitted(self, "is_fitted_")
         X = check_array(X)
 
-        if not self.scale_std:
+        if not self.scale:
             dist_arr = distance.cdist(
-                XA=X, XB=self.df_canonical_.to_numpy(), metric=self.metric
+                XA=X, XB=self.df_centroid_.to_numpy(), metric=self.metric
             )
 
         else:
             dist_arr_list = []
-            # Clip to avoid zero error later
-            wtdf = 1 / np.clip(self.df_std_, a_min=np.finfo(float).eps, a_max=None)
-            # wtdf = wtdf.replace([np.inf, -np.inf], np.nan)
-            # wtdf = wtdf.fillna(0)
+
+            if self.dispersion_stat == "std":
+                # Clip to avoid zero error later
+                wtdf = 1 / np.clip(self.df_std_, a_min=np.finfo(float).eps, a_max=None)
+            elif self.dispersion_stat == "iqr":
+                wtdf = 1 / np.clip(self.df_iqr_, a_min=np.finfo(float).eps, a_max=None)
 
             for cl in self.classes_:
-                XB = self.df_canonical_.loc[cl].to_numpy().reshape(1, -1)
+                XB = self.df_centroid_.loc[cl].to_numpy().reshape(1, -1)
                 w = wtdf.loc[cl].to_numpy()  # 1/std dev
                 XB = XB * w  # w is for this class only
                 XA = X * w  # w is for this class only
@@ -186,20 +203,22 @@ class DistanceMetricClassifier(BaseEstimator, ClassifierMixin):
         check_is_fitted(self, "is_fitted_")
         X = check_array(X)
 
-        if not self.scale_std:
+        if not self.scale:
             dist_arr = distance.cdist(
-                XA=X, XB=self.df_canonical_.to_numpy(), metric=self.metric
+                XA=X, XB=self.df_centroid_.to_numpy(), metric=self.metric
             )
 
         else:
             dist_arr_list = []
-            wtdf = 1 / self.df_std_
-            wtdf = wtdf.replace([np.inf, -np.inf], np.nan)
-            wtdf = wtdf.fillna(0)
-            self.wtdf_ = wtdf
+
+            if self.dispersion_stat == "std":
+                # Clip to avoid zero error later
+                wtdf = 1 / np.clip(self.df_std_, a_min=np.finfo(float).eps, a_max=None)
+            elif self.dispersion_stat == "iqr":
+                wtdf = 1 / np.clip(self.df_iqr_, a_min=np.finfo(float).eps, a_max=None)
 
             for cl in self.classes_:
-                XB = self.df_canonical_.loc[cl].to_numpy().reshape(1, -1)
+                XB = self.df_centroid_.loc[cl].to_numpy().reshape(1, -1)
                 w = wtdf.loc[cl].to_numpy()  # 1/std dev
                 XB = XB * w  # w is for this class only
                 XA = X * w  # w is for this class only
@@ -207,11 +226,11 @@ class DistanceMetricClassifier(BaseEstimator, ClassifierMixin):
                 dist_arr_list.append(cl_dist)
             dist_arr = np.column_stack(dist_arr_list)
 
-        self.canonical_dist_df_ = pd.DataFrame(
+        self.centroid_dist_df_ = pd.DataFrame(
             data=dist_arr, index=np.arange(X.shape[0]), columns=self.classes_
         )
-        self.canonical_dist_df_.columns = [
-            f"{ind}_dist" for ind in self.canonical_dist_df_.columns
+        self.centroid_dist_df_.columns = [
+            f"{ind}_dist" for ind in self.centroid_dist_df_.columns
         ]
 
         y_pred = self.classes_[dist_arr.argmin(axis=1)]
@@ -221,7 +240,7 @@ class DistanceMetricClassifier(BaseEstimator, ClassifierMixin):
             scale_factors = np.exp(
                 [
                     self.kde_dict_[cl].score_samples(
-                        self.df_canonical_.loc[cl].to_numpy().reshape(1, -1)
+                        self.df_centroid_.loc[cl].to_numpy().reshape(1, -1)
                     )[0]
                     for cl in self.classes_
                 ]
@@ -239,18 +258,23 @@ class DistanceMetricClassifier(BaseEstimator, ClassifierMixin):
 
         if self.calculate_1d_dist:
             conf_cl = []
-            Xdf_temp = pd.DataFrame(data=X, columns=self.df_canonical_.columns)
+            Xdf_temp = pd.DataFrame(data=X, columns=self.df_centroid_.columns)
             for cl in self.classes_:
                 sum_1d_dists = np.zeros(shape=(len(Xdf_temp)))
                 for feat in Xdf_temp.columns:
                     dists = distance.cdist(
                         XA=np.zeros(shape=(1, 1)),
-                        XB=(self.df_canonical_.loc[cl] - Xdf_temp)[feat]
+                        XB=(self.df_centroid_.loc[cl] - Xdf_temp)[feat]
                         .to_numpy()
                         .reshape(-1, 1),
                         metric=self.metric,
                     ).ravel()
-                    sum_1d_dists = sum_1d_dists + dists / self.df_std_.loc[cl, feat]
+                    if self.scale and self.dispersion_stat == "std":
+                        sum_1d_dists = sum_1d_dists + dists / self.df_std_.loc[cl, feat]
+                    elif self.scale and self.dispersion_stat == "std":
+                        sum_1d_dists = sum_1d_dists + dists / self.df_iqr_.loc[cl, feat]
+                    else:
+                        sum_1d_dists = sum_1d_dists + dists
                 confs = 1 / sum_1d_dists
                 # Add epsilon later
                 # confs = 1 / (sum_1d_dists + np.finfo(float).eps)
@@ -281,7 +305,7 @@ class DistanceMetricClassifier(BaseEstimator, ClassifierMixin):
 
         # Calculate confidence for each prediction
         if method == "distance_inverse":
-            self.confidence_df_ = 1 / self.canonical_dist_df_
+            self.confidence_df_ = 1 / self.centroid_dist_df_
             self.confidence_df_.columns = [
                 x.replace("_dist", "_conf") for x in self.confidence_df_.columns
             ]

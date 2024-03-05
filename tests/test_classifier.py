@@ -5,9 +5,9 @@ from distclassipy.classifier import DistanceMetricClassifier
 
 # Test initialization of the classifier with specific parameters
 def test_init():
-    clf = DistanceMetricClassifier(metric="euclidean", scale_std=True)
+    clf = DistanceMetricClassifier(metric="euclidean", scale=True)
     assert clf.metric == "euclidean"
-    assert clf.scale_std is True
+    assert clf.scale is True
 
 
 # Fix later
@@ -42,10 +42,10 @@ def test_predict():
 def test_predict_without_stdscale():
     X = np.array([[1, 2], [3, 4], [5, 6]])  # Sample feature set
     y = np.array([0, 1, 0])  # Sample target values
-    clf = DistanceMetricClassifier(scale_std=False)
+    clf = DistanceMetricClassifier(scale=False)
     clf.fit(X, y)
     predictions = clf.predict(X)
-    assert clf.scale_std is False
+    assert clf.scale is False
     assert len(predictions) == len(y)
 
 
@@ -101,22 +101,22 @@ def test_metric_invalid():
         clf.fit(X, y)
 
 
-# Test setting canonical statistical method to median
-def test_canonical_stat_median():
+# Test setting central statistical method to median
+def test_central_stat_median():
     X = np.array([[1, 2], [3, 4], [5, 6]])  # Sample feature set
     y = np.array([0, 1, 0])  # Sample target values
-    clf = DistanceMetricClassifier(canonical_stat="median")
+    clf = DistanceMetricClassifier(central_stat="median")
     clf.fit(X, y)
-    assert clf.canonical_stat == "median"
+    assert clf.central_stat == "median"
 
 
-# Test setting canonical statistical method to mean
-def test_canonical_stat_mean():
+# Test setting central statistical method to mean
+def test_central_stat_mean():
     X = np.array([[1, 2], [3, 4], [5, 6]])  # Sample feature set
     y = np.array([0, 1, 0])  # Sample target values
-    clf = DistanceMetricClassifier(canonical_stat="mean")
+    clf = DistanceMetricClassifier(central_stat="mean")
     clf.fit(X, y)
-    assert clf.canonical_stat == "mean"
+    assert clf.central_stat == "mean"
 
 
 # Test KDE calculation functionality
