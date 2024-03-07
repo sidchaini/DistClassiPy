@@ -33,12 +33,13 @@ jobs:
     - name: Install Python dependencies
       run: |
         python3 -m pip install --upgrade pip
-        python3 -m pip install distclassipy pytest pytest-cov
+        python3 -m pip install -e .
+        python3 -m pip install pytest pytest-cov
 
     - name: Test classifier model with PyTest
       run: |
-        python3 -m pytest tests/test_classifier.py --cov=distclassipy.classifier --cov-report term-missing
+        python3 -m pytest tests/test_classifier.py --cov=distclassipy.classifier --cov-report=xml term-missing
 
     - name: Test distance functions with PyTest
       run: |
-        python3 -m pytest tests/test_distances.py --cov=distclassipy.distances --cov-report term-missing
+        python3 -m pytest tests/test_distances.py --cov=distclassipy.distances --cov-report=xml term-missing
