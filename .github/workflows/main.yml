@@ -38,7 +38,7 @@ jobs:
 
     - name: Test classifier model with PyTest
       run: |
-        python3 -m pytest tests/test_classifier.py --cov=distclassipy.classifier --cov-report=xml term-missing
+        python3 -m pytest tests/test_classifier.py --cov=distclassipy.classifier --cov-report=xml
 
     - name: Test distance functions with PyTest
       run: |
