@@ -42,4 +42,4 @@ jobs:
 
     - name: Test distance functions with PyTest
       run: |
-        python3 -m pytest tests/test_distances.py --cov=distclassipy.distances --cov-report=xml term-missing
+        python3 -m pytest tests/test_distances.py --cov=distclassipy.distances --cov-report=xml
