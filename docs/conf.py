@@ -53,3 +53,11 @@ html_theme_options = {
 favicons = [
     "favicon.svg",
 ]
+
+
+# -- sphinx-copybutton configuration ----------------------------------------
+extensions.append("sphinx_copybutton")
+## sets up the expected prompt text from console blocks, and excludes it from
+## the text that goes into the clipboard.
+copybutton_exclude = ".linenos, .gp"
+copybutton_prompt_text = ">> "
