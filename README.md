@@ -39,7 +39,7 @@ DistClassiPy is released under the [GNU General Public License v3.0](https://www
 ## Citation
 
 If you use DistClassiPy in your research or project, please consider citing the paper:
-> Paper Title
+> Light Curve Classification with DistClassiPy: a new distance-based classifier (submitted)
 
 ### Bibtex
 
@@ -47,16 +47,16 @@ If you use DistClassiPy in your research or project, please consider citing the 
 @ARTICLE{Chaini2024,
        author = {{Chaini}, S. and {Mahabal}, A. and {Kembhavi}, A. and {Bianco}, F.~B.},
         title = "{Light Curve Classification with DistClassiPy: a new distance-based classifier}",
-      journal = {Astronomy and Computing},
-     keywords = {},
+      journal = {Submitted to A&C},
+    %  keywords = {},
          year = 2024,
-        month = ,
-       volume = {},
-          eid = {},
-        pages = {},
-          doi = {},
-       adsurl = {},
-      adsnote = {}
+      %   month = ,
+      %  volume = {},
+      %     eid = {},
+      %   pages = {},
+      %     doi = {},
+      %  adsurl = {},
+      % adsnote = {}
 }
 ```
 
