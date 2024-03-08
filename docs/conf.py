@@ -45,8 +45,8 @@ html_theme_options = {
     "repository_url": "https://github.com/sidchaini/DistClassiPy",
     "use_repository_button": True,
     "logo": {
-        "image_light": "_static/logo.svg",
-        "image_dark": "_static/logo-dark.png",
+        "image_light": "logo.svg",
+        "image_dark": "logo-dark.png",
     },
 }
 
