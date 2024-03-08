@@ -1,7 +1,12 @@
 <h1 align="center">
-<img src="docs/_static/logo.png" width="300">
+<script>
+  if (window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches) {
+    document.write('<img src="docs/_static/logo-dark.png" width="300">');
+  } else {
+    document.write('<img src="docs/_static/logo.png" width="300">');
+  }
+</script>
 </h1><br>
-
 A python package for a distance-based classifier which can use several different distance metrics.
 
 ## Installation
