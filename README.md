@@ -1,4 +1,7 @@
-# DistClassiPy
+<h1 align="center">
+<img src="docs/_static/logo.png" width="300">
+</h1><br>
+
 A python package for a distance-based classifier which can use several different distance metrics.
 
 ## Installation
