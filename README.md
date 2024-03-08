@@ -35,8 +35,30 @@ DistClassiPy is released under the [GNU General Public License v3.0](https://www
 
 ## Citation
 
-If you use DistClassiPy in your research or project, please consider citing the package. You can find citation information in the [CITATION.cff](https://github.com/sidchaini/DistClassiPy/CITATION.cff) file.
+If you use DistClassiPy in your research or project, please consider citing the paper:
+> Paper Title
+
+### Bibtex
+
+```bibtex
+@ARTICLE{Chaini2024,
+       author = {{Chaini}, S. and {Mahabal}, A. and {Kembhavi}, A. and {Bianco}, F.~B.},
+        title = "{Light Curve Classification with DistClassiPy: a new distance-based classifier}",
+      journal = {Astronomy and Computing},
+     keywords = {},
+         year = 2024,
+        month = ,
+       volume = {},
+          eid = {},
+        pages = {},
+          doi = {},
+       adsurl = {},
+      adsnote = {}
+}
+```
+
+<!-- You can also find citation information in the [CITATION.cff](https://github.com/sidchaini/DistClassiPy/CITATION.cff) file. -->
 
 
-## Contact
-For any queries, please reach out to Siddharth Chaini at sidchaini@gmail.com.
+## Authors
+Siddharth Chaini (E-mail: sidchaini@gmail.com), Ashish Mahabal, Ajit Kembhavi and Federica B. Bianco.
