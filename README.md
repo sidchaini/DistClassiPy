@@ -1,7 +1,9 @@
+<h1 align="center">
 <picture align="center">
   <source media="(prefers-color-scheme: dark)" srcset="docs/_static/logo-dark.svg" width="300">
   <img alt="Pandas Logo" src="docs/_static/logo.svg" width="300">
 </picture>
+</h1>
 
 -----------------
 
