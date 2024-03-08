@@ -4,8 +4,7 @@
   <img alt="Pandas Logo" src="docs/_static/logo.svg" width="300">
 </picture>
 </h1>
-
------------------
+<br>
 
 
 A python package for a distance-based classifier which can use several different distance metrics.
