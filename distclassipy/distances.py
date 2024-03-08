@@ -55,7 +55,6 @@ class Distance:
     def acc(self, u, v):
         """
         Calculate the average of Cityblock/Manhattan and Chebyshev distances.
-
         This function computes the ACC distance, also known as the Average distance, between two
         vectors u and v. It is the average of the Cityblock (or Manhattan) and Chebyshev distances.
 
@@ -68,15 +67,14 @@ class Distance:
         References:
         1. Krause EF (2012) Taxicab Geometry An Adventure in Non-Euclidean Geometry. Dover Publications.
         2. Sung-Hyuk C (2007) Comprehensive Survey on Distance/Similarity Measures between Probability
-           Density Functions. International Journal of Mathematical Models and Methods in Applied Sciences.
-           vol. 1(4), pp. 300-307.
+        Density Functions. International Journal of Mathematical Models and Methods in Applied Sciences.
+        vol. 1(4), pp. 300-307.
         """
         return (self.cityblock(u, v) + self.chebyshev(u, v)) / 2
 
     def add_chisq(self, u, v):
         """
         Compute the Additive Symmetric Chi-square distance between two vectors.
-
         The Additive Symmetric Chi-square distance is a measure that can be used to compare two vectors.
         This function calculates it based on the input vectors u and v.
 
@@ -87,9 +85,9 @@ class Distance:
         - The Additive Symmetric Chi-square distance between the two vectors.
 
         References:
-        1. Sung-Hyuk C (2007) Comprehensive Survey on Distance/Similarity Measures between Probability
-           Density Functions. International Journal of Mathematical Models and Methods in Applied Sciences.
-           vol. 1(4), pp. 300-307.
+            1. Sung-Hyuk C (2007) Comprehensive Survey on Distance/Similarity Measures between Probability
+               Density Functions. International Journal of Mathematical Models and Methods in Applied Sciences.
+               vol. 1(4), pp. 300-307.
         """
         u, v = np.asarray(u), np.asarray(v)
         uvmult = u * v
@@ -109,14 +107,14 @@ class Distance:
         - The Bhattacharyya distance between the two vectors.
 
         References:
-        1. Bhattacharyya A (1947) On a measure of divergence between two
-           statistical populations defined by probability distributions,
-           Bull. Calcutta Math. Soc., 35, 99–109.
-        2. Sung-Hyuk C. (2007) Comprehensive Survey on Distance/Similarity
-           Measures between Probability Density Functions. International
-           Journal of Mathematical Models and Methods in Applied Sciences.
-           1(4), 300-307.
-        3. https://en.wikipedia.org/wiki/Bhattacharyya_distance
+            1. Bhattacharyya A (1947) On a measure of divergence between two
+               statistical populations defined by probability distributions,
+               Bull. Calcutta Math. Soc., 35, 99–109.
+            2. Sung-Hyuk C. (2007) Comprehensive Survey on Distance/Similarity
+               Measures between Probability Density Functions. International
+               Journal of Mathematical Models and Methods in Applied Sciences.
+               1(4), 300-307.
+            3. https://en.wikipedia.org/wiki/Bhattacharyya_distance
         """
         u, v = np.asarray(u), np.asarray(v)
         return -np.log(np.sum(np.sqrt(u * v)))

@@ -3,12 +3,12 @@
 <html lang="en" data-content_root="./">
   <head>
     <meta charset="utf-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="generator" content="Docutils 0.19: https://docutils.sourceforge.io/" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="viewport" content="width=device-width, initial-scale=1" />
 
-    <title>Distance module &#8212; DistClassiPy 0.0.8 documentation</title>
+    <title>Distance module &#8212; DistClassiPy 0.1.0 documentation</title>
     <link rel="stylesheet" type="text/css" href="_static/pygments.css?v=d1102ebc" />
     <link rel="stylesheet" type="text/css" href="_static/alabaster.css?v=12dfc556" />
-    <script src="_static/documentation_options.js?v=53b53b71"></script>
+    <script src="_static/documentation_options.js?v=01f34227"></script>
     <script src="_static/doctools.js?v=888ff710"></script>
     <script src="_static/sphinx_highlight.js?v=dc90522c"></script>
     <link rel="index" title="Index" href="genindex.html" />
@@ -75,8 +75,8 @@ limitations under the License.</p>
 <dl class="py method">
 <dt class="sig sig-object py" id="distclassipy.distances.Distance.acc">
 <span class="sig-name descname"><span class="pre">acc</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">u</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">v</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#distclassipy.distances.Distance.acc" title="Link to this definition">¶</a></dt>
-<dd><p>Calculate the average of Cityblock/Manhattan and Chebyshev distances.</p>
-<p>This function computes the ACC distance, also known as the Average distance, between two
+<dd><p>Calculate the average of Cityblock/Manhattan and Chebyshev distances.
+This function computes the ACC distance, also known as the Average distance, between two
 vectors u and v. It is the average of the Cityblock (or Manhattan) and Chebyshev distances.</p>
 <p>Parameters:
 - u, v: Input vectors between which the distance is to be calculated.</p>
@@ -84,29 +84,27 @@ vectors u and v. It is the average of the Cityblock (or Manhattan) and Chebyshev
 - The ACC distance between the two vectors.</p>
 <p>References:
 1. Krause EF (2012) Taxicab Geometry An Adventure in Non-Euclidean Geometry. Dover Publications.
-2. Sung-Hyuk C (2007) Comprehensive Survey on Distance/Similarity Measures between Probability</p>
-<blockquote>
-<div><p>Density Functions. International Journal of Mathematical Models and Methods in Applied Sciences.
+2. Sung-Hyuk C (2007) Comprehensive Survey on Distance/Similarity Measures between Probability
+Density Functions. International Journal of Mathematical Models and Methods in Applied Sciences.
 vol. 1(4), pp. 300-307.</p>
-</div></blockquote>
 </dd></dl>
 
 <dl class="py method">
 <dt class="sig sig-object py" id="distclassipy.distances.Distance.add_chisq">
 <span class="sig-name descname"><span class="pre">add_chisq</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">u</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">v</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#distclassipy.distances.Distance.add_chisq" title="Link to this definition">¶</a></dt>
-<dd><p>Compute the Additive Symmetric Chi-square distance between two vectors.</p>
-<p>The Additive Symmetric Chi-square distance is a measure that can be used to compare two vectors.
+<dd><p>Compute the Additive Symmetric Chi-square distance between two vectors.
+The Additive Symmetric Chi-square distance is a measure that can be used to compare two vectors.
 This function calculates it based on the input vectors u and v.</p>
 <p>Parameters:
 - u, v: Input vectors between which the distance is to be calculated.</p>
 <p>Returns:
 - The Additive Symmetric Chi-square distance between the two vectors.</p>
-<p>References:
-1. Sung-Hyuk C (2007) Comprehensive Survey on Distance/Similarity Measures between Probability</p>
-<blockquote>
-<div><p>Density Functions. International Journal of Mathematical Models and Methods in Applied Sciences.
-vol. 1(4), pp. 300-307.</p>
-</div></blockquote>
+<p class="rubric">References</p>
+<ol class="arabic simple">
+<li><p>Sung-Hyuk C (2007) Comprehensive Survey on Distance/Similarity Measures between Probability
+Density Functions. International Journal of Mathematical Models and Methods in Applied Sciences.
+vol. 1(4), pp. 300-307.</p></li>
+</ol>
 </dd></dl>
 
 <dl class="py method">
@@ -118,13 +116,11 @@ vol. 1(4), pp. 300-307.</p>
 - u, v: Input vectors between which the distance is to be calculated.</p>
 <p>Returns:
 - The Bhattacharyya distance between the two vectors.</p>
-<p>References:
-1. Bhattacharyya A (1947) On a measure of divergence between two</p>
-<blockquote>
-<div><p>statistical populations defined by probability distributions,
-Bull. Calcutta Math. Soc., 35, 99–109.</p>
-</div></blockquote>
-<ol class="arabic simple" start="2">
+<p class="rubric">References</p>
+<ol class="arabic simple">
+<li><p>Bhattacharyya A (1947) On a measure of divergence between two
+statistical populations defined by probability distributions,
+Bull. Calcutta Math. Soc., 35, 99–109.</p></li>
 <li><p>Sung-Hyuk C. (2007) Comprehensive Survey on Distance/Similarity
 Measures between Probability Density Functions. International
 Journal of Mathematical Models and Methods in Applied Sciences.
