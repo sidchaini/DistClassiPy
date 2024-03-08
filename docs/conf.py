@@ -29,7 +29,7 @@ release = get_version_from_pyproject()
 # -- General configuration ---------------------------------------------------
 # https://www.sphinx-doc.org/en/master/usage/configuration.html#general-configuration
 
-extensions = ["sphinx.ext.autodoc", "sphinx.ext.napoleon"]
+extensions = ["sphinx.ext.autodoc", "sphinx.ext.napoleon", "sphinx_favicon"]
 
 templates_path = ["_templates"]
 exclude_patterns = ["_build", "Thumbs.db", ".DS_Store"]
@@ -49,3 +49,7 @@ html_theme_options = {
         "image_dark": "_static/logo-dark.png",
     },
 }
+
+favicons = [
+    "favicon.svg",
+]
