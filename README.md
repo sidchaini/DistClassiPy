@@ -1,12 +1,11 @@
-<h1 align="center">
-<script>
-  if (window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches) {
-    document.write('<img src="docs/_static/logo-dark.png" width="300">');
-  } else {
-    document.write('<img src="docs/_static/logo.png" width="300">');
-  }
-</script>
-</h1><br>
+<picture align="center">
+  <source media="(prefers-color-scheme: dark)" srcset="docs/_static/logo-dark.svg" width="300">
+  <img alt="Pandas Logo" src="docs/_static/logo.svg" width="300">
+</picture>
+
+-----------------
+
+
 A python package for a distance-based classifier which can use several different distance metrics.
 
 ## Installation
