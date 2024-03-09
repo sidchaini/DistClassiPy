@@ -6,8 +6,9 @@
 </h1>
 <br>
 
-[![PyPI Downloads](https://img.shields.io/pypi/dm/distclassipy.svg?label=PyPI%20downloads)](
-https://pypi.org/project/distclassipy/)
+[![PyPI](https://img.shields.io/pypi/v/distclassipy?color=blue&logo=pypi&logoColor=white)](https://pypi.org/project/distclassipy/)
+[![Installs](https://img.shields.io/pypi/dm/distclassipy.svg?label=PyPI%20downloads)](https://pypi.org/project/distclassipy/)
+
 <!-- [![Paper](https://img.shields.io/badge/DOI-10.1038%2Fs41586--020--2649--2-blue)](
 https://doi.org/10.1038/s41586-020-2649-2) -->
 [![Code style: black](https://img.shields.io/badge/code%20style-black-000000.svg)](https://github.com/psf/black)
