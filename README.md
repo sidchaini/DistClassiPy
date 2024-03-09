@@ -19,6 +19,7 @@ pip install distclassipy
 Here's a quick example to get you started with DistClassiPy:
 ```python
 import distclassipy as dcpy
+
 clf = dcpy.DistanceMetricClassifier()
 # Add your data and labels
 clf.fit(data, labels)

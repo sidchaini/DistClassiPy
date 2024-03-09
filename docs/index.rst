@@ -25,6 +25,7 @@ Here's a quick example to get you started with DistClassiPy:
 .. code-block:: python
 
     import distclassipy as dcpy
+
     clf = dcpy.DistanceMetricClassifier()
     # Add your data and labels
     clf.fit(data, labels)
