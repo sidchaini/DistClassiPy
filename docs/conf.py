@@ -32,7 +32,7 @@ release = get_version_from_pyproject()
 extensions = ["sphinx.ext.autodoc", "sphinx.ext.napoleon", "sphinx_favicon"]
 
 templates_path = ["_templates"]
-exclude_patterns = ["_build", "Thumbs.db", ".DS_Store"]
+exclude_patterns = ["_build", "Thumbs.db", ".DS_Store", "**.ipynb_checkpoints"]
 
 
 # -- Options for HTML output -------------------------------------------------
@@ -61,3 +61,6 @@ extensions.append("sphinx_copybutton")
 ## the text that goes into the clipboard.
 copybutton_exclude = ".linenos, .gp"
 copybutton_prompt_text = ">> "
+
+## lets us suppress the copy button on select code blocks.
+copybutton_selector = "div:not(.no-copybutton) > div.highlight > pre"

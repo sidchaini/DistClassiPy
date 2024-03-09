@@ -11,7 +11,7 @@ requires-python = ">=3.10"
 license = {file = "LICENSE"}
 authors = [{name = "Siddharth Chaini", email = "sidchaini@gmail.com"}]
 classifiers = [
-    "Development Status :: 3 - Alpha",
+    "Development Status :: 4 - Beta",
     "Intended Audience :: Developers",
     "Intended Audience :: Education",
     "Intended Audience :: Science/Research",
@@ -30,5 +30,5 @@ dependencies = [
 ]
 
 [project.urls]
-Homepage = "https://github.com/sidchaini/DistClassiPy"
-Issues = "https://github.com/sidchaini/DistClassiPy/issues"
+Repository = "https://github.com/sidchaini/DistClassiPy"
+Documenation = "https://sidchaini.github.io/DistClassiPy/"
