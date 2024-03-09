@@ -6,6 +6,12 @@
 </h1>
 <br>
 
+[![PyPI Downloads](https://img.shields.io/pypi/dm/numpy.svg?label=PyPI%20downloads)](
+https://pypi.org/project/distclassipy/)
+<!-- [![Paper](https://img.shields.io/badge/DOI-10.1038%2Fs41586--020--2649--2-blue)](
+https://doi.org/10.1038/s41586-020-2649-2) -->
+[![Code Style](https://img.shields.io/badge/code%20style-black-000000.svg)]
+
 
 A python package for a distance-based classifier which can use several different distance metrics.
 
