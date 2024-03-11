@@ -36,22 +36,12 @@ jobs:
         python3 -m pip install -e .
         python3 -m pip install pytest pytest-cov
 
-    - name: Test classifier model with PyTest
+    - name: Test with PyTest and generate coverage report
       run: |
-        python3 -m pytest tests/test_classifier.py --cov=distclassipy.classifier --cov-report=xml
+        python3 -m pytest tests/ --cov=distclassipy --cov-report=xml
 
     - name: Upload coverage report to codecov
       uses: codecov/codecov-action@v4.0.1
       with:
         token: ${{ secrets.CODECOV_TOKEN }}
-        slug: sidchaini/DistClassiPy    
-
-    - name: Test distance functions with PyTest
-      run: |
-        python3 -m pytest tests/test_distances.py --cov=distclassipy.distances --cov-report=xml
-    
-    - name: Upload coverage report to codecov
-      uses: codecov/codecov-action@v4.0.1
-      with:
-        token: ${{ secrets.CODECOV_TOKEN }}
-        slug: sidchaini/DistClassiPy    
+        slug: sidchaini/DistClassiPy
