@@ -1,6 +1,6 @@
 # Guide: https://shrra.github.io/python-intermediate-development/23-continuous-integration-automated-testing/index.html
 
-name: CI
+name: Unit test and code coverage
 
 # We can specify which Github events will trigger a CI build
 on: push
