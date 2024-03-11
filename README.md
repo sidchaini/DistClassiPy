@@ -8,6 +8,8 @@
 
 [![PyPI](https://img.shields.io/pypi/v/distclassipy?color=blue&logo=pypi&logoColor=white)](https://pypi.org/project/distclassipy/)
 [![Installs](https://img.shields.io/pypi/dm/distclassipy.svg?label=PyPI%20downloads)](https://pypi.org/project/distclassipy/)
+[![Codecov](https://codecov.io/gh/sidchaini/distclassipy/branch/main/graph/badge.svg)](https://codecov.io/gh/sidchaini/distclassipy)
+[![License - GPL-3](https://img.shields.io/pypi/l/distclassipy.svg)](https://github.com/sidchaini/distclassipy/blob/main/LICENSE)
 [![Code style: black](https://img.shields.io/badge/code%20style-black-000000.svg)](https://github.com/psf/black)
 
 <!-- [![Paper](https://img.shields.io/badge/DOI-10.1038%2Fs41586--020--2649--2-blue)](
