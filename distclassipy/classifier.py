@@ -1,6 +1,6 @@
 import numpy as np
 import pandas as pd
-from scipy.spatial import distance
+import scipy
 from .distances import Distance
 from sklearn.base import BaseEstimator, ClassifierMixin
 from sklearn.utils.validation import check_X_y, check_array, check_is_fitted
@@ -52,6 +52,12 @@ class DistanceMetricClassifier(BaseEstimator, ClassifierMixin):
         self.calculate_kde = calculate_kde
         self.calculate_1d_dist = calculate_1d_dist
 
+        # Hardcoded metric sources to check in.
+        self.metric_sources = {
+            "scipy.spatial.distance": scipy.spatial.distance,
+            "distances.Distance": Distance(),
+        }
+
     def fit(self, X: np.array, y: np.array, feat_labels: list[str] = None):
         """Fit the classifier to the data.
 
@@ -69,6 +75,8 @@ class DistanceMetricClassifier(BaseEstimator, ClassifierMixin):
         X, y = check_X_y(X, y)
         self.classes_ = unique_labels(y)
         self.n_features_in_ = X.shape[1]
+
+        self.set_metric_fn()
 
         if feat_labels is None:
             feat_labels = [f"Feature_{x}" for x in range(X.shape[1])]
@@ -112,7 +120,6 @@ class DistanceMetricClassifier(BaseEstimator, ClassifierMixin):
             self.df_iqr_ = df_iqr
 
         if self.calculate_kde:
-            self.set_metric_fn()
             self.kde_dict_ = {}
 
             for cl in self.classes_:
@@ -146,7 +153,7 @@ class DistanceMetricClassifier(BaseEstimator, ClassifierMixin):
         X = check_array(X)
 
         if not self.scale:
-            dist_arr = distance.cdist(
+            dist_arr = scipy.spatial.distance.cdist(
                 XA=X, XB=self.df_centroid_.to_numpy(), metric=self.metric
             )
 
@@ -164,7 +171,7 @@ class DistanceMetricClassifier(BaseEstimator, ClassifierMixin):
                 w = wtdf.loc[cl].to_numpy()  # 1/std dev
                 XB = XB * w  # w is for this class only
                 XA = X * w  # w is for this class only
-                cl_dist = distance.cdist(XA=XA, XB=XB, metric=self.metric)
+                cl_dist = scipy.spatial.distance.cdist(XA=XA, XB=XB, metric=self.metric)
                 dist_arr_list.append(cl_dist)
             dist_arr = np.column_stack(dist_arr_list)
 
@@ -177,17 +184,24 @@ class DistanceMetricClassifier(BaseEstimator, ClassifierMixin):
 
         If the metric is a string, the function will look for a corresponding function in scipy.spatial.distance or distances.Distance. If the metric is a function, it will be used directly.
         """
-        if not callable(self.metric) or isinstance(self.metric, str):
-            if hasattr(distance, self.metric):
-                self.metric_fn_ = getattr(distance, self.metric)
-            elif hasattr(Distance(), self.metric):
-                self.metric_fn_ = getattr(Distance(), self.metric)
-            else:
+
+        if callable(self.metric):
+            self.metric_fn_ = self.metric
+            self.metric_arg_ = self.metric
+
+        elif isinstance(self.metric, str):
+            metric_str_lowercase = self.metric.lower()
+            metric_found = False
+            for _, source in self.metric_sources.items():
+                if hasattr(source, metric_str_lowercase):
+                    self.metric_fn_ = getattr(source, metric_str_lowercase)
+                    metric_found = True
+                    break
+
+            if not metric_found:
                 raise ValueError(
                     f"{self.metric} metric not found. Please pass a string of the name of a metric in scipy.spatial.distance or distances.Distance, or pass a metric function directly. For a list of available metrics, see: https://sidchaini.github.io/DistClassiPy/distances.html or https://docs.scipy.org/doc/scipy/reference/spatial.distance.html"
                 )
-        else:
-            self.metric_fn_ = self.metric
 
     def predict_and_analyse(self, X: np.array):
         """
@@ -204,7 +218,7 @@ class DistanceMetricClassifier(BaseEstimator, ClassifierMixin):
         X = check_array(X)
 
         if not self.scale:
-            dist_arr = distance.cdist(
+            dist_arr = scipy.spatial.distance.cdist(
                 XA=X, XB=self.df_centroid_.to_numpy(), metric=self.metric
             )
 
@@ -222,7 +236,7 @@ class DistanceMetricClassifier(BaseEstimator, ClassifierMixin):
                 w = wtdf.loc[cl].to_numpy()  # 1/std dev
                 XB = XB * w  # w is for this class only
                 XA = X * w  # w is for this class only
-                cl_dist = distance.cdist(XA=XA, XB=XB, metric=self.metric)
+                cl_dist = scipy.spatial.distance.cdist(XA=XA, XB=XB, metric=self.metric)
                 dist_arr_list.append(cl_dist)
             dist_arr = np.column_stack(dist_arr_list)
 
@@ -262,7 +276,7 @@ class DistanceMetricClassifier(BaseEstimator, ClassifierMixin):
             for cl in self.classes_:
                 sum_1d_dists = np.zeros(shape=(len(Xdf_temp)))
                 for feat in Xdf_temp.columns:
-                    dists = distance.cdist(
+                    dists = scipy.spatial.distance.cdist(
                         XA=np.zeros(shape=(1, 1)),
                         XB=(self.df_centroid_.loc[cl] - Xdf_temp)[feat]
                         .to_numpy()
