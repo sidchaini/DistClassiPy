@@ -60,7 +60,7 @@ DistClassiPy is released under the [GNU General Public License v3.0](https://www
 ## Citation
 
 If you use DistClassiPy in your research or project, please consider citing the paper:
-> Light Curve Classification with DistClassiPy: a new distance-based classifier (submitted)
+> Light Curve Classification with DistClassiPy: a new distance-based classifier (submitted to A&C)
 
 
 <!--
