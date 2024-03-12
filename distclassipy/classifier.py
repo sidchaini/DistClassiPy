@@ -47,8 +47,6 @@ class DistanceMetricClassifier(BaseEstimator, ClassifierMixin):
         Indicates whether a kernel density estimate is calculated.
     calculate_1d_dist : bool
         Indicates whether 1-dimensional distances are calculated.
-    metric_sources_ : dict
-        A dictionary mapping metric source names to their respective objects or functions currently supported in DistClassiPy.
 
     See Also
     --------
@@ -61,7 +59,7 @@ class DistanceMetricClassifier(BaseEstimator, ClassifierMixin):
 
     References
     ----------
-    .. [1] "", Machine Learning, 45(1), 5-32, 2001.
+    .. [1] "Light Curve Classification with DistClassiPy: a new distance-based classifier"
 
     Examples
     --------
@@ -102,7 +100,7 @@ class DistanceMetricClassifier(BaseEstimator, ClassifierMixin):
             "distances.Distance": Distance(),
         }
 
-    def set_metric_fn(self):
+    def set_metric_fn_(self):
         """
         Set the metric function based on the provided metric.
 
@@ -116,10 +114,15 @@ class DistanceMetricClassifier(BaseEstimator, ClassifierMixin):
         elif isinstance(self.metric, str):
             metric_str_lowercase = self.metric.lower()
             metric_found = False
-            for _, source in self.metric_sources_.items():
+            for package_str, source in self.metric_sources_.items():
                 if hasattr(source, metric_str_lowercase):
                     self.metric_fn_ = getattr(source, metric_str_lowercase)
                     metric_found = True
+                    if package_str == "scipy.spatial.distance":
+                        # Use the string as an argument if it belongs to scipy as it is optimized
+                        self.metric_arg_ = self.metric
+                    else:
+                        self.metric_arg_ = self.metric_fn_
                     break
 
             if not metric_found:
@@ -151,7 +154,7 @@ class DistanceMetricClassifier(BaseEstimator, ClassifierMixin):
         self.classes_ = unique_labels(y)
         self.n_features_in_ = X.shape[1]
 
-        self.set_metric_fn()
+        self.set_metric_fn_()
 
         if feat_labels is None:
             feat_labels = [f"Feature_{x}" for x in range(X.shape[1])]
@@ -234,7 +237,7 @@ class DistanceMetricClassifier(BaseEstimator, ClassifierMixin):
 
         if not self.scale:
             dist_arr = scipy.spatial.distance.cdist(
-                XA=X, XB=self.df_centroid_.to_numpy(), metric=self.metric
+                XA=X, XB=self.df_centroid_.to_numpy(), metric=self.metric_arg_
             )
 
         else:
@@ -251,7 +254,9 @@ class DistanceMetricClassifier(BaseEstimator, ClassifierMixin):
                 w = wtdf.loc[cl].to_numpy()  # 1/std dev
                 XB = XB * w  # w is for this class only
                 XA = X * w  # w is for this class only
-                cl_dist = scipy.spatial.distance.cdist(XA=XA, XB=XB, metric=self.metric)
+                cl_dist = scipy.spatial.distance.cdist(
+                    XA=XA, XB=XB, metric=self.metric_arg_
+                )
                 dist_arr_list.append(cl_dist)
             dist_arr = np.column_stack(dist_arr_list)
 
@@ -281,7 +286,7 @@ class DistanceMetricClassifier(BaseEstimator, ClassifierMixin):
 
         if not self.scale:
             dist_arr = scipy.spatial.distance.cdist(
-                XA=X, XB=self.df_centroid_.to_numpy(), metric=self.metric
+                XA=X, XB=self.df_centroid_.to_numpy(), metric=self.metric_arg_
             )
 
         else:
@@ -298,7 +303,9 @@ class DistanceMetricClassifier(BaseEstimator, ClassifierMixin):
                 w = wtdf.loc[cl].to_numpy()  # 1/std dev
                 XB = XB * w  # w is for this class only
                 XA = X * w  # w is for this class only
-                cl_dist = scipy.spatial.distance.cdist(XA=XA, XB=XB, metric=self.metric)
+                cl_dist = scipy.spatial.distance.cdist(
+                    XA=XA, XB=XB, metric=self.metric_arg_
+                )
                 dist_arr_list.append(cl_dist)
             dist_arr = np.column_stack(dist_arr_list)
 
@@ -343,7 +350,7 @@ class DistanceMetricClassifier(BaseEstimator, ClassifierMixin):
                         XB=(self.df_centroid_.loc[cl] - Xdf_temp)[feat]
                         .to_numpy()
                         .reshape(-1, 1),
-                        metric=self.metric,
+                        metric=self.metric_arg_,
                     ).ravel()
                     if self.scale and self.dispersion_stat == "std":
                         sum_1d_dists = sum_1d_dists + dists / self.df_std_.loc[cl, feat]
