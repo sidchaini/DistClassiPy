@@ -4,38 +4,26 @@ A module providing a variety of distance metrics to calculate the distance betwe
 This module includes implementations of various distance metrics, including both common and less
 common measures. It allows for the calculation of distances between data points in a vectorized
 manner using numpy arrays.
-This code is based on the work of Andrzej Zielezinski, originally retrieved on 20 November 2022 from
-https://github.com/aziele/statistical-distances/blob/04412b3155c59fc7238b3d8ecf6f3723ac5befff/distance.py
+A part of this code is based on the work of Andrzej Zielezinski, originally retrieved on 20 November 2022 from
+https://github.com/aziele/statistical-distances/blob/04412b3155c59fc7238b3d8ecf6f3723ac5befff/distance.py, which was released via the GNU General Public License v3.0.
 
-It has been modified by Siddharth Chaini on 27 November 2022.
+It was originally modified by Siddharth Chaini on 27 November 2022.
 
-Licensed GNU General Public License v3.0;
-you may not use this file except in compliance with the License.
-You may obtain a copy of the License at
+Notes
+-----
 
-    https://www.gnu.org/licenses/gpl-3.0.en.html
+    Modifications by Siddharth Chaini include the addition of the following distance measures:
+        1. Meehl distance
+        2. Sorensen distance
+        3. Ruzicka distance
+        4. Inner product distance
+        5. Harmonic mean distance
+        6. Fidelity
+        7. Minimimum Symmetric Chi Squared
+        8. Probabilistic Symmetric Chi Squared
 
-Unless required by applicable law or agreed to in writing, software
-distributed under the License is distributed on an "AS IS" BASIS,
-WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-See the License for the specific language governing permissions and
-limitations under the License.
-
-Modifications by Siddharth Chaini include the addition of the following distance measures:
-    1. Meehl distance
-    2. Sorensen distance
-    3. Ruzicka distance
-    4. Inner product distance
-    5. Harmonic mean distance
-    6. Fidelity
-    7. Minimimum Symmetric Chi Squared
-    8. Probabilistic Symmetric Chi Squared
-
-In addition, the following code was added to all functions for array conversion:
-    u,v = np.asarray(u), np.asarray(v)
-
-Todos:
-    ALSO COMPARE RUNTIME OF THIS v/s custom v/s Tschopp
+    In addition, the following code was added to all functions for array conversion:
+        u,v = np.asarray(u), np.asarray(v)
 """
 
 import numpy as np
@@ -47,7 +35,8 @@ class Distance:
         """
         Initialize the Distance class with an optional epsilon value.
 
-        Parameters:
+        Parameters
+        ----------
         - epsilon: A small value to avoid division by zero errors.
         """
         self.epsilon = np.finfo(float).eps if not epsilon else epsilon
@@ -58,17 +47,20 @@ class Distance:
         This function computes the ACC distance, also known as the Average distance, between two
         vectors u and v. It is the average of the Cityblock (or Manhattan) and Chebyshev distances.
 
-        Parameters:
+        Parameters
+        ----------
         - u, v: Input vectors between which the distance is to be calculated.
 
-        Returns:
+        Returns
+        -------
         - The ACC distance between the two vectors.
 
-        References:
-        1. Krause EF (2012) Taxicab Geometry An Adventure in Non-Euclidean Geometry. Dover Publications.
-        2. Sung-Hyuk C (2007) Comprehensive Survey on Distance/Similarity Measures between Probability
-        Density Functions. International Journal of Mathematical Models and Methods in Applied Sciences.
-        vol. 1(4), pp. 300-307.
+        References
+        ----------
+            1. Krause EF (2012) Taxicab Geometry An Adventure in Non-Euclidean Geometry. Dover Publications.
+            2. Sung-Hyuk C (2007) Comprehensive Survey on Distance/Similarity Measures between Probability
+               Density Functions. International Journal of Mathematical Models and Methods in Applied Sciences.
+               vol. 1(4), pp. 300-307.
         """
         return (self.cityblock(u, v) + self.chebyshev(u, v)) / 2
 
@@ -78,13 +70,16 @@ class Distance:
         The Additive Symmetric Chi-square distance is a measure that can be used to compare two vectors.
         This function calculates it based on the input vectors u and v.
 
-        Parameters:
+        Parameters
+        ----------
         - u, v: Input vectors between which the distance is to be calculated.
 
-        Returns:
+        Returns
+        -------
         - The Additive Symmetric Chi-square distance between the two vectors.
 
-        References:
+        References
+        ----------
             1. Sung-Hyuk C (2007) Comprehensive Survey on Distance/Similarity Measures between Probability
                Density Functions. International Journal of Mathematical Models and Methods in Applied Sciences.
                vol. 1(4), pp. 300-307.
@@ -100,13 +95,16 @@ class Distance:
 
         Returns a distance value between 0 and 1.
 
-        Parameters:
+        Parameters
+        ----------
         - u, v: Input vectors between which the distance is to be calculated.
 
-        Returns:
+        Returns
+        -------
         - The Bhattacharyya distance between the two vectors.
 
-        References:
+        References
+        ----------
             1. Bhattacharyya A (1947) On a measure of divergence between two
                statistical populations defined by probability distributions,
                Bull. Calcutta Math. Soc., 35, 99–109.
@@ -128,17 +126,21 @@ class Distance:
         of species at both sites. It is closely related to the Sørensen distance and is also known as
         Bray-Curtis dissimilarity.
 
-        Notes:
+        Notes
+        -----
             When used for comparing two probability density functions (pdfs),
             the Bray-Curtis distance equals the Cityblock distance divided by 2.
 
-        Parameters:
+        Parameters
+        ----------
         - u, v: Input vectors between which the distance is to be calculated.
 
-        Returns:
+        Returns
+        -------
         - The Bray-Curtis distance between the two vectors.
 
-        References:
+        References
+        ----------
             1. Bray JR, Curtis JT (1957) An ordination of the upland forest of
                southern Wisconsin. Ecological Monographs, 27, 325-349.
             2. Sung-Hyuk C. (2007) Comprehensive Survey on Distance/Similarity
@@ -156,17 +158,21 @@ class Distance:
 
         The Canberra distance is a weighted version of the Manhattan distance, used in numerical analysis.
 
-        Notes:
+        Notes
+        -----
             When `u[i]` and `v[i]` are 0 for given i, then the fraction 0/0 = 0
             is used in the calculation.
 
-        Parameters:
+        Parameters
+        ----------
         - u, v: Input vectors between which the distance is to be calculated.
 
-        Returns:
+        Returns
+        -------
         - The Canberra distance between the two vectors.
 
-        References:
+        References
+        ----------
             1. Sung-Hyuk C. (2007) Comprehensive Survey on Distance/Similarity
                Measures between Probability Density Functions. International
                Journal of Mathematical Models and Methods in Applied Sciences.
@@ -189,13 +195,16 @@ class Distance:
             Maximum value distance
             Minimax approximation
 
-        Parameters:
+        Parameters
+        ----------
         - u, v: Input vectors between which the distance is to be calculated.
 
-        Returns:
+        Returns
+        -------
         - The Chebyshev distance between the two vectors.
 
-        References:
+        References
+        ----------
             1. Sung-Hyuk C. (2007) Comprehensive Survey on Distance/Similarity
                Measures between Probability Density Functions. International
                Journal of Mathematical Models and Methods in Applied Sciences.
@@ -210,10 +219,12 @@ class Distance:
 
         This measure represents a custom approach by Zielezinski to distance measurement, focusing on the minimum absolute difference.
 
-        Parameters:
+        Parameters
+        ----------
         - u, v: Input vectors between which the distance is to be calculated.
 
-        Returns:
+        Returns
+        -------
         - The minimum value distance between the two vectors.
         """
         u, v = np.asarray(u), np.asarray(v)
@@ -225,17 +236,21 @@ class Distance:
 
         The Clark distance equals the square root of half of the divergence.
 
-        Notes:
+        Notes
+        -----
             When `u[i]` and `v[i]` are 0 for given i, then the fraction 0/0 = 0
             is used in the calculation.
 
-        Parameters:
+        Parameters
+        ----------
         - u, v: Input vectors between which the distance is to be calculated.
 
-        Returns:
+        Returns
+        -------
         - The Clark distance between the two vectors.
 
-        References:
+        References
+        ----------
             1. Sung-Hyuk C. (2007) Comprehensive Survey on Distance/Similarity
                Measures between Probability Density Functions. International
                Journal of Mathematical Models and Methods in Applied Sciences.
@@ -249,13 +264,16 @@ class Distance:
         """
         Calculate the cosine distance between two vectors.
 
-        Parameters:
+        Parameters
+        ----------
         - u, v: Input vectors between which the distance is to be calculated.
 
-        Returns:
+        Returns
+        -------
         - The cosine distance between the two vectors.
 
-        References:
+        References
+        ----------
             1. SciPy.
         """
         u, v = np.asarray(u), np.asarray(v)
@@ -267,10 +285,12 @@ class Distance:
 
         Returns a distance value between 0 and 2.
 
-        Parameters:
+        Parameters
+        ----------
         - u, v: Input vectors between which the distance is to be calculated.
 
-        Returns:
+        Returns
+        -------
         - The Pearson correlation distance between the two vectors.
         """
 
@@ -282,13 +302,16 @@ class Distance:
         """
         Calculate the Czekanowski distance between two vectors.
 
-        Parameters:
+        Parameters
+        ----------
         - u, v: Input vectors between which the distance is to be calculated.
 
-        Returns:
+        Returns
+        -------
         - The Czekanowski distance between the two vectors.
 
-        References:
+        References
+        ----------
             1. Sung-Hyuk C. (2007) Comprehensive Survey on Distance/Similarity
                Measures between Probability Density Functions. International
                Journal of Mathematical Models and Methods in Applied Sciences.
@@ -304,13 +327,16 @@ class Distance:
         Synonyms:
             Sorensen distance
 
-        Parameters:
+        Parameters
+        ----------
         - u, v: Input vectors between which the distance is to be calculated.
 
-        Returns:
+        Returns
+        -------
         - The Dice dissimilarity between the two vectors.
 
-        References:
+        References
+        ----------
             1. Dice LR (1945) Measures of the amount of ecologic association
                between species. Ecology. 26, 297-302.
             2. Sung-Hyuk C. (2007) Comprehensive Survey on Distance/Similarity
@@ -328,13 +354,16 @@ class Distance:
 
         Divergence equals squared Clark distance multiplied by 2.
 
-        Parameters:
+        Parameters
+        ----------
         - u, v: Input vectors between which the distance is to be calculated.
 
-        Returns:
+        Returns
+        -------
         - The divergence between the two vectors.
 
-        References:
+        References
+        ----------
             1. Sung-Hyuk C. (2007) Comprehensive Survey on Distance/Similarity
                Measures between Probability Density Functions. International
                Journal of Mathematical Models and Methods in Applied Sciences.
@@ -350,13 +379,16 @@ class Distance:
 
         The Euclidean distance is the "ordinary" straight-line distance between two points in Euclidean space.
 
-        Parameters:
+        Parameters
+        ----------
         - u, v: Input vectors between which the distance is to be calculated.
 
-        Returns:
+        Returns
+        -------
         - The Euclidean distance between the two vectors.
 
-        References:
+        References
+        ----------
             1. Sung-Hyuk C. (2007) Comprehensive Survey on Distance/Similarity
                Measures between Probability Density Functions. International
                Journal of Mathematical Models and Methods in Applied Sciences.
@@ -371,13 +403,16 @@ class Distance:
 
         The fidelity distance measures the similarity between two probability distributions.
 
-        Parameters:
+        Parameters
+        ----------
         - u, v: Input vectors between which the distance is to be calculated.
 
-        Returns:
+        Returns
+        -------
         - The fidelity distance between the two vectors.
 
-        Notes:
+        Notes
+        -----
             Added by SC.
         """
         u, v = np.asarray(u), np.asarray(v)
@@ -389,17 +424,21 @@ class Distance:
 
         NGD is a measure of similarity derived from the number of hits returned by the Google search engine for a given set of keywords.
 
-        Parameters:
+        Parameters
+        ----------
         - u, v: Input vectors between which the distance is to be calculated.
 
-        Returns:
+        Returns
+        -------
         - The Normalized Google Distance between the two vectors.
 
-        Notes:
+        Notes
+        -----
             When used for comparing two probability density functions (pdfs),
             Google distance equals half of Cityblock distance.
 
-        References:
+        References
+        ----------
             1. Lee & Rashid (2008) Information Technology, ITSim 2008.
                doi:10.1109/ITSIM.2008.4631601.
         """
@@ -415,13 +454,16 @@ class Distance:
 
         The Gower distance equals the Cityblock distance divided by the vector length.
 
-        Parameters:
+        Parameters
+        ----------
         - u, v: Input vectors between which the distance is to be calculated.
 
-        Returns:
+        Returns
+        -------
         - The Gower distance between the two vectors.
 
-        References:
+        References
+        ----------
             1. Gower JC. (1971) General Coefficient of Similarity
                and Some of Its Properties, Biometrics 27, 857-874.
             2. Sung-Hyuk C. (2007) Comprehensive Survey on Distance/Similarity
@@ -449,18 +491,22 @@ class Distance:
 
         The Hellinger distance is a measure of similarity between two probability distributions.
 
-        Parameters:
+        Parameters
+        ----------
         - u, v: Input vectors between which the distance is to be calculated.
 
-        Returns:
+        Returns
+        -------
         - The Hellinger distance between the two vectors.
 
-        Notes:
+        Notes
+        -----
             This implementation produces values two times larger than values
             obtained by Hellinger distance described in Wikipedia and also
             in https://gist.github.com/larsmans/3116927.
 
-        References:
+        References
+        ----------
            1. Sung-Hyuk C. (2007) Comprehensive Survey on Distance/Similarity
               Measures between Probability Density Functions. International
               Journal of Mathematical Models and Methods in Applied Sciences.
@@ -475,13 +521,16 @@ class Distance:
 
         The inner product distance is a measure of similarity between two vectors, based on their inner product.
 
-        Parameters:
+        Parameters
+        ----------
         - u, v: Input vectors between which the distance is to be calculated.
 
-        Returns:
+        Returns
+        -------
         - The inner product distance between the two vectors.
 
-        Notes:
+        Notes
+        -----
             Added by SC.
         """
         u, v = np.asarray(u), np.asarray(v)
@@ -493,13 +542,16 @@ class Distance:
 
         The Jaccard distance measures dissimilarity between sample sets.
 
-        Parameters:
+        Parameters
+        ----------
         - u, v: Input vectors between which the distance is to be calculated.
 
-        Returns:
+        Returns
+        -------
         - The Jaccard distance between the two vectors.
 
-        References:
+        References
+        ----------
            1. Sung-Hyuk C. (2007) Comprehensive Survey on Distance/Similarity
               Measures between Probability Density Functions. International
               Journal of Mathematical Models and Methods in Applied Sciences.
@@ -515,13 +567,16 @@ class Distance:
 
         The Jeffreys divergence is a symmetric version of the Kullback-Leibler divergence.
 
-        Parameters:
+        Parameters
+        ----------
         - u, v: Input vectors between which the divergence is to be calculated.
 
-        Returns:
+        Returns
+        -------
         - The Jeffreys divergence between the two vectors.
 
-        References:
+        References
+        ----------
             1. Jeffreys H (1946) An Invariant Form for the Prior Probability
                in Estimation Problems. Proc.Roy.Soc.Lon., Ser. A 186, 453-461.
             2. Sung-Hyuk C. (2007) Comprehensive Survey on Distance/Similarity
@@ -545,13 +600,16 @@ class Distance:
 
         The Jensen-Shannon divergence is a symmetric and finite measure of similarity between two probability distributions.
 
-        Parameters:
+        Parameters
+        ----------
         - u, v: Input vectors between which the divergence is to be calculated.
 
-        Returns:
+        Returns
+        -------
         - The Jensen-Shannon divergence between the two vectors.
 
-        References:
+        References
+        ----------
             1. Lin J. (1991) Divergence measures based on the Shannon entropy.
                IEEE Transactions on Information Theory, 37(1):145–151.
             2. Sung-Hyuk C. (2007) Comprehensive Survey on Distance/Similarity
@@ -580,18 +638,22 @@ class Distance:
 
         The Jensen difference is considered similar to the Jensen-Shannon divergence.
 
-        Parameters:
+        Parameters
+        ----------
         - u, v: Input vectors between which the distance is to be calculated.
 
-        Returns:
+        Returns
+        -------
         - The Jensen difference between the two vectors.
 
-        Notes:
+        Notes
+        -----
             1. Equals half of Topsøe distance
             2. Equals squared jensenshannon_distance.
 
 
-        References:
+        References
+        ----------
             1. Sung-Hyuk C. (2007) Comprehensive Survey on Distance/Similarity
                Measures between Probability Density Functions. International
                Journal of Mathematical Models and Methods in Applied Sciences.
@@ -608,13 +670,16 @@ class Distance:
         """
         Calculate the K divergence between two vectors.
 
-        Parameters:
+        Parameters
+        ----------
         - u, v: Input vectors between which the divergence is to be calculated.
 
-        Returns:
+        Returns
+        -------
         - The K divergence between the two vectors.
 
-        References:
+        References
+        ----------
             1. Sung-Hyuk C. (2007) Comprehensive Survey on Distance/Similarity
                Measures between Probability Density Functions. International
                Journal of Mathematical Models and Methods in Applied Sciences.
@@ -631,13 +696,16 @@ class Distance:
 
         The Kullback-Leibler divergence measures the difference between two probability distributions.
 
-        Parameters:
+        Parameters
+        ----------
         - u, v: Input vectors between which the divergence is to be calculated.
 
-        Returns:
+        Returns
+        -------
         - The Kullback-Leibler divergence between the two vectors.
 
-        References:
+        References
+        ----------
             1. Kullback S, Leibler RA (1951) On information and sufficiency.
                Ann. Math. Statist. 22:79–86
             2. Sung-Hyuk C. (2007) Comprehensive Survey on Distance/Similarity
@@ -654,13 +722,16 @@ class Distance:
         """
         Calculate the Kulczynski distance between two vectors.
 
-        Parameters:
+        Parameters
+        ----------
         - u, v: Input vectors between which the distance is to be calculated.
 
-        Returns:
+        Returns
+        -------
         - The Kulczynski distance between the two vectors.
 
-        References:
+        References
+        ----------
             1. Sung-Hyuk C. (2007) Comprehensive Survey on Distance/Similarity
                Measures between Probability Density Functions. International
                Journal of Mathematical Models and Methods in Applied Sciences.
@@ -673,13 +744,16 @@ class Distance:
         """
         Calculate the Kumar-Johnson distance between two vectors.
 
-        Parameters:
+        Parameters
+        ----------
         - u, v: Input vectors between which the distance is to be calculated.
 
-        Returns:
+        Returns
+        -------
         - The Kumar-Johnson distance between the two vectors.
 
-        References:
+        References
+        ----------
             1. Kumar P, Johnson A. (2005) On a symmetric divergence measure
                and information inequalities, Journal of Inequalities in pure
                and applied Mathematics. 6(3).
@@ -699,19 +773,23 @@ class Distance:
         """
         Calculate the Lorentzian distance between two vectors.
 
-        Parameters:
+        Parameters
+        ----------
         - u, v: Input vectors between which the distance is to be calculated.
 
-        Returns:
+        Returns
+        -------
         - The Lorentzian distance between the two vectors.
 
-        References:
+        References
+        ----------
             1. Sung-Hyuk C. (2007) Comprehensive Survey on Distance/Similarity
                Measures between Probability Density Functions. International
                Journal of Mathematical Models and Methods in Applied Sciences.
                1(4):300-307.
 
-        Notes:
+        Notes
+        -----
             One (1) is added to guarantee the non-negativity property and to
             eschew the log of zero.
         """
@@ -722,13 +800,16 @@ class Distance:
         """
         Calculate the Cityblock (Manhattan) distance between two vectors.
 
-        Parameters:
+        Parameters
+        ----------
         - u, v: Input vectors between which the distance is to be calculated.
 
-        Returns:
+        Returns
+        -------
         - The Cityblock distance between the two vectors.
 
-        References:
+        References
+        ----------
             1. Sung-Hyuk C. (2007) Comprehensive Survey on Distance/Similarity
                Measures between Probability Density Functions. International
                Journal of Mathematical Models and Methods in Applied Sciences.
@@ -740,7 +821,8 @@ class Distance:
             Rectilinear distance
             Taxicab norm
 
-        Notes:
+        Notes
+        -----
             Cityblock distance between two probability density functions
             (pdfs) equals:
             1. Non-intersection distance multiplied by 2.
@@ -755,13 +837,16 @@ class Distance:
         """
         Calculate the Maryland Bridge distance between two vectors.
 
-        Parameters:
+        Parameters
+        ----------
         - u, v: Input vectors between which the distance is to be calculated.
 
-        Returns:
+        Returns
+        -------
         - The Maryland Bridge distance between the two vectors.
 
-        References:
+        References
+        ----------
             1. Deza M, Deza E (2009) Encyclopedia of Distances.
                Springer-Verlag Berlin Heidelberg. 1-590.
         """
@@ -773,19 +858,23 @@ class Distance:
         """
         Calculate the Matusita distance between two vectors.
 
-        Parameters:
+        Parameters
+        ----------
         - u, v: Input vectors between which the distance is to be calculated.
 
-        Returns:
+        Returns
+        -------
         - The Matusita distance between the two vectors.
 
-        References:
+        References
+        ----------
             1. Sung-Hyuk C. (2007) Comprehensive Survey on Distance/Similarity
                Measures between Probability Density Functions. International
                Journal of Mathematical Models and Methods in Applied Sciences.
                1(4):300-307.
 
-        Notes:
+        Notes
+        -----
             Equals square root of Squared-chord distance.
         """
         u, v = np.asarray(u), np.asarray(v)
@@ -795,13 +884,16 @@ class Distance:
         """
         Calculate the maximum symmetric chi-square distance between two vectors.
 
-        Parameters:
+        Parameters
+        ----------
         - u, v: Input vectors between which the distance is to be calculated.
 
-        Returns:
+        Returns
+        -------
         - The maximum symmetric chi-square distance between the two vectors.
 
-        References:
+        References
+        ----------
             1. Sung-Hyuk C. (2007) Comprehensive Survey on Distance/Similarity
                Measures between Probability Density Functions. International
                Journal of Mathematical Models and Methods in Applied Sciences.
@@ -814,13 +906,16 @@ class Distance:
         """
         Calculate the minimum symmetric chi-square distance between two vectors.
 
-        Parameters:
+        Parameters
+        ----------
         - u, v: Input vectors between which the distance is to be calculated.
 
-        Returns:
+        Returns
+        -------
         - The minimum symmetric chi-square distance between the two vectors.
 
-        Notes:
+        Notes
+        -----
             Added by SC.
         """
         u, v = np.asarray(u), np.asarray(v)
@@ -830,16 +925,20 @@ class Distance:
         """
         Calculate the Meehl distance between two vectors.
 
-        Parameters:
+        Parameters
+        ----------
         - u, v: Input vectors between which the distance is to be calculated.
 
-        Returns:
+        Returns
+        -------
         - The Meehl distance between the two vectors.
 
-        Notes:
+        Notes
+        -----
             Added by SC.
 
-        References:
+        References
+        ----------
             1. Deza M. and Deza E. (2013) Encyclopedia of Distances.
                Berlin, Heidelberg: Springer Berlin Heidelberg.
                https://doi.org/10.1007/978-3-642-30958-8.
@@ -858,17 +957,21 @@ class Distance:
         """
         Calculate the Minkowski distance between two vectors.
 
-        Parameters:
+        Parameters
+        ----------
         - u, v: Input vectors between which the distance is to be calculated.
         - p: The order of the norm of the difference.
 
-        Returns:
+        Returns
+        -------
         - The Minkowski distance between the two vectors.
 
-        Notes:
+        Notes
+        -----
             When p goes to infinite, the Chebyshev distance is derived.
 
-        References:
+        References
+        ----------
             1. Sung-Hyuk C. (2007) Comprehensive Survey on Distance/Similarity
                Measures between Probability Density Functions. International
                Journal of Mathematical Models and Methods in Applied Sciences.
@@ -881,16 +984,20 @@ class Distance:
         """
         Calculate the Motyka distance between two vectors.
 
-        Parameters:
+        Parameters
+        ----------
         - u, v: Input vectors between which the distance is to be calculated.
 
-        Returns:
+        Returns
+        -------
         - The Motyka distance between the two vectors.
 
-        Notes:
+        Notes
+        -----
             The distance between identical vectors is not equal to 0 but 0.5.
 
-        References:
+        References
+        ----------
             1. Sung-Hyuk C. (2007) Comprehensive Survey on Distance/Similarity
                Measures between Probability Density Functions. International
                Journal of Mathematical Models and Methods in Applied Sciences.
@@ -903,13 +1010,16 @@ class Distance:
         """
         Calculate the Neyman chi-square distance between two vectors.
 
-        Parameters:
+        Parameters
+        ----------
         - u, v: Input vectors between which the distance is to be calculated.
 
-        Returns:
+        Returns
+        -------
         - The Neyman chi-square distance between the two vectors.
 
-        References:
+        References
+        ----------
             1. Neyman J (1949) Contributions to the theory of the chi^2 test.
                In Proceedings of the First Berkley Symposium on Mathematical
                Statistics and Probability.
@@ -926,19 +1036,23 @@ class Distance:
         """
         Calculate the Nonintersection distance between two vectors.
 
-        Parameters:
+        Parameters
+        ----------
         - u, v: Input vectors between which the distance is to be calculated.
 
-        Returns:
+        Returns
+        -------
         - The Nonintersection distance between the two vectors.
 
-        References:
+        References
+        ----------
             1. Sung-Hyuk C. (2007) Comprehensive Survey on Distance/Similarity
                Measures between Probability Density Functions. International
                Journal of Mathematical Models and Methods in Applied Sciences.
                1(4), 300-307.
 
-        Notes:
+        Notes
+        -----
             When used for comparing two probability density functions (pdfs),
             Nonintersection distance equals half of Cityblock distance.
         """
@@ -949,13 +1063,16 @@ class Distance:
         """
         Calculate the Pearson chi-square divergence between two vectors.
 
-        Parameters:
+        Parameters
+        ----------
         - u, v: Input vectors between which the divergence is to be calculated.
 
-        Returns:
+        Returns
+        -------
         - The Pearson chi-square divergence between the two vectors.
 
-        References:
+        References
+        ----------
             1. Pearson K. (1900) On the Criterion that a given system of
                deviations from the probable in the case of correlated system
                of variables is such that it can be reasonable supposed to have
@@ -965,7 +1082,8 @@ class Distance:
                Journal of Mathematical Models and Methods in Applied Sciences.
                1(4), 300-307.
 
-        Notes:
+        Notes
+        -----
             Pearson chi-square divergence is asymmetric.
         """
         u, v = np.asarray(u), np.asarray(v)
@@ -976,13 +1094,16 @@ class Distance:
         """
         Calculate the Penrose shape distance between two vectors.
 
-        Parameters:
+        Parameters
+        ----------
         - u, v: Input vectors between which the distance is to be calculated.
 
-        Returns:
+        Returns
+        -------
         - The Penrose shape distance between the two vectors.
 
-        References:
+        References
+        ----------
             1. Deza M, Deza E (2009) Encyclopedia of Distances.
                Springer-Verlag Berlin Heidelberg. 1-590.
         """
@@ -995,13 +1116,16 @@ class Distance:
         """
         Calculate the Probabilistic chi-square distance between two vectors.
 
-        Parameters:
+        Parameters
+        ----------
         - u, v: Input vectors between which the distance is to be calculated.
 
-        Returns:
+        Returns
+        -------
         - The Probabilistic chi-square distance between the two vectors.
 
-        Notes:
+        Notes
+        -----
             Added by SC.
         """
         u, v = np.asarray(u), np.asarray(v)
@@ -1013,13 +1137,16 @@ class Distance:
         """
         Calculate the Ruzicka distance between two vectors.
 
-        Parameters:
+        Parameters
+        ----------
         - u, v: Input vectors between which the distance is to be calculated.
 
-        Returns:
+        Returns
+        -------
         - The Ruzicka distance between the two vectors.
 
-        Notes:
+        Notes
+        -----
             Added by SC.
         """
         u, v = np.asarray(u), np.asarray(v)
@@ -1031,13 +1158,16 @@ class Distance:
         """
         Calculate the Sorensen distance between two vectors.
 
-        Parameters:
+        Parameters
+        ----------
         - u, v: Input vectors between which the distance is to be calculated.
 
-        Returns:
+        Returns
+        -------
         - The Sorensen distance between the two vectors.
 
-        Notes:
+        Notes
+        -----
             The Sorensen distance equals the Manhattan distance divided by the sum of the two vectors.
 
             Added by SC.
@@ -1049,16 +1179,20 @@ class Distance:
         """
         Calculate the Soergel distance between two vectors.
 
-        Parameters:
+        Parameters
+        ----------
         - u, v: Input vectors between which the distance is to be calculated.
 
-        Returns:
+        Returns
+        -------
         - The Soergel distance between the two vectors.
 
-        Notes:
+        Notes
+        -----
             Equals Tanimoto distance.
 
-        References:
+        References
+        ----------
             1. Sung-Hyuk C. (2007) Comprehensive Survey on Distance/Similarity
                Measures between Probability Density Functions. International
                Journal of Mathematical Models and Methods in Applied Sciences.
@@ -1071,13 +1205,16 @@ class Distance:
         """
         Calculate the Squared chi-square distance between two vectors.
 
-        Parameters:
+        Parameters
+        ----------
         - u, v: Input vectors between which the distance is to be calculated.
 
-        Returns:
+        Returns
+        -------
         - The Squared chi-square distance between the two vectors.
 
-        References:
+        References
+        ----------
             1. Sung-Hyuk C. (2007) Comprehensive Survey on Distance/Similarity
                Measures between Probability Density Functions. International
                Journal of Mathematical Models and Methods in Applied Sciences.
@@ -1092,13 +1229,16 @@ class Distance:
         """
         Calculate the Squared-chord distance between two vectors.
 
-        Parameters:
+        Parameters
+        ----------
         - u, v: Input vectors between which the distance is to be calculated.
 
-        Returns:
+        Returns
+        -------
         - The Squared-chord distance between the two vectors.
 
-        References:
+        References
+        ----------
             1. Gavin DG et al. (2003) A statistical approach to evaluating
                distance metrics and analog assignments for pollen records.
                Quaternary Research 60:356–367.
@@ -1107,7 +1247,8 @@ class Distance:
                Journal of Mathematical Models and Methods in Applied Sciences.
                1(4), 300-307.
 
-        Notes:
+        Notes
+        -----
             Equals to squared Matusita distance.
         """
         u, v = np.asarray(u), np.asarray(v)
@@ -1117,13 +1258,16 @@ class Distance:
         """
         Calculate the Squared Euclidean distance between two vectors.
 
-        Parameters:
+        Parameters
+        ----------
         - u, v: Input vectors between which the distance is to be calculated.
 
-        Returns:
+        Returns
+        -------
         - The Squared Euclidean distance between the two vectors.
 
-        References:
+        References
+        ----------
             1. Gavin DG et al. (2003) A statistical approach to evaluating
                distance metrics and analog assignments for pollen records.
                Quaternary Research 60:356–367.
@@ -1132,7 +1276,8 @@ class Distance:
                Journal of Mathematical Models and Methods in Applied Sciences.
                1(4), 300-307.
 
-        Notes:
+        Notes
+        -----
             Equals to squared Euclidean distance.
         """
         u, v = np.asarray(u), np.asarray(v)
@@ -1142,13 +1287,16 @@ class Distance:
         """
         Calculate the Taneja distance between two vectors.
 
-        Parameters:
+        Parameters
+        ----------
         - u, v: Input vectors between which the distance is to be calculated.
 
-        Returns:
+        Returns
+        -------
         - The Taneja distance between the two vectors.
 
-        References:
+        References
+        ----------
             1. Taneja IJ. (1995), New Developments in Generalized Information
                Measures, Chapter in: Advances in Imaging and Electron Physics,
                Ed. P.W. Hawkes, 91, 37-135.
@@ -1167,19 +1315,23 @@ class Distance:
         """
         Calculate the Tanimoto distance between two vectors.
 
-        Parameters:
+        Parameters
+        ----------
         - u, v: Input vectors between which the distance is to be calculated.
 
-        Returns:
+        Returns
+        -------
         - The Tanimoto distance between the two vectors.
 
-        References:
+        References
+        ----------
             1. Sung-Hyuk C. (2007) Comprehensive Survey on Distance/Similarity
                Measures between Probability Density Functions. International
                Journal of Mathematical Models and Methods in Applied Sciences.
                1(4), 300-307.
 
-        Notes:
+        Notes
+        -----
             Equals Soergel distance.
         """
         u, v = np.asarray(u), np.asarray(v)
@@ -1193,19 +1345,23 @@ class Distance:
         """
         Calculate the Topsøe distance between two vectors.
 
-        Parameters:
+        Parameters
+        ----------
         - u, v: Input vectors between which the distance is to be calculated.
 
-        Returns:
+        Returns
+        -------
         - The Topsøe distance between the two vectors.
 
-        References:
+        References
+        ----------
             1. Sung-Hyuk C (2007) Comprehensive Survey on Distance/Similarity
                Measures between Probability Density Functions. International
                Journal of Mathematical Models and Methods in Applied Sciences.
                1(4), 300-307.
 
-        Notes:
+        Notes
+        -----
             Equals two times Jensen-Shannon divergence.
         """
         u, v = np.asarray(u), np.asarray(v)
@@ -1219,13 +1375,16 @@ class Distance:
         """
         Calculate the Vicis Symmetric chi-square distance between two vectors.
 
-        Parameters:
+        Parameters
+        ----------
         - u, v: Input vectors between which the distance is to be calculated.
 
-        Returns:
+        Returns
+        -------
         - The Vicis Symmetric chi-square distance between the two vectors.
 
-        References:
+        References
+        ----------
             1. Sung-Hyuk C (2007) Comprehensive Survey on Distance/Similarity
                Measures between Probability Density Functions. International
                Journal of Mathematical Models and Methods in Applied Sciences.
@@ -1241,13 +1400,16 @@ class Distance:
         """
         Calculate the Vicis-Wave Hedges distance between two vectors.
 
-        Parameters:
+        Parameters
+        ----------
         - u, v: Input vectors between which the distance is to be calculated.
 
-        Returns:
+        Returns
+        -------
         - The Vicis-Wave Hedges distance between the two vectors.
 
-        References:
+        References
+        ----------
             1. Sung-Hyuk C (2007) Comprehensive Survey on Distance/Similarity
                Measures between Probability Density Functions. International
                Journal of Mathematical Models and Methods in Applied Sciences.
@@ -1263,13 +1425,16 @@ class Distance:
         """
         Calculate the Wave Hedges distance between two vectors.
 
-        Parameters:
+        Parameters
+        ----------
         - u, v: Input vectors between which the distance is to be calculated.
 
-        Returns:
+        Returns
+        -------
         - The Wave Hedges distance between the two vectors.
 
-        References:
+        References
+        ----------
             1. Sung-Hyuk C (2007) Comprehensive Survey on Distance/Similarity
                Measures between Probability Density Functions. International
                Journal of Mathematical Models and Methods in Applied Sciences.
