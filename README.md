@@ -90,4 +90,4 @@ If you use DistClassiPy in your research or project, please consider citing the 
 
 
 ## Authors
-Siddharth Chaini (E-mail: sidchaini@gmail.com), Ashish Mahabal, Ajit Kembhavi and Federica B. Bianco.
+Siddharth Chaini, Ashish Mahabal, Ajit Kembhavi and Federica B. Bianco.
