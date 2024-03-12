@@ -13,10 +13,15 @@ jobs:
     steps:
       - uses: actions/checkout@v4
       - uses: actions/setup-python@v5
-      - name: Install dependencies
+      - name: Install distclassipy
         run: |
           python3 -m pip install .
+      - name: Install sphinx dependencies
+        run: |
           if [ -f docs/requirements.txt ]; then python3 -m pip install -r docs/requirements.txt; fi
+      - name: Install pandoc
+        run: |
+          sudo apt-get install pandoc
       - name: Sphinx build
         run: |
           sphinx-build -T -E -b html -d docs/build/doctrees ./docs docs/build/html
