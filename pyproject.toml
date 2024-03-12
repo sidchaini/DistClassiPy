@@ -31,4 +31,4 @@ dependencies = [
 
 [project.urls]
 Repository = "https://github.com/sidchaini/DistClassiPy"
-Documenation = "https://sidchaini.github.io/DistClassiPy/"
+Documentation = "https://sidchaini.github.io/DistClassiPy/"
