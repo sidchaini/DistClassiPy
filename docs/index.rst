@@ -25,12 +25,19 @@ Here's a quick example to get you started with DistClassiPy:
 .. code-block:: python
 
     import distclassipy as dcpy
+    from sklearn.datasets import make_classification
 
-    clf = dcpy.DistanceMetricClassifier()
-    # Add your data and labels
-    clf.fit(data, labels)
-    # Predict new instances
-    predictions = clf.predict(new_data)
+    X, y = make_classification(
+        n_samples=1000,
+        n_features=4,
+        n_informative=2,
+        n_redundant=0,
+        random_state=0,
+        shuffle=False,
+    )
+    clf = dcpy.DistanceMetricClassifier(metric="canberra")
+    clf.fit(X, y)
+    print(clf.predict([[0, 0, 0, 0]]))
 
 Features
 --------
@@ -39,10 +46,10 @@ Features
 - Easy integration with existing data processing pipelines
 - Efficient and scalable for large datasets
 
-Contact
+Authors
 -------
 
-For any queries, please reach out to Siddharth Chaini at sidchaini@gmail.com.
+Siddharth Chaini (E-mail: sidchaini@gmail.com), Ashish Mahabal, Ajit Kembhavi and Federica B. Bianco.
 
 
 
