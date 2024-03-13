@@ -94,18 +94,18 @@ class DistanceMetricClassifier(BaseEstimator, ClassifierMixin):
         self.calculate_kde = calculate_kde
         self.calculate_1d_dist = calculate_1d_dist
 
-        # Hardcoded source packages to check for distance metrics.
-        self.metric_sources_ = {
-            "scipy.spatial.distance": scipy.spatial.distance,
-            "distances.Distance": Distance(),
-        }
-
     def set_metric_fn_(self):
         """
         Set the metric function based on the provided metric.
 
         If the metric is a string, the function will look for a corresponding function in scipy.spatial.distance or distances.Distance. If the metric is a function, it will be used directly.
         """
+
+        # Hardcoded source packages to check for distance metrics.
+        metric_sources_ = {
+            "scipy.spatial.distance": scipy.spatial.distance,
+            "distances.Distance": Distance(),
+        }
 
         if callable(self.metric):
             self.metric_fn_ = self.metric
@@ -114,7 +114,7 @@ class DistanceMetricClassifier(BaseEstimator, ClassifierMixin):
         elif isinstance(self.metric, str):
             metric_str_lowercase = self.metric.lower()
             metric_found = False
-            for package_str, source in self.metric_sources_.items():
+            for package_str, source in metric_sources_.items():
                 if hasattr(source, metric_str_lowercase):
                     self.metric_fn_ = getattr(source, metric_str_lowercase)
                     metric_found = True
