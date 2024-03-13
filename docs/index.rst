@@ -49,7 +49,7 @@ Features
 Authors
 -------
 
-Siddharth Chaini (E-mail: sidchaini@gmail.com), Ashish Mahabal, Ajit Kembhavi and Federica B. Bianco.
+Siddharth Chaini, Ashish Mahabal, Ajit Kembhavi and Federica B. Bianco.
 
 
 
