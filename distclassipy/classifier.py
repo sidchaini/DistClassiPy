@@ -115,16 +115,25 @@ class DistanceMetricClassifier(BaseEstimator, ClassifierMixin):
             metric_str_lowercase = self.metric.lower()
             metric_found = False
             for package_str, source in metric_sources_.items():
+
+                # Don't use scipy for jaccard as their implementation only works with booleans - use custom jaccard instead
+                if (
+                    package_str == "scipy.spatial.distance"
+                    and metric_str_lowercase == "jaccard"
+                ):
+                    continue
+
                 if hasattr(source, metric_str_lowercase):
                     self.metric_fn_ = getattr(source, metric_str_lowercase)
                     metric_found = True
-                    if package_str == "scipy.spatial.distance":
-                        # Use the string as an argument if it belongs to scipy as it is optimized
-                        self.metric_arg_ = self.metric
-                    else:
-                        self.metric_arg_ = self.metric_fn_
-                    break
 
+                    # Use the string as an argument if it belongs to scipy as it is optimized
+                    self.metric_arg_ = (
+                        self.metric
+                        if package_str == "scipy.spatial.distance"
+                        else self.metric_fn_
+                    )
+                    break
             if not metric_found:
                 raise ValueError(
                     f"{self.metric} metric not found. Please pass a string of the name of a metric in scipy.spatial.distance or distances.Distance, or pass a metric function directly. For a list of available metrics, see: https://sidchaini.github.io/DistClassiPy/distances.html or https://docs.scipy.org/doc/scipy/reference/spatial.distance.html"
