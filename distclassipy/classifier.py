@@ -358,9 +358,7 @@ class DistanceMetricClassifier(BaseEstimator, ClassifierMixin):
                         sum_1d_dists = sum_1d_dists + dists / self.df_iqr_.loc[cl, feat]
                     else:
                         sum_1d_dists = sum_1d_dists + dists
-                confs = 1 / sum_1d_dists
-                # Add epsilon later
-                # confs = 1 / (sum_1d_dists + np.finfo(float).eps)
+                confs = 1 / np.clip(sum_1d_dists, a_min=np.finfo(float).eps, a_max=None)
                 conf_cl.append(confs)
             conf_cl = np.array(conf_cl)
             self.conf_cl_ = conf_cl
@@ -388,7 +386,9 @@ class DistanceMetricClassifier(BaseEstimator, ClassifierMixin):
 
         # Calculate confidence for each prediction
         if method == "distance_inverse":
-            self.confidence_df_ = 1 / self.centroid_dist_df_
+            self.confidence_df_ = 1 / np.clip(
+                self.centroid_dist_df_, a_min=np.finfo(float).eps, a_max=None
+            )
             self.confidence_df_.columns = [
                 x.replace("_dist", "_conf") for x in self.confidence_df_.columns
             ]
