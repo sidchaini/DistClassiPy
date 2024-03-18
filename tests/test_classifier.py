@@ -1,6 +1,7 @@
 import pytest
 import numpy as np
 from distclassipy.classifier import DistanceMetricClassifier
+from sklearn.utils.estimator_checks import check_estimator
 
 
 # Test initialization of the classifier with specific parameters
@@ -8,9 +9,6 @@ def test_init():
     clf = DistanceMetricClassifier(metric="euclidean", scale=True)
     assert clf.metric == "euclidean"
     assert clf.scale is True
-
-
-from sklearn.utils.estimator_checks import check_estimator
 
 
 def test_sklearn_compatibility():
