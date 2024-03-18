@@ -43,9 +43,11 @@ print(clf.predict([[0, 0, 0, 0]]))
 ```
 
 ## Features
-- Multiple distance metrics support
-- Easy integration with existing data processing pipelines
-- Efficient and scalable for large datasets
+- **Distance Metric-Based Classification**: Utilizes a variety of distance metrics for classification.
+- **Customizable for Scientific Goals**: Allows fine-tuning based on scientific objectives by selecting appropriate distance metrics and features, enhancing both computational efficiency and model performance.
+- **Interpretable Results**: Offers improved interpretability of classification outcomes by directly using distance metrics and feature importance, making it ideal for scientific applications.
+- **Efficient and Scalable**: Demonstrates lower computational requirements compared to traditional methods like Random Forests, making it suitable for large datasets
+- **Open Source and Accessible**: Available as an open-source Python package on PyPI, encouraging broad application in astronomy and beyond
 
 ## Documentation
 
