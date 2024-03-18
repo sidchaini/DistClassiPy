@@ -1,3 +1,7 @@
+"""
+A module which contains the DistanceMetricClassifier introduced by Chaini et al. (2024) in "Light Curve Classification with DistClassiPy: a new distance-based classifier".
+"""
+
 import numpy as np
 import pandas as pd
 import scipy

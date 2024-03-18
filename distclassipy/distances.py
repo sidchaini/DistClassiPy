@@ -24,6 +24,7 @@ Notes
 
     In addition, the following code was added to all functions for array conversion:
         u,v = np.asarray(u), np.asarray(v)
+-----
 """
 
 import numpy as np
