@@ -89,33 +89,33 @@ class Distance:
         with np.errstate(divide="ignore", invalid="ignore"):
             return np.sum(np.where(uvmult != 0, ((u - v) ** 2 * (u + v)) / uvmult, 0))
 
-    def bhattacharyya(self, u, v):
-        """
-        Calculate the Bhattacharyya distance between two vectors.
+    # def bhattacharyya(self, u, v):
+    #     """
+    #     Calculate the Bhattacharyya distance between two vectors.
 
-        Returns a distance value between 0 and 1.
+    #     Returns a distance value between 0 and 1.
 
-        Parameters
-        ----------
-        - u, v: Input vectors between which the distance is to be calculated.
+    #     Parameters
+    #     ----------
+    #     - u, v: Input vectors between which the distance is to be calculated.
 
-        Returns
-        -------
-        - The Bhattacharyya distance between the two vectors.
+    #     Returns
+    #     -------
+    #     - The Bhattacharyya distance between the two vectors.
 
-        References
-        ----------
-            1. Bhattacharyya A (1947) On a measure of divergence between two
-               statistical populations defined by probability distributions,
-               Bull. Calcutta Math. Soc., 35, 99–109.
-            2. Sung-Hyuk C. (2007) Comprehensive Survey on Distance/Similarity
-               Measures between Probability Density Functions. International
-               Journal of Mathematical Models and Methods in Applied Sciences.
-               1(4), 300-307.
-            3. https://en.wikipedia.org/wiki/Bhattacharyya_distance
-        """
-        u, v = np.asarray(u), np.asarray(v)
-        return -np.log(np.sum(np.sqrt(u * v)))
+    #     References
+    #     ----------
+    #         1. Bhattacharyya A (1947) On a measure of divergence between two
+    #            statistical populations defined by probability distributions,
+    #            Bull. Calcutta Math. Soc., 35, 99–109.
+    #         2. Sung-Hyuk C. (2007) Comprehensive Survey on Distance/Similarity
+    #            Measures between Probability Density Functions. International
+    #            Journal of Mathematical Models and Methods in Applied Sciences.
+    #            1(4), 300-307.
+    #         3. https://en.wikipedia.org/wiki/Bhattacharyya_distance
+    #     """
+    #     u, v = np.asarray(u), np.asarray(v)
+    #     return -np.log(np.sum(np.sqrt(u * v)))
 
     def braycurtis(self, u, v):
         """
@@ -397,26 +397,26 @@ class Distance:
         u, v = np.asarray(u), np.asarray(v)
         return np.linalg.norm(u - v)
 
-    def fidelity(self, u, v):
-        """
-        Calculate the fidelity distance between two vectors.
+    # def fidelity(self, u, v):
+    #     """
+    #     Calculate the fidelity distance between two vectors.
 
-        The fidelity distance measures the similarity between two probability distributions.
+    #     The fidelity distance measures the similarity between two probability distributions.
 
-        Parameters
-        ----------
-        - u, v: Input vectors between which the distance is to be calculated.
+    #     Parameters
+    #     ----------
+    #     - u, v: Input vectors between which the distance is to be calculated.
 
-        Returns
-        -------
-        - The fidelity distance between the two vectors.
+    #     Returns
+    #     -------
+    #     - The fidelity distance between the two vectors.
 
-        Notes
-        -----
-            Added by SC.
-        """
-        u, v = np.asarray(u), np.asarray(v)
-        return 1 - (np.sum(np.sqrt(u * v)))
+    #     Notes
+    #     -----
+    #         Added by SC.
+    #     """
+    #     u, v = np.asarray(u), np.asarray(v)
+    #     return 1 - (np.sum(np.sqrt(u * v)))
 
     def google(self, u, v):
         """
@@ -515,26 +515,26 @@ class Distance:
         u, v = np.asarray(u), np.asarray(v)
         return np.sqrt(2 * np.sum((np.sqrt(u) - np.sqrt(v)) ** 2))
 
-    def inner(self, u, v):
-        """
-        Calculate the inner product distance between two vectors.
+    # def inner(self, u, v):
+    #     """
+    #     Calculate the inner product distance between two vectors.
 
-        The inner product distance is a measure of similarity between two vectors, based on their inner product.
+    #     The inner product distance is a measure of similarity between two vectors, based on their inner product.
 
-        Parameters
-        ----------
-        - u, v: Input vectors between which the distance is to be calculated.
+    #     Parameters
+    #     ----------
+    #     - u, v: Input vectors between which the distance is to be calculated.
 
-        Returns
-        -------
-        - The inner product distance between the two vectors.
+    #     Returns
+    #     -------
+    #     - The inner product distance between the two vectors.
 
-        Notes
-        -----
-            Added by SC.
-        """
-        u, v = np.asarray(u), np.asarray(v)
-        return 1 - np.dot(u, v)
+    #     Notes
+    #     -----
+    #         Added by SC.
+    #     """
+    #     u, v = np.asarray(u), np.asarray(v)
+    #     return 1 - np.dot(u, v)
 
     def jaccard(self, u, v):
         """
@@ -1032,32 +1032,32 @@ class Distance:
         with np.errstate(divide="ignore", invalid="ignore"):
             return np.sum(np.where(u != 0, (u - v) ** 2 / u, 0))
 
-    def nonintersection(self, u, v):
-        """
-        Calculate the Nonintersection distance between two vectors.
+    # def nonintersection(self, u, v):
+    #     """
+    #     Calculate the Nonintersection distance between two vectors.
 
-        Parameters
-        ----------
-        - u, v: Input vectors between which the distance is to be calculated.
+    #     Parameters
+    #     ----------
+    #     - u, v: Input vectors between which the distance is to be calculated.
 
-        Returns
-        -------
-        - The Nonintersection distance between the two vectors.
+    #     Returns
+    #     -------
+    #     - The Nonintersection distance between the two vectors.
 
-        References
-        ----------
-            1. Sung-Hyuk C. (2007) Comprehensive Survey on Distance/Similarity
-               Measures between Probability Density Functions. International
-               Journal of Mathematical Models and Methods in Applied Sciences.
-               1(4), 300-307.
+    #     References
+    #     ----------
+    #         1. Sung-Hyuk C. (2007) Comprehensive Survey on Distance/Similarity
+    #            Measures between Probability Density Functions. International
+    #            Journal of Mathematical Models and Methods in Applied Sciences.
+    #            1(4), 300-307.
 
-        Notes
-        -----
-            When used for comparing two probability density functions (pdfs),
-            Nonintersection distance equals half of Cityblock distance.
-        """
-        u, v = np.asarray(u), np.asarray(v)
-        return 1 - np.sum(np.minimum(u, v))
+    #     Notes
+    #     -----
+    #         When used for comparing two probability density functions (pdfs),
+    #         Nonintersection distance equals half of Cityblock distance.
+    #     """
+    #     u, v = np.asarray(u), np.asarray(v)
+    #     return 1 - np.sum(np.minimum(u, v))
 
     def pearson_chisq(self, u, v):
         """
