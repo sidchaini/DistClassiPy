@@ -12,6 +12,8 @@
 [![License - GPL-3](https://img.shields.io/pypi/l/distclassipy.svg)](https://github.com/sidchaini/distclassipy/blob/main/LICENSE)
 [![Code style: black](https://img.shields.io/badge/code%20style-black-000000.svg)](https://github.com/psf/black)
 
+[![arXiv](https://img.shields.io/badge/arxiv-astro--ph%2F2403.12120-red)](https://arxiv.org/abs/2403.12120) 
+
 <!-- [![Paper](https://img.shields.io/badge/DOI-10.1038%2Fs41586--020--2649--2-blue)](
 https://doi.org/10.1038/s41586-020-2649-2) -->
 
@@ -62,30 +64,28 @@ DistClassiPy is released under the [GNU General Public License v3.0](https://www
 ## Citation
 
 If you use DistClassiPy in your research or project, please consider citing the paper:
-> Light Curve Classification with DistClassiPy: a new distance-based classifier (submitted to A&C)
+> Chaini, S., Mahabal, A., Kembhavi, A., & Bianco, F. B. (2024). Light Curve Classification with DistClassiPy: a new distance-based classifier. arXiv. https://doi.org/10.48550/arXiv.2403.12120
 
-
-<!--
 ### Bibtex
 
 
 ```bibtex
-@ARTICLE{Chaini2024,
-       author = {{Chaini}, S. and {Mahabal}, A. and {Kembhavi}, A. and {Bianco}, F.~B.},
-        title = "{Light Curve Classification with DistClassiPy: a new distance-based classifier}",
-      journal = {Submitted to A&C},
-    %  keywords = {},
-         year = 2024,
-      %   month = ,
-      %  volume = {},
-      %     eid = {},
-      %   pages = {},
-      %     doi = {},
-      %  adsurl = {},
-      % adsnote = {}
+@ARTICLE{chaini2024light,
+       author = {{Chaini}, Siddharth and {Mahabal}, Ashish and {Kembhavi}, Ajit and {Bianco}, Federica B.},
+       title = "{Light Curve Classification with DistClassiPy: a new distance-based classifier}",
+       journal = {arXiv e-prints},
+       keywords = {Astrophysics - Instrumentation and Methods for Astrophysics, Astrophysics - Solar and Stellar Astrophysics, Computer Science - Machine Learning},
+       year = 2024,
+       month = mar,
+       eid = {arXiv:2403.12120},
+       pages = {arXiv:2403.12120},
+       archivePrefix = {arXiv},
+       eprint = {2403.12120},
+       primaryClass = {astro-ph.IM},
+       adsurl = {https://ui.adsabs.harvard.edu/abs/2024arXiv240312120C},
+       adsnote = {Provided by the SAO/NASA Astrophysics Data System}
 }
 ```
--->
   
 
 <!-- You can also find citation information in the [CITATION.cff](https://github.com/sidchaini/DistClassiPy/CITATION.cff) file. -->
