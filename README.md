@@ -13,6 +13,7 @@
 [![Code style: black](https://img.shields.io/badge/code%20style-black-000000.svg)](https://github.com/psf/black)
 
 [![arXiv](https://img.shields.io/badge/arXiv-astro--ph%2F2403.12120-red)](https://arxiv.org/abs/2403.12120) 
+[![ascl:2403.002](https://img.shields.io/badge/ascl-2403.002-blue.svg?colorB=262255)](https://ascl.net/2403.002)
 
 <!-- [![Paper](https://img.shields.io/badge/DOI-10.1038%2Fs41586--020--2649--2-blue)](
 https://doi.org/10.1038/s41586-020-2649-2) -->
