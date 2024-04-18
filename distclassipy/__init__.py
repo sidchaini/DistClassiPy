@@ -12,4 +12,5 @@ from .classifier import (
 from .distances import (
     Distance,
 )  # Importing the Distance class from the distances module
-from .version import __version__
+
+__version__ = "0.1.3"
