@@ -5,15 +5,17 @@ A module which contains the DistanceMetricClassifier introduced by Chaini et al.
 import numpy as np
 import pandas as pd
 import scipy
-from .distances import Distance
+
 from sklearn.base import BaseEstimator, ClassifierMixin
-from sklearn.utils.validation import check_X_y, check_array, check_is_fitted
-from sklearn.utils.multiclass import unique_labels
 from sklearn.neighbors import KernelDensity
+from sklearn.utils.multiclass import unique_labels
+from sklearn.utils.validation import check_X_y, check_array, check_is_fitted
+
 from typing import Callable
 
-# Hardcoded source packages to check for distance metrics.
+from .distances import Distance
 
+# Hardcoded source packages to check for distance metrics.
 METRIC_SOURCES_ = {
     "scipy.spatial.distance": scipy.spatial.distance,
     "distances.Distance": Distance(),

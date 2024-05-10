@@ -6,11 +6,7 @@ Classes:
     Distance - A class that provides various distance metrics for use in classification.
 """
 
-from .classifier import (
-    DistanceMetricClassifier,
-)  # Importing the DistanceMetricClassifier from the classifier module
-from .distances import (
-    Distance,
-)  # Importing the Distance class from the distances module
+from .classifier import DistanceMetricClassifier  # noqa
+from .distances import Distance  # noqa
 
 __version__ = "0.1.4"
