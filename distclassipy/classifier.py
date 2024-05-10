@@ -1,6 +1,6 @@
-"""
-A module which contains the DistanceMetricClassifier introduced by Chaini et al. (2024) in "Light Curve Classification with DistClassiPy: a new distance-based classifier".
-"""
+"""A module which contains the DistanceMetricClassifier introduced by Chaini et
+al. (2024) in "Light Curve Classification with DistClassiPy: a new distance-
+based classifier"."""
 
 import numpy as np
 import pandas as pd
@@ -23,8 +23,8 @@ METRIC_SOURCES_ = {
 
 
 class DistanceMetricClassifier(BaseEstimator, ClassifierMixin):
-    """
-    A distance-based classifier that supports the use of various distance metrics.
+    """A distance-based classifier that supports the use of various distance
+    metrics.
 
     The distance metric classifier determines the similarity between features in a dataset by leveraging the use of different distance metrics to. A specified distance metric is used to compute the distance between a given object and a centroid for every training class in the feature space. The classifier supports the use of different statistical measures for constructing the centroid and scaling the computed distance. Additionally, the distance metric classifier also optionally provides an estimate of the confidence of the classifier's predictions.
 
@@ -97,9 +97,7 @@ class DistanceMetricClassifier(BaseEstimator, ClassifierMixin):
         calculate_kde: bool = True,
         calculate_1d_dist: bool = True,
     ):
-        """
-        Initialize the classifier with specified parameters.
-        """
+        """Initialize the classifier with specified parameters."""
         self.metric = metric
         self.scale = scale
         self.central_stat = central_stat
@@ -108,10 +106,12 @@ class DistanceMetricClassifier(BaseEstimator, ClassifierMixin):
         self.calculate_1d_dist = calculate_1d_dist
 
     def set_metric_fn_(self):
-        """
-        Set the metric function based on the provided metric.
+        """Set the metric function based on the provided metric.
 
-        If the metric is a string, the function will look for a corresponding function in scipy.spatial.distance or distances.Distance. If the metric is a function, it will be used directly.
+        If the metric is a string, the function will look for a
+        corresponding function in scipy.spatial.distance or
+        distances.Distance. If the metric is a function, it will be used
+        directly.
         """
 
         if callable(self.metric):
@@ -147,8 +147,9 @@ class DistanceMetricClassifier(BaseEstimator, ClassifierMixin):
                 )
 
     def fit(self, X: np.array, y: np.array, feat_labels: list[str] = None):
-        """
-        Calculate the feature space centroid for all classes in the training set (X,y) using the central statistic. If scaling is enabled, also calculate the appropriate dispersion statistic.
+        """Calculate the feature space centroid for all classes in the training
+        set (X,y) using the central statistic. If scaling is enabled, also
+        calculate the appropriate dispersion statistic.
 
         This involves computing the centroid for every class in the feature space and optionally calculating the kernel density estimate and 1-dimensional distance.
 
@@ -280,8 +281,7 @@ class DistanceMetricClassifier(BaseEstimator, ClassifierMixin):
         return y_pred
 
     def predict_and_analyse(self, X: np.array):
-        """
-        Predict the class labels for the provided X and perform analysis.
+        """Predict the class labels for the provided X and perform analysis.
 
         The prediction is based on the distance of each data point in the input sample to the centroid for each class in the feature space. The predicted class is the one whose centroid is the closest to the input sample.
 
@@ -384,8 +384,7 @@ class DistanceMetricClassifier(BaseEstimator, ClassifierMixin):
         return y_pred
 
     def calculate_confidence(self, method: str = "distance_inverse"):
-        """
-        Calculate the confidence for each prediction.
+        """Calculate the confidence for each prediction.
 
         The confidence is calculated based on either the distance of each data point to the centroids of the training data, optionally the kernel density estimate or 1-dimensional distance.
 

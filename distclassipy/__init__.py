@@ -1,5 +1,4 @@
-"""
-A module for using distance metrics for classification.
+"""A module for using distance metrics for classification.
 
 Classes:
     DistanceMetricClassifier - A classifier that uses a specified distance metric for classification.
