@@ -12,6 +12,13 @@ from sklearn.utils.multiclass import unique_labels
 from sklearn.neighbors import KernelDensity
 from typing import Callable
 
+# Hardcoded source packages to check for distance metrics.
+
+METRIC_SOURCES_ = {
+    "scipy.spatial.distance": scipy.spatial.distance,
+    "distances.Distance": Distance(),
+}
+
 
 class DistanceMetricClassifier(BaseEstimator, ClassifierMixin):
     """
@@ -105,12 +112,6 @@ class DistanceMetricClassifier(BaseEstimator, ClassifierMixin):
         If the metric is a string, the function will look for a corresponding function in scipy.spatial.distance or distances.Distance. If the metric is a function, it will be used directly.
         """
 
-        # Hardcoded source packages to check for distance metrics.
-        metric_sources_ = {
-            "scipy.spatial.distance": scipy.spatial.distance,
-            "distances.Distance": Distance(),
-        }
-
         if callable(self.metric):
             self.metric_fn_ = self.metric
             self.metric_arg_ = self.metric
@@ -118,7 +119,7 @@ class DistanceMetricClassifier(BaseEstimator, ClassifierMixin):
         elif isinstance(self.metric, str):
             metric_str_lowercase = self.metric.lower()
             metric_found = False
-            for package_str, source in metric_sources_.items():
+            for package_str, source in METRIC_SOURCES_.items():
 
                 # Don't use scipy for jaccard as their implementation only works with booleans - use custom jaccard instead
                 if (
