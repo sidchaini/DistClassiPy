@@ -475,7 +475,7 @@ class Distance:
         u, v = np.asarray(u), np.asarray(v)
         return np.sum(np.abs(u - v)) / u.size
 
-    #### NEEDS CHECKING ####
+    # NEEDS CHECKING
     # def harmonicmean(self, u, v):
     #     """
     #     Harmonic mean distance.
@@ -484,7 +484,6 @@ class Distance:
     #     """
     #     u,v = np.asarray(u), np.asarray(v)
     #     return 1 - 2.*np.sum(u*v/(u+v))
-    #########
 
     def hellinger(self, u, v):
         """
