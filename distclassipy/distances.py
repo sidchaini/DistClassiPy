@@ -1,5 +1,5 @@
-"""
-A module providing a variety of distance metrics to calculate the distance between two points.
+"""A module providing a variety of distance metrics to calculate the distance
+between two points.
 
 This module includes implementations of various distance metrics, including both common and less
 common measures. It allows for the calculation of distances between data points in a vectorized
@@ -33,8 +33,7 @@ import numpy as np
 class Distance:
 
     def __init__(self, epsilon=None):
-        """
-        Initialize the Distance class with an optional epsilon value.
+        """Initialize the Distance class with an optional epsilon value.
 
         Parameters
         ----------
@@ -43,10 +42,10 @@ class Distance:
         self.epsilon = np.finfo(float).eps if not epsilon else epsilon
 
     def acc(self, u, v):
-        """
-        Calculate the average of Cityblock/Manhattan and Chebyshev distances.
-        This function computes the ACC distance, also known as the Average distance, between two
-        vectors u and v. It is the average of the Cityblock (or Manhattan) and Chebyshev distances.
+        """Calculate the average of Cityblock/Manhattan and Chebyshev
+        distances. This function computes the ACC distance, also known as the
+        Average distance, between two vectors u and v. It is the average of the
+        Cityblock (or Manhattan) and Chebyshev distances.
 
         Parameters
         ----------
@@ -66,10 +65,10 @@ class Distance:
         return (self.cityblock(u, v) + self.chebyshev(u, v)) / 2
 
     def add_chisq(self, u, v):
-        """
-        Compute the Additive Symmetric Chi-square distance between two vectors.
-        The Additive Symmetric Chi-square distance is a measure that can be used to compare two vectors.
-        This function calculates it based on the input vectors u and v.
+        """Compute the Additive Symmetric Chi-square distance between two
+        vectors. The Additive Symmetric Chi-square distance is a measure that
+        can be used to compare two vectors. This function calculates it based
+        on the input vectors u and v.
 
         Parameters
         ----------
@@ -119,8 +118,7 @@ class Distance:
     #     return -np.log(np.sum(np.sqrt(u * v)))
 
     def braycurtis(self, u, v):
-        """
-        Calculate the Bray-Curtis distance between two vectors.
+        """Calculate the Bray-Curtis distance between two vectors.
 
         The Bray-Curtis distance is a measure of dissimilarity between two non-negative vectors,
         often used in ecology to measure the compositional dissimilarity between two sites based on counts
@@ -154,8 +152,7 @@ class Distance:
         return np.sum(np.abs(u - v)) / np.sum(np.abs(u + v))
 
     def canberra(self, u, v):
-        """
-        Calculate the Canberra distance between two vectors.
+        """Calculate the Canberra distance between two vectors.
 
         The Canberra distance is a weighted version of the Manhattan distance, used in numerical analysis.
 
@@ -184,8 +181,7 @@ class Distance:
             return np.nansum(np.abs(u - v) / (np.abs(u) + np.abs(v)))
 
     def chebyshev(self, u, v):
-        """
-        Calculate the Chebyshev distance between two vectors.
+        """Calculate the Chebyshev distance between two vectors.
 
         The Chebyshev distance is a metric defined on a vector space where the distance between two vectors
         is the greatest of their differences along any coordinate dimension.
@@ -215,8 +211,7 @@ class Distance:
         return np.amax(np.abs(u - v))
 
     def chebyshev_min(self, u, v):
-        """
-        Calculate the minimum value distance between two vectors.
+        """Calculate the minimum value distance between two vectors.
 
         This measure represents a custom approach by Zielezinski to distance measurement, focusing on the minimum absolute difference.
 
@@ -232,8 +227,7 @@ class Distance:
         return np.amin(np.abs(u - v))
 
     def clark(self, u, v):
-        """
-        Calculate the Clark distance between two vectors.
+        """Calculate the Clark distance between two vectors.
 
         The Clark distance equals the square root of half of the divergence.
 
@@ -262,8 +256,7 @@ class Distance:
             return np.sqrt(np.nansum(np.power(np.abs(u - v) / (u + v), 2)))
 
     def cosine(self, u, v):
-        """
-        Calculate the cosine distance between two vectors.
+        """Calculate the cosine distance between two vectors.
 
         Parameters
         ----------
@@ -281,8 +274,7 @@ class Distance:
         return 1 - np.dot(u, v) / (np.sqrt(np.dot(u, u)) * np.sqrt(np.dot(v, v)))
 
     def correlation_pearson(self, u, v):
-        """
-        Calculate the Pearson correlation distance between two vectors.
+        """Calculate the Pearson correlation distance between two vectors.
 
         Returns a distance value between 0 and 2.
 
@@ -300,8 +292,7 @@ class Distance:
         return 1.0 - r
 
     def czekanowski(self, u, v):
-        """
-        Calculate the Czekanowski distance between two vectors.
+        """Calculate the Czekanowski distance between two vectors.
 
         Parameters
         ----------
@@ -322,8 +313,7 @@ class Distance:
         return np.sum(np.abs(u - v)) / np.sum(u + v)
 
     def dice(self, u, v):
-        """
-        Calculate the Dice dissimilarity between two vectors.
+        """Calculate the Dice dissimilarity between two vectors.
 
         Synonyms:
             Sorensen distance
@@ -350,8 +340,7 @@ class Distance:
         return np.dot(u_v, u_v) / (np.dot(u, u) + np.dot(v, v))
 
     def divergence(self, u, v):
-        """
-        Calculate the divergence between two vectors.
+        """Calculate the divergence between two vectors.
 
         Divergence equals squared Clark distance multiplied by 2.
 
@@ -375,8 +364,7 @@ class Distance:
             return 2 * np.nansum(np.power(u - v, 2) / np.power(u + v, 2))
 
     def euclidean(self, u, v):
-        """
-        Calculate the Euclidean distance between two vectors.
+        """Calculate the Euclidean distance between two vectors.
 
         The Euclidean distance is the "ordinary" straight-line distance between two points in Euclidean space.
 
@@ -420,8 +408,7 @@ class Distance:
     #     return 1 - (np.sum(np.sqrt(u * v)))
 
     def google(self, u, v):
-        """
-        Calculate the Normalized Google Distance (NGD) between two vectors.
+        """Calculate the Normalized Google Distance (NGD) between two vectors.
 
         NGD is a measure of similarity derived from the number of hits returned by the Google search engine for a given set of keywords.
 
@@ -450,8 +437,7 @@ class Distance:
         return (max([x, y]) - summin) / ((x + y) - min([x, y]))
 
     def gower(self, u, v):
-        """
-        Calculate the Gower distance between two vectors.
+        """Calculate the Gower distance between two vectors.
 
         The Gower distance equals the Cityblock distance divided by the vector length.
 
@@ -486,8 +472,7 @@ class Distance:
     #     return 1 - 2.*np.sum(u*v/(u+v))
 
     def hellinger(self, u, v):
-        """
-        Calculate the Hellinger distance between two vectors.
+        """Calculate the Hellinger distance between two vectors.
 
         The Hellinger distance is a measure of similarity between two probability distributions.
 
@@ -537,8 +522,7 @@ class Distance:
     #     return 1 - np.dot(u, v)
 
     def jaccard(self, u, v):
-        """
-        Calculate the Jaccard distance between two vectors.
+        """Calculate the Jaccard distance between two vectors.
 
         The Jaccard distance measures dissimilarity between sample sets.
 
@@ -562,8 +546,7 @@ class Distance:
         return 1 - (uv / (np.dot(u, u) + np.dot(v, v) - uv))
 
     def jeffreys(self, u, v):
-        """
-        Calculate the Jeffreys divergence between two vectors.
+        """Calculate the Jeffreys divergence between two vectors.
 
         The Jeffreys divergence is a symmetric version of the Kullback-Leibler divergence.
 
@@ -595,8 +578,7 @@ class Distance:
         return np.sum((u - v) * np.log(u / v))
 
     def jensenshannon_divergence(self, u, v):
-        """
-        Calculate the Jensen-Shannon divergence between two vectors.
+        """Calculate the Jensen-Shannon divergence between two vectors.
 
         The Jensen-Shannon divergence is a symmetric and finite measure of similarity between two probability distributions.
 
@@ -633,8 +615,7 @@ class Distance:
         return (np.sum(dl) + np.sum(dr)) / 2
 
     def jensen_difference(self, u, v):
-        """
-        Calculate the Jensen difference between two vectors.
+        """Calculate the Jensen difference between two vectors.
 
         The Jensen difference is considered similar to the Jensen-Shannon divergence.
 
@@ -667,8 +648,7 @@ class Distance:
         return np.sum(el1 - el2 * np.log(el2))
 
     def k_divergence(self, u, v):
-        """
-        Calculate the K divergence between two vectors.
+        """Calculate the K divergence between two vectors.
 
         Parameters
         ----------
@@ -691,8 +671,7 @@ class Distance:
         return np.sum(u * np.log(2 * u / (u + v)))
 
     def kl_divergence(self, u, v):
-        """
-        Calculate the Kullback-Leibler divergence between two vectors.
+        """Calculate the Kullback-Leibler divergence between two vectors.
 
         The Kullback-Leibler divergence measures the difference between two probability distributions.
 
@@ -719,8 +698,7 @@ class Distance:
         return np.sum(u * np.log(u / v))
 
     def kulczynski(self, u, v):
-        """
-        Calculate the Kulczynski distance between two vectors.
+        """Calculate the Kulczynski distance between two vectors.
 
         Parameters
         ----------
@@ -741,8 +719,7 @@ class Distance:
         return np.sum(np.abs(u - v)) / np.sum(np.minimum(u, v))
 
     def kumarjohnson(self, u, v):
-        """
-        Calculate the Kumar-Johnson distance between two vectors.
+        """Calculate the Kumar-Johnson distance between two vectors.
 
         Parameters
         ----------
@@ -770,8 +747,7 @@ class Distance:
             return np.sum(np.where(uvmult != 0, numer / denom, 0))
 
     def lorentzian(self, u, v):
-        """
-        Calculate the Lorentzian distance between two vectors.
+        """Calculate the Lorentzian distance between two vectors.
 
         Parameters
         ----------
@@ -797,8 +773,7 @@ class Distance:
         return np.sum(np.log(np.abs(u - v) + 1))
 
     def cityblock(self, u, v):
-        """
-        Calculate the Cityblock (Manhattan) distance between two vectors.
+        """Calculate the Cityblock (Manhattan) distance between two vectors.
 
         Parameters
         ----------
@@ -834,8 +809,7 @@ class Distance:
         return np.sum(np.abs(u - v))
 
     def marylandbridge(self, u, v):
-        """
-        Calculate the Maryland Bridge distance between two vectors.
+        """Calculate the Maryland Bridge distance between two vectors.
 
         Parameters
         ----------
@@ -855,8 +829,7 @@ class Distance:
         return 1 - (uvdot / np.dot(u, u) + uvdot / np.dot(v, v)) / 2
 
     def matusita(self, u, v):
-        """
-        Calculate the Matusita distance between two vectors.
+        """Calculate the Matusita distance between two vectors.
 
         Parameters
         ----------
@@ -881,8 +854,8 @@ class Distance:
         return np.sqrt(np.sum((np.sqrt(u) - np.sqrt(v)) ** 2))
 
     def max_symmetric_chisq(self, u, v):
-        """
-        Calculate the maximum symmetric chi-square distance between two vectors.
+        """Calculate the maximum symmetric chi-square distance between two
+        vectors.
 
         Parameters
         ----------
@@ -903,8 +876,8 @@ class Distance:
         return max(self.neyman_chisq(u, v), self.pearson_chisq(u, v))
 
     def min_symmetric_chisq(self, u, v):
-        """
-        Calculate the minimum symmetric chi-square distance between two vectors.
+        """Calculate the minimum symmetric chi-square distance between two
+        vectors.
 
         Parameters
         ----------
@@ -922,8 +895,7 @@ class Distance:
         return min(self.neyman_chisq(u, v), self.pearson_chisq(u, v))
 
     def meehl(self, u, v):
-        """
-        Calculate the Meehl distance between two vectors.
+        """Calculate the Meehl distance between two vectors.
 
         Parameters
         ----------
@@ -954,8 +926,7 @@ class Distance:
             return np.nansum((xi - yi - xiplus1 + yiplus1) ** 2)
 
     def minkowski(self, u, v, p=2):
-        """
-        Calculate the Minkowski distance between two vectors.
+        """Calculate the Minkowski distance between two vectors.
 
         Parameters
         ----------
@@ -981,8 +952,7 @@ class Distance:
         return np.linalg.norm(u - v, ord=p)
 
     def motyka(self, u, v):
-        """
-        Calculate the Motyka distance between two vectors.
+        """Calculate the Motyka distance between two vectors.
 
         Parameters
         ----------
@@ -1007,8 +977,7 @@ class Distance:
         return np.sum(np.maximum(u, v)) / np.sum(u + v)
 
     def neyman_chisq(self, u, v):
-        """
-        Calculate the Neyman chi-square distance between two vectors.
+        """Calculate the Neyman chi-square distance between two vectors.
 
         Parameters
         ----------
@@ -1060,8 +1029,7 @@ class Distance:
     #     return 1 - np.sum(np.minimum(u, v))
 
     def pearson_chisq(self, u, v):
-        """
-        Calculate the Pearson chi-square divergence between two vectors.
+        """Calculate the Pearson chi-square divergence between two vectors.
 
         Parameters
         ----------
@@ -1091,8 +1059,7 @@ class Distance:
             return np.sum(np.where(v != 0, (u - v) ** 2 / v, 0))
 
     def penroseshape(self, u, v):
-        """
-        Calculate the Penrose shape distance between two vectors.
+        """Calculate the Penrose shape distance between two vectors.
 
         Parameters
         ----------
@@ -1113,8 +1080,7 @@ class Distance:
         return np.sqrt(np.sum(((u - umu) - (v - vmu)) ** 2))
 
     def prob_chisq(self, u, v):
-        """
-        Calculate the Probabilistic chi-square distance between two vectors.
+        """Calculate the Probabilistic chi-square distance between two vectors.
 
         Parameters
         ----------
@@ -1134,8 +1100,7 @@ class Distance:
             return 2 * np.sum(np.where(uvsum != 0, (u - v) ** 2 / uvsum, 0))
 
     def ruzicka(self, u, v):
-        """
-        Calculate the Ruzicka distance between two vectors.
+        """Calculate the Ruzicka distance between two vectors.
 
         Parameters
         ----------
@@ -1155,8 +1120,7 @@ class Distance:
         return 1 - np.sum(np.minimum(u, v)) / den
 
     def sorensen(self, u, v):
-        """
-        Calculate the Sorensen distance between two vectors.
+        """Calculate the Sorensen distance between two vectors.
 
         Parameters
         ----------
@@ -1176,8 +1140,7 @@ class Distance:
         return np.sum(np.abs(u - v)) / np.sum(u + v)
 
     def soergel(self, u, v):
-        """
-        Calculate the Soergel distance between two vectors.
+        """Calculate the Soergel distance between two vectors.
 
         Parameters
         ----------
@@ -1202,8 +1165,7 @@ class Distance:
         return np.sum(np.abs(u - v)) / np.sum(np.maximum(u, v))
 
     def squared_chisq(self, u, v):
-        """
-        Calculate the Squared chi-square distance between two vectors.
+        """Calculate the Squared chi-square distance between two vectors.
 
         Parameters
         ----------
@@ -1226,8 +1188,7 @@ class Distance:
             return np.sum(np.where(uvsum != 0, (u - v) ** 2 / uvsum, 0))
 
     def squaredchord(self, u, v):
-        """
-        Calculate the Squared-chord distance between two vectors.
+        """Calculate the Squared-chord distance between two vectors.
 
         Parameters
         ----------
@@ -1255,8 +1216,7 @@ class Distance:
         return np.sum((np.sqrt(u) - np.sqrt(v)) ** 2)
 
     def squared_euclidean(self, u, v):
-        """
-        Calculate the Squared Euclidean distance between two vectors.
+        """Calculate the Squared Euclidean distance between two vectors.
 
         Parameters
         ----------
@@ -1284,8 +1244,7 @@ class Distance:
         return np.dot((u - v), (u - v))
 
     def taneja(self, u, v):
-        """
-        Calculate the Taneja distance between two vectors.
+        """Calculate the Taneja distance between two vectors.
 
         Parameters
         ----------
@@ -1312,8 +1271,7 @@ class Distance:
         return np.sum((uvsum / 2) * np.log(uvsum / (2 * np.sqrt(u * v))))
 
     def tanimoto(self, u, v):
-        """
-        Calculate the Tanimoto distance between two vectors.
+        """Calculate the Tanimoto distance between two vectors.
 
         Parameters
         ----------
@@ -1342,8 +1300,7 @@ class Distance:
         return (usum + vsum - 2 * minsum) / (usum + vsum - minsum)
 
     def topsoe(self, u, v):
-        """
-        Calculate the Topsøe distance between two vectors.
+        """Calculate the Topsøe distance between two vectors.
 
         Parameters
         ----------
@@ -1372,8 +1329,8 @@ class Distance:
         return np.sum(dl + dr)
 
     def vicis_symmetric_chisq(self, u, v):
-        """
-        Calculate the Vicis Symmetric chi-square distance between two vectors.
+        """Calculate the Vicis Symmetric chi-square distance between two
+        vectors.
 
         Parameters
         ----------
@@ -1397,8 +1354,7 @@ class Distance:
             return np.sum(np.where(uvmin != 0, u_v / uvmin, 0))
 
     def vicis_wave_hedges(self, u, v):
-        """
-        Calculate the Vicis-Wave Hedges distance between two vectors.
+        """Calculate the Vicis-Wave Hedges distance between two vectors.
 
         Parameters
         ----------
@@ -1422,8 +1378,7 @@ class Distance:
             return np.sum(np.where(uvmin != 0, u_v / uvmin, 0))
 
     def wave_hedges(self, u, v):
-        """
-        Calculate the Wave Hedges distance between two vectors.
+        """Calculate the Wave Hedges distance between two vectors.
 
         Parameters
         ----------
