@@ -2,9 +2,9 @@
 al. (2024) in "Light Curve Classification with DistClassiPy: a new distance-
 based classifier".
 
------
-Copyright (C) 2024  Siddharth Chaini
 
+Copyright (C) 2024  Siddharth Chaini
+-----
 This program is free software: you can redistribute it and/or modify
 it under the terms of the GNU General Public License as published by
 the Free Software Foundation, either version 3 of the License, or

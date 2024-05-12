@@ -4,9 +4,9 @@ Classes:
     DistanceMetricClassifier - A classifier that uses a specified distance metric for classification.
     Distance - A class that provides various distance metrics for use in classification.
 
------
-Copyright (C) 2024  Siddharth Chaini
 
+Copyright (C) 2024  Siddharth Chaini
+-----
 This program is free software: you can redistribute it and/or modify
 it under the terms of the GNU General Public License as published by
 the Free Software Foundation, either version 3 of the License, or

@@ -24,9 +24,9 @@ Notes
 
     In addition, the following code was added to all functions for array conversion:
         u,v = np.asarray(u), np.asarray(v)
------
-Copyright (C) 2024  Siddharth Chaini
 
+Copyright (C) 2024  Siddharth Chaini
+-----
 This program is free software: you can redistribute it and/or modify
 it under the terms of the GNU General Public License as published by
 the Free Software Foundation, either version 3 of the License, or
