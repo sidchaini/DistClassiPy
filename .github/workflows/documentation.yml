@@ -1,6 +1,6 @@
 # Guide: https://coderefinery.github.io/documentation/gh_workflow/
 
-name: documentation
+name: Documentation
 
 on: [push, pull_request, workflow_dispatch]
 
