@@ -1,18 +1,21 @@
 """A module providing a variety of distance metrics to calculate the distance
 between two points.
 
-This module includes implementations of various distance metrics, including both common and less
-common measures. It allows for the calculation of distances between data points in a vectorized
-manner using numpy arrays.
-A part of this code is based on the work of Andrzej Zielezinski, originally retrieved on 20 November 2022 from
-https://github.com/aziele/statistical-distances/blob/04412b3155c59fc7238b3d8ecf6f3723ac5befff/distance.py, which was released via the GNU General Public License v3.0.
+This module includes implementations of various distance metrics, including both
+common and less common measures. It allows for the calculation of distances between
+data points in a vectorized manner using numpy arrays.
+A part of this code is based on the work of Andrzej Zielezinski, originally retrieved
+on 20 November 2022 from 
+https://github.com/aziele/statistical-distances/blob/04412b3155c59fc7238b3d8ecf6f3723ac5befff/distance.py, # noqa
+which was released via the GNU General Public License v3.0.
 
 It was originally modified by Siddharth Chaini on 27 November 2022.
 
 Notes
 -----
 
-    Modifications by Siddharth Chaini include the addition of the following distance measures:
+    Modifications by Siddharth Chaini include the addition of the following distance
+    measures:
         1. Meehl distance
         2. Sorensen distance
         3. Ruzicka distance
@@ -71,9 +74,11 @@ class Distance:
 
         References
         ----------
-            1. Krause EF (2012) Taxicab Geometry An Adventure in Non-Euclidean Geometry. Dover Publications.
-            2. Sung-Hyuk C (2007) Comprehensive Survey on Distance/Similarity Measures between Probability
-               Density Functions. International Journal of Mathematical Models and Methods in Applied Sciences.
+            1. Krause EF (2012) Taxicab Geometry An Adventure in Non-Euclidean
+               Geometry. Dover Publications.
+            2. Sung-Hyuk C (2007) Comprehensive Survey on Distance/Similarity
+               Measures between Probability Density Functions. International
+               Journal of Mathematical Models and Methods in Applied Sciences.
                vol. 1(4), pp. 300-307.
         """
         return (self.cityblock(u, v) + self.chebyshev(u, v)) / 2
@@ -94,8 +99,10 @@ class Distance:
 
         References
         ----------
-            1. Sung-Hyuk C (2007) Comprehensive Survey on Distance/Similarity Measures between Probability
-               Density Functions. International Journal of Mathematical Models and Methods in Applied Sciences.
+            1. Sung-Hyuk C (2007) Comprehensive Survey on Distance/Similarity
+               Measures between Probability Density Functions.
+               International Journal of Mathematical Models and Methods in
+               Applied Sciences.
                vol. 1(4), pp. 300-307.
         """
         u, v = np.asarray(u), np.asarray(v)
@@ -134,10 +141,11 @@ class Distance:
     def braycurtis(self, u, v):
         """Calculate the Bray-Curtis distance between two vectors.
 
-        The Bray-Curtis distance is a measure of dissimilarity between two non-negative vectors,
-        often used in ecology to measure the compositional dissimilarity between two sites based on counts
-        of species at both sites. It is closely related to the Sørensen distance and is also known as
-        Bray-Curtis dissimilarity.
+        The Bray-Curtis distance is a measure of dissimilarity between two non-negative
+        vectors, often used in ecology to measure the compositional dissimilarity
+        between two sites based on counts of species at both sites. It is closely
+        related to the Sørensen distance and is also known as Bray-Curtis
+        dissimilarity.
 
         Notes
         -----
@@ -168,7 +176,8 @@ class Distance:
     def canberra(self, u, v):
         """Calculate the Canberra distance between two vectors.
 
-        The Canberra distance is a weighted version of the Manhattan distance, used in numerical analysis.
+        The Canberra distance is a weighted version of the Manhattan distance, used
+        in numerical analysis.
 
         Notes
         -----
@@ -197,7 +206,8 @@ class Distance:
     def chebyshev(self, u, v):
         """Calculate the Chebyshev distance between two vectors.
 
-        The Chebyshev distance is a metric defined on a vector space where the distance between two vectors
+        The Chebyshev distance is a metric defined on a vector space where the distance
+        between two vectors
         is the greatest of their differences along any coordinate dimension.
 
         Synonyms:
@@ -227,7 +237,8 @@ class Distance:
     def chebyshev_min(self, u, v):
         """Calculate the minimum value distance between two vectors.
 
-        This measure represents a custom approach by Zielezinski to distance measurement, focusing on the minimum absolute difference.
+        This measure represents a custom approach by Zielezinski to distance
+        measurement, focusing on the minimum absolute difference.
 
         Parameters
         ----------
@@ -380,7 +391,8 @@ class Distance:
     def euclidean(self, u, v):
         """Calculate the Euclidean distance between two vectors.
 
-        The Euclidean distance is the "ordinary" straight-line distance between two points in Euclidean space.
+        The Euclidean distance is the "ordinary" straight-line distance between two
+        points in Euclidean space.
 
         Parameters
         ----------
@@ -404,7 +416,8 @@ class Distance:
     #     """
     #     Calculate the fidelity distance between two vectors.
 
-    #     The fidelity distance measures the similarity between two probability distributions.
+    #     The fidelity distance measures the similarity between two probability
+    #     distributions.
 
     #     Parameters
     #     ----------
@@ -424,7 +437,8 @@ class Distance:
     def google(self, u, v):
         """Calculate the Normalized Google Distance (NGD) between two vectors.
 
-        NGD is a measure of similarity derived from the number of hits returned by the Google search engine for a given set of keywords.
+        NGD is a measure of similarity derived from the number of hits returned by the
+        Google search engine for a given set of keywords.
 
         Parameters
         ----------
@@ -488,7 +502,8 @@ class Distance:
     def hellinger(self, u, v):
         """Calculate the Hellinger distance between two vectors.
 
-        The Hellinger distance is a measure of similarity between two probability distributions.
+        The Hellinger distance is a measure of similarity between two probability
+        distributions.
 
         Parameters
         ----------
@@ -518,7 +533,8 @@ class Distance:
     #     """
     #     Calculate the inner product distance between two vectors.
 
-    #     The inner product distance is a measure of similarity between two vectors, based on their inner product.
+    #     The inner product distance is a measure of similarity between two vectors,
+    #     based on their inner product.
 
     #     Parameters
     #     ----------
@@ -562,7 +578,8 @@ class Distance:
     def jeffreys(self, u, v):
         """Calculate the Jeffreys divergence between two vectors.
 
-        The Jeffreys divergence is a symmetric version of the Kullback-Leibler divergence.
+        The Jeffreys divergence is a symmetric version of the Kullback-Leibler
+        divergence.
 
         Parameters
         ----------
@@ -594,7 +611,8 @@ class Distance:
     def jensenshannon_divergence(self, u, v):
         """Calculate the Jensen-Shannon divergence between two vectors.
 
-        The Jensen-Shannon divergence is a symmetric and finite measure of similarity between two probability distributions.
+        The Jensen-Shannon divergence is a symmetric and finite measure of similarity
+        between two probability distributions.
 
         Parameters
         ----------
@@ -687,7 +705,8 @@ class Distance:
     def kl_divergence(self, u, v):
         """Calculate the Kullback-Leibler divergence between two vectors.
 
-        The Kullback-Leibler divergence measures the difference between two probability distributions.
+        The Kullback-Leibler divergence measures the difference between two
+        probability distributions.
 
         Parameters
         ----------
@@ -1146,7 +1165,8 @@ class Distance:
 
         Notes
         -----
-            The Sorensen distance equals the Manhattan distance divided by the sum of the two vectors.
+            The Sorensen distance equals the Manhattan distance divided by the sum of
+            the two vectors.
 
             Added by SC.
         """

@@ -43,18 +43,29 @@ class DistanceMetricClassifier(BaseEstimator, ClassifierMixin):
     """A distance-based classifier that supports the use of various distance
     metrics.
 
-    The distance metric classifier determines the similarity between features in a dataset by leveraging the use of different distance metrics to. A specified distance metric is used to compute the distance between a given object and a centroid for every training class in the feature space. The classifier supports the use of different statistical measures for constructing the centroid and scaling the computed distance. Additionally, the distance metric classifier also optionally provides an estimate of the confidence of the classifier's predictions.
+    The distance metric classifier determines the similarity between features in a
+    dataset by leveraging the use of different distance metrics to. A specified
+    distance metric is used to compute the distance between a given object and a
+    centroid for every training class in the feature space. The classifier supports
+    the use of different statistical measures for constructing the centroid and scaling
+    the computed distance. Additionally, the distance metric classifier also
+    optionally provides an estimate of the confidence of the classifier's predictions.
 
     Parameters
     ----------
     metric : str or callable, default="euclidean"
         The distance metric to use for calculating the distance between features.
     scale : bool, default=True
-        Whether to scale the distance between the test object and the centroid for a class in the feature space. If True, the data will be scaled based on the specified dispersion statistic.
+        Whether to scale the distance between the test object and the centroid for a
+        class in the feature space. If True, the data will be scaled based on the
+        specified dispersion statistic.
     central_stat : {"mean", "median"}, default="median"
-        The statistic used to calculate the central tendency of the data to construct the feature-space centroid. Supported statistics are "mean" and "median".
+        The statistic used to calculate the central tendency of the data to construct
+        the feature-space centroid. Supported statistics are "mean" and "median".
     dispersion_stat : {"std", "iqr"}, default="std"
-        The statistic used to calculate the dispersion of the data for scaling the distance. Supported  statistics are "std" for standard deviation and "iqr" for inter-quartile range.
+        The statistic used to calculate the dispersion of the data for scaling the
+        distance. Supported  statistics are "std" for standard deviation and "iqr"
+        for inter-quartile range.
 
         .. versionadded:: 0.1.0
 
@@ -85,11 +96,14 @@ class DistanceMetricClassifier(BaseEstimator, ClassifierMixin):
 
     Notes
     -----
-    If using distance metrics supported by SciPy, it is desirable to pass a string, which allows SciPy to use an optimized C version of the code instead of the slower Python version.
+    If using distance metrics supported by SciPy, it is desirable to pass a string,
+    which allows SciPy to use an optimized C version of the code instead of the slower
+    Python version.
 
     References
     ----------
-    .. [1] "Light Curve Classification with DistClassiPy: a new distance-based classifier"
+    .. [1] "Light Curve Classification with DistClassiPy: a new distance-based
+            classifier"
 
     Examples
     --------
@@ -122,7 +136,7 @@ class DistanceMetricClassifier(BaseEstimator, ClassifierMixin):
         self.calculate_kde = calculate_kde
         self.calculate_1d_dist = calculate_1d_dist
 
-    def set_metric_fn_(self):
+    def initialize_metric_function(self):
         """Set the metric function based on the provided metric.
 
         If the metric is a string, the function will look for a
@@ -140,7 +154,8 @@ class DistanceMetricClassifier(BaseEstimator, ClassifierMixin):
             metric_found = False
             for package_str, source in METRIC_SOURCES_.items():
 
-                # Don't use scipy for jaccard as their implementation only works with booleans - use custom jaccard instead
+                # Don't use scipy for jaccard as their implementation only works with
+                # booleans - use custom jaccard instead
                 if (
                     package_str == "scipy.spatial.distance"
                     and metric_str_lowercase == "jaccard"
@@ -151,7 +166,8 @@ class DistanceMetricClassifier(BaseEstimator, ClassifierMixin):
                     self.metric_fn_ = getattr(source, metric_str_lowercase)
                     metric_found = True
 
-                    # Use the string as an argument if it belongs to scipy as it is optimized
+                    # Use the string as an argument if it belongs to scipy as it is
+                    # optimized
                     self.metric_arg_ = (
                         self.metric
                         if package_str == "scipy.spatial.distance"
@@ -160,7 +176,12 @@ class DistanceMetricClassifier(BaseEstimator, ClassifierMixin):
                     break
             if not metric_found:
                 raise ValueError(
-                    f"{self.metric} metric not found. Please pass a string of the name of a metric in scipy.spatial.distance or distances.Distance, or pass a metric function directly. For a list of available metrics, see: https://sidchaini.github.io/DistClassiPy/distances.html or https://docs.scipy.org/doc/scipy/reference/spatial.distance.html"
+                    f"{self.metric} metric not found. Please pass a string of the "
+                    "name of a metric in scipy.spatial.distance or "
+                    "distances.Distance, or pass a metric function directly. For a "
+                    "list of available metrics, see: "
+                    "https://sidchaini.github.io/DistClassiPy/distances.html or "
+                    "https://docs.scipy.org/doc/scipy/reference/spatial.distance.html"
                 )
 
     def fit(self, X: np.array, y: np.array, feat_labels: list[str] = None):
@@ -168,7 +189,8 @@ class DistanceMetricClassifier(BaseEstimator, ClassifierMixin):
         set (X,y) using the central statistic. If scaling is enabled, also
         calculate the appropriate dispersion statistic.
 
-        This involves computing the centroid for every class in the feature space and optionally calculating the kernel density estimate and 1-dimensional distance.
+        This involves computing the centroid for every class in the feature space and
+        optionally calculating the kernel density estimate and 1-dimensional distance.
 
         Parameters
         ----------
@@ -177,7 +199,8 @@ class DistanceMetricClassifier(BaseEstimator, ClassifierMixin):
         y : array-like of shape (n_samples,)
             The target values (class labels).
         feat_labels : list of str, optional, default=None
-            The feature labels. If not provided, default labels representing feature number will be used.
+            The feature labels. If not provided, default labels representing feature
+            number will be used.
 
         Returns
         -------
@@ -188,7 +211,7 @@ class DistanceMetricClassifier(BaseEstimator, ClassifierMixin):
         self.classes_ = unique_labels(y)
         self.n_features_in_ = X.shape[1]
 
-        self.set_metric_fn_()
+        self.initialize_metric_function()
 
         if feat_labels is None:
             feat_labels = [f"Feature_{x}" for x in range(X.shape[1])]
@@ -209,7 +232,8 @@ class DistanceMetricClassifier(BaseEstimator, ClassifierMixin):
             std_list = []
             for cur_class in self.classes_:
                 cur_X = X[y == cur_class]
-                # Note we're using ddof=1 because we're dealing with a sample. See more: https://stackoverflow.com/a/46083501/10743245
+                # Note we're using ddof=1 because we're dealing with a sample.
+                # See more: https://stackoverflow.com/a/46083501/10743245
                 std_list.append(np.std(cur_X, axis=0, ddof=1).ravel())
             df_std = pd.DataFrame(
                 data=np.array(std_list), index=self.classes_, columns=feat_labels
@@ -221,7 +245,8 @@ class DistanceMetricClassifier(BaseEstimator, ClassifierMixin):
 
             for cur_class in self.classes_:
                 cur_X = X[y == cur_class]
-                # Note we're using ddof=1 because we're dealing with a sample. See more: https://stackoverflow.com/a/46083501/10743245
+                # Note we're using ddof=1 because we're dealing with a sample.
+                # See more: https://stackoverflow.com/a/46083501/10743245
                 iqr_list.append(
                     np.quantile(cur_X, q=0.75, axis=0).ravel()
                     - np.quantile(cur_X, q=0.25, axis=0).ravel()
@@ -254,7 +279,9 @@ class DistanceMetricClassifier(BaseEstimator, ClassifierMixin):
     def predict(self, X: np.array):
         """Predict the class labels for the provided X.
 
-        The prediction is based on the distance of each data point in the input sample to the centroid for each class in the feature space. The predicted class is the one whose centroid is the closest to the input sample.
+        The prediction is based on the distance of each data point in the input sample
+        to the centroid for each class in the feature space. The predicted class is the
+        one whose centroid is the closest to the input sample.
 
         Parameters
         ----------
@@ -300,9 +327,12 @@ class DistanceMetricClassifier(BaseEstimator, ClassifierMixin):
     def predict_and_analyse(self, X: np.array):
         """Predict the class labels for the provided X and perform analysis.
 
-        The prediction is based on the distance of each data point in the input sample to the centroid for each class in the feature space. The predicted class is the one whose centroid is the closest to the input sample.
+        The prediction is based on the distance of each data point in the input sample
+        to the centroid for each class in the feature space. The predicted class is the
+        one whose centroid is the closest to the input sample.
 
-        The analysis involves saving all calculated distances and confidences as an attribute for inspection and analysis later.
+        The analysis involves saving all calculated distances and confidences as an
+        attribute for inspection and analysis later.
 
         Parameters
         ----------
@@ -403,17 +433,22 @@ class DistanceMetricClassifier(BaseEstimator, ClassifierMixin):
     def calculate_confidence(self, method: str = "distance_inverse"):
         """Calculate the confidence for each prediction.
 
-        The confidence is calculated based on either the distance of each data point to the centroids of the training data, optionally the kernel density estimate or 1-dimensional distance.
+        The confidence is calculated based on either the distance of each data point to
+        the centroids of the training data, optionally the kernel density estimate or
+        1-dimensional distance.
 
         Parameters
         ----------
-        method : {"distance_inverse", "1d_distance_inverse", "kde_likelihood"}, default="distance_inverse"
-            The method to use for calculating confidence. Default is 'distance_inverse'.
+        method : {"distance_inverse", "1d_distance_inverse","kde_likelihood"},
+                 default="distance_inverse"
+            The method to use for calculating confidence. Default is
+            'distance_inverse'.
         """
         check_is_fitted(self, "is_fitted_")
         if not hasattr(self, "analyis_"):
             raise ValueError(
-                "Use predict_and_analyse() instead of predict() for confidence calculation."
+                "Use predict_and_analyse() instead of predict() for "
+                "confidence calculation."
             )
 
         # Calculate confidence for each prediction
@@ -428,7 +463,8 @@ class DistanceMetricClassifier(BaseEstimator, ClassifierMixin):
         elif method == "1d_distance_inverse":
             if not self.calculate_1d_dist:
                 raise ValueError(
-                    "method='1d_distance_inverse' is only valid if calculate_1d_dist is set to True"
+                    "method='1d_distance_inverse' is only valid if calculate_1d_dist "
+                    "is set to True"
                 )
             self.confidence_df_ = pd.DataFrame(
                 data=self.conf_cl_.T, columns=[f"{x}_conf" for x in self.classes_]
@@ -437,7 +473,8 @@ class DistanceMetricClassifier(BaseEstimator, ClassifierMixin):
         elif method == "kde_likelihood":
             if not self.calculate_kde:
                 raise ValueError(
-                    "method='kde_likelihood' is only valid if calculate_kde is set to True"
+                    "method='kde_likelihood' is only valid if calculate_kde is set "
+                    "to True"
                 )
 
             self.confidence_df_ = pd.DataFrame(
