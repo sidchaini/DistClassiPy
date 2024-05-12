@@ -1,6 +1,7 @@
-import pytest
-import numpy as np
+# import pytest
 from distclassipy.distances import Distance
+
+import numpy as np
 
 # Initialize the Distance class to use its methods for testing
 distance = Distance()

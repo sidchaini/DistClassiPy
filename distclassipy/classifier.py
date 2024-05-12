@@ -19,16 +19,18 @@ You should have received a copy of the GNU General Public License
 along with this program.  If not, see <https://www.gnu.org/licenses/>.
 """
 
+from typing import Callable
+
 import numpy as np
+
 import pandas as pd
+
 import scipy
 
 from sklearn.base import BaseEstimator, ClassifierMixin
 from sklearn.neighbors import KernelDensity
 from sklearn.utils.multiclass import unique_labels
 from sklearn.utils.validation import check_X_y, check_array, check_is_fitted
-
-from typing import Callable
 
 from .distances import Distance
 

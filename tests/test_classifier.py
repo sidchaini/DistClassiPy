@@ -1,6 +1,9 @@
-import pytest
-import numpy as np
 from distclassipy.classifier import DistanceMetricClassifier
+
+import numpy as np
+
+import pytest
+
 from sklearn.utils.estimator_checks import check_estimator
 
 
