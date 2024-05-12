@@ -20,3 +20,7 @@ jobs:
     - run: |
         pip install flake8
         flake8 --extend-ignore=E203,E701 --max-line-length 88 tests/ distclassipy setup.py --show-source --statistics
+    - name: Run pydocstyle
+      run: |
+        pip install pydocstyle
+        pydocstyle distclassipy --convention=numpy
