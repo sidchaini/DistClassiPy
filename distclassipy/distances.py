@@ -5,7 +5,7 @@ This module includes implementations of various distance metrics, including both
 common and less common measures. It allows for the calculation of distances between
 data points in a vectorized manner using numpy arrays.
 A part of this code is based on the work of Andrzej Zielezinski, originally retrieved
-on 20 November 2022 from 
+on 20 November 2022 from
 https://github.com/aziele/statistical-distances/blob/04412b3155c59fc7238b3d8ecf6f3723ac5befff/distance.py, # noqa
 which was released via the GNU General Public License v3.0.
 
