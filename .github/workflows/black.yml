@@ -13,3 +13,10 @@ jobs:
         src: "./distclassipy"
         jupyter: true
         version: "~= 24.0"
+    - name: Run flake8
+      uses: actions/setup-python@v4
+      with:
+        python-version: '3.x'
+    - run: |
+        pip install flake8
+        flake8 --extend-ignore=E203,E701 --max-line-length 88 tests/ distclassipy setup.py --show-source --statistics
