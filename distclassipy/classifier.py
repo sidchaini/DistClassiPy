@@ -1,6 +1,7 @@
-"""A module which contains the DistanceMetricClassifier introduced by Chaini et
-al. (2024) in "Light Curve Classification with DistClassiPy: a new distance-
-based classifier".
+"""A module containing the distance metric classifier.
+
+This module contains the DistanceMetricClassifier introduced by Chaini et al. (2024)
+in "Light Curve Classification with DistClassiPy: a new distance-based classifier"
 
 Copyright (C) 2024  Siddharth Chaini
 -----
@@ -41,8 +42,7 @@ METRIC_SOURCES_ = {
 
 
 class DistanceMetricClassifier(BaseEstimator, ClassifierMixin):
-    """A distance-based classifier that supports the use of various distance
-    metrics.
+    """A distance-based classifier that supports different distance metrics.
 
     The distance metric classifier determines the similarity between features in a
     dataset by leveraging the use of different distance metrics to. A specified
@@ -140,12 +140,10 @@ class DistanceMetricClassifier(BaseEstimator, ClassifierMixin):
     def initialize_metric_function(self):
         """Set the metric function based on the provided metric.
 
-        If the metric is a string, the function will look for a
-        corresponding function in scipy.spatial.distance or
-        distances.Distance. If the metric is a function, it will be used
-        directly.
+        If the metric is a string, the function will look for a corresponding
+        function in scipy.spatial.distance or distances.Distance. If the metric
+        is a function, it will be used directly.
         """
-
         if callable(self.metric):
             self.metric_fn_ = self.metric
             self.metric_arg_ = self.metric
@@ -186,10 +184,11 @@ class DistanceMetricClassifier(BaseEstimator, ClassifierMixin):
                 )
 
     def fit(self, X: np.array, y: np.array, feat_labels: list[str] = None):
-        """Calculate the feature space centroid for all classes in the training
-        set (X,y) using the central statistic. If scaling is enabled, also
-        calculate the appropriate dispersion statistic.
+        """Calculate the feature space centroid for all classes.
 
+        This function calculates the feature space centroid in the training
+        set (X, y) for all classes using the central statistic. If scaling
+        is enabled, it also calculates the appropriate dispersion statistic.
         This involves computing the centroid for every class in the feature space and
         optionally calculating the kernel density estimate and 1-dimensional distance.
 

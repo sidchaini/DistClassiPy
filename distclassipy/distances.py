@@ -1,5 +1,4 @@
-"""A module providing a variety of distance metrics to calculate the distance
-between two points.
+"""A module providing a variety of distance metrics.
 
 This module includes implementations of various distance metrics, including both
 common and less common measures. It allows for the calculation of distances between
@@ -13,7 +12,6 @@ It was originally modified by Siddharth Chaini on 27 November 2022.
 
 Notes
 -----
-
     Modifications by Siddharth Chaini include the addition of the following distance
     measures:
         1. Meehl distance
@@ -48,6 +46,36 @@ import numpy as np
 
 
 class Distance:
+    """A class to calculate various distance metrics between vectors.
+
+    This class provides methods to compute different types of distances between
+    two vectors, such as Euclidean, Manhattan, Canberra, and other statistical
+    distances. Each method takes two vectors as input and returns the calculated
+    distance. The class can handle both numpy arrays and lists, converting them
+    internally to numpy arrays for computation.
+
+    Attributes
+    ----------
+    epsilon : float, optional
+        A small value to avoid division by zero errors in certain distance
+        calculations. Default is the machine precision for float data type.
+
+    Methods
+    -------
+    acc(u, v)
+        Returns the average of Cityblock/Manhattan and Chebyshev distances.
+    add_chisq(u, v)
+        Returns the Additive Symmetric Chi-square distance.
+    (Other methods are not listed here for brevity)
+
+    Examples
+    --------
+    >>> dist = Distance()
+    >>> u = [1, 2, 3]
+    >>> v = [4, 5, 6]
+    >>> print(dist.acc(u, v))
+    5.0
+    """
 
     def __init__(self, epsilon=None):
         """Initialize the Distance class with an optional epsilon value.
@@ -59,8 +87,9 @@ class Distance:
         self.epsilon = np.finfo(float).eps if not epsilon else epsilon
 
     def acc(self, u, v):
-        """Calculate the average of Cityblock/Manhattan and Chebyshev
-        distances. This function computes the ACC distance, also known as the
+        """Calculate the average of Cityblock and Chebyshev distance.
+
+        This function computes the ACC distance, also known as the
         Average distance, between two vectors u and v. It is the average of the
         Cityblock (or Manhattan) and Chebyshev distances.
 
@@ -84,8 +113,9 @@ class Distance:
         return (self.cityblock(u, v) + self.chebyshev(u, v)) / 2
 
     def add_chisq(self, u, v):
-        """Compute the Additive Symmetric Chi-square distance between two
-        vectors. The Additive Symmetric Chi-square distance is a measure that
+        """Compute the Additive Symmetric Chi-square distance between two vectors.
+
+        The Additive Symmetric Chi-square distance is a measure that
         can be used to compare two vectors. This function calculates it based
         on the input vectors u and v.
 
@@ -311,7 +341,6 @@ class Distance:
         -------
         - The Pearson correlation distance between the two vectors.
         """
-
         u, v = np.asarray(u), np.asarray(v)
         r = np.ma.corrcoef(u, v)[0, 1]
         return 1.0 - r
@@ -887,8 +916,7 @@ class Distance:
         return np.sqrt(np.sum((np.sqrt(u) - np.sqrt(v)) ** 2))
 
     def max_symmetric_chisq(self, u, v):
-        """Calculate the maximum symmetric chi-square distance between two
-        vectors.
+        """Calculate the maximum symmetric chi-square distance.
 
         Parameters
         ----------
@@ -909,8 +937,7 @@ class Distance:
         return max(self.neyman_chisq(u, v), self.pearson_chisq(u, v))
 
     def min_symmetric_chisq(self, u, v):
-        """Calculate the minimum symmetric chi-square distance between two
-        vectors.
+        """Calculate the minimum symmetric chi-square distance.
 
         Parameters
         ----------
@@ -1363,8 +1390,7 @@ class Distance:
         return np.sum(dl + dr)
 
     def vicis_symmetric_chisq(self, u, v):
-        """Calculate the Vicis Symmetric chi-square distance between two
-        vectors.
+        """Calculate the Vicis Symmetric chi-square distance.
 
         Parameters
         ----------
