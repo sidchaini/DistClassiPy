@@ -3,39 +3,12 @@ platform darwin -- Python 3.12.2, pytest-8.1.0, pluggy-1.4.0
 rootdir: /Users/sidchaini/Research/DistClassiPy
 configfile: pyproject.toml
 plugins: hypothesis-6.100.7, anyio-4.3.0, cov-4.1.0
-collected 70 items
+collected 69 items
 
 tests/test_classifier.py .................                               [ 24%]
-tests/test_distances.py ...........F.................................... [ 92%]
-.....                                                                    [100%]
+tests/test_distances.py ................................................ [ 94%]
+....                                                                     [100%]
 
-=================================== FAILURES ===================================
-______________________ test_non_negative[marylandbridge] _______________________
-
-metric = 'marylandbridge'
-
-    @pytest.mark.parametrize("metric", _ALL_METRICS)
->   @given(arrays)
-
-tests/test_distances.py:63: 
-_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
-
-metric = 'marylandbridge', data = (array([1.]), array([2.]))
-
-    @pytest.mark.parametrize("metric", _ALL_METRICS)
-    @given(arrays)
-    def test_non_negative(metric, data):
-        u, v = data
->       assert getattr(distance, metric)(u, v) >= 0
-E       AssertionError: assert -0.25 >= 0
-E        +  where -0.25 = <bound method Distance.marylandbridge of <distclassipy.distances.Distance object at 0x1327c8bc0>>(array([1.]), array([2.]))
-E        +    where <bound method Distance.marylandbridge of <distclassipy.distances.Distance object at 0x1327c8bc0>> = getattr(<distclassipy.distances.Distance object at 0x1327c8bc0>, 'marylandbridge')
-E       Falsifying example: test_non_negative(
-E           metric='marylandbridge',
-E           data=(array([1.0]), array([2.0])),
-E       )
-
-tests/test_distances.py:66: AssertionError
 =============================== warnings summary ===============================
 tests/test_classifier.py: 10 warnings
   /Users/sidchaini/miniconda3/lib/python3.12/site-packages/numpy/core/_methods.py:206: RuntimeWarning: Degrees of freedom <= 0 for slice
@@ -54,6 +27,4 @@ tests/test_distances.py: 300 warnings
 ---------- coverage: platform darwin, python 3.12.2-final-0 ----------
 Coverage XML written to file coverage.xml
 
-=========================== short test summary info ============================
-FAILED tests/test_distances.py::test_non_negative[marylandbridge] - Assertion...
-================= 1 failed, 69 passed, 320 warnings in 36.88s ==================
+====================== 69 passed, 320 warnings in 34.66s =======================
