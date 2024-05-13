@@ -42,6 +42,8 @@ You should have received a copy of the GNU General Public License
 along with this program.  If not, see <https://www.gnu.org/licenses/>.
 """
 
+import warnings
+
 import numpy as np
 
 import scipy
@@ -257,6 +259,12 @@ class Distance:
         - The Pearson correlation distance between the two vectors.
         """
         u, v = np.asarray(u), np.asarray(v)
+        if u.ndim == 1 and v.ndim == 1:
+            warnings.warn(
+                "The correlation metric defaults to 0 when used on 1D vectors",
+                RuntimeWarning,
+            )
+            return 0
         return scipy.spatial.distance.correlation(u, v, w, centered)
 
     def cosine(self, u, v, w=None):

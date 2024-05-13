@@ -15,7 +15,7 @@ arrays = st.integers(min_value=1, max_value=20).flatmap(
         st.lists(
             st.floats(
                 min_value=1,
-                max_value=10000,
+                max_value=10e3,
                 allow_nan=False,
                 allow_infinity=False,
                 width=32,
@@ -26,7 +26,7 @@ arrays = st.integers(min_value=1, max_value=20).flatmap(
         st.lists(
             st.floats(
                 min_value=1,
-                max_value=10000,
+                max_value=10e3,
                 allow_nan=False,
                 allow_infinity=False,
                 width=32,
@@ -36,8 +36,8 @@ arrays = st.integers(min_value=1, max_value=20).flatmap(
         ).map(np.array),
     )
 )
-# List all metrics
-all_metrics = [
+# List of all distance metrics
+_ALL_METRICS = [
     "euclidean",
     "braycurtis",
     "canberra",
@@ -59,21 +59,21 @@ all_metrics = [
 ]
 
 
-@pytest.mark.parametrize("metric", all_metrics)
+@pytest.mark.parametrize("metric", _ALL_METRICS)
 @given(arrays)
 def test_non_negative(metric, data):
     u, v = data
     assert getattr(distance, metric)(u, v) >= 0
 
 
-@pytest.mark.parametrize("metric", all_metrics)
+@pytest.mark.parametrize("metric", _ALL_METRICS)
 @given(arrays)
 def test_self_distance(metric, data):
     u, _ = data
     assert getattr(distance, metric)(u, u) == 0
 
 
-@pytest.mark.parametrize("metric", all_metrics)
+@pytest.mark.parametrize("metric", _ALL_METRICS)
 @given(arrays)
 def test_symmetry(metric, data):
     u, v = data

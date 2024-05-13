@@ -3,11 +3,65 @@ platform darwin -- Python 3.12.2, pytest-8.1.0, pluggy-1.4.0
 rootdir: /Users/sidchaini/Research/DistClassiPy
 configfile: pyproject.toml
 plugins: hypothesis-6.100.7, anyio-4.3.0, cov-4.1.0
-collected 62 items
+collected 71 items
 
-tests/test_classifier.py .................                               [ 27%]
-tests/test_distances.py .............................................    [100%]
+tests/test_classifier.py .................                               [ 23%]
+tests/test_distances.py ...........F...................F................ [ 91%]
+......                                                                   [100%]
 
+=================================== FAILURES ===================================
+______________________ test_non_negative[marylandbridge] _______________________
+
+metric = 'marylandbridge'
+
+    @pytest.mark.parametrize("metric", _ALL_METRICS)
+>   @given(arrays)
+
+tests/test_distances.py:63: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+metric = 'marylandbridge', data = (array([1.]), array([2.]))
+
+    @pytest.mark.parametrize("metric", _ALL_METRICS)
+    @given(arrays)
+    def test_non_negative(metric, data):
+        u, v = data
+>       assert getattr(distance, metric)(u, v) >= 0
+E       AssertionError: assert -0.25 >= 0
+E        +  where -0.25 = <bound method Distance.marylandbridge of <distclassipy.distances.Distance object at 0x15d50a7e0>>(array([1.]), array([2.]))
+E        +    where <bound method Distance.marylandbridge of <distclassipy.distances.Distance object at 0x15d50a7e0>> = getattr(<distclassipy.distances.Distance object at 0x15d50a7e0>, 'marylandbridge')
+E       Falsifying example: test_non_negative(
+E           metric='marylandbridge',
+E           data=(array([1.0]), array([2.0])),
+E       )
+
+tests/test_distances.py:66: AssertionError
+__________________________ test_self_distance[motyka] __________________________
+
+metric = 'motyka'
+
+    @pytest.mark.parametrize("metric", _ALL_METRICS)
+>   @given(arrays)
+
+tests/test_distances.py:70: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+metric = 'motyka', data = (array([1.]), array([1.]))
+
+    @pytest.mark.parametrize("metric", _ALL_METRICS)
+    @given(arrays)
+    def test_self_distance(metric, data):
+        u, _ = data
+>       assert getattr(distance, metric)(u, u) == 0
+E       AssertionError: assert 0.5 == 0
+E        +  where 0.5 = <bound method Distance.motyka of <distclassipy.distances.Distance object at 0x15d50a7e0>>(array([1.]), array([1.]))
+E        +    where <bound method Distance.motyka of <distclassipy.distances.Distance object at 0x15d50a7e0>> = getattr(<distclassipy.distances.Distance object at 0x15d50a7e0>, 'motyka')
+E       Falsifying example: test_self_distance(
+E           metric='motyka',
+E           data=(array([1.0]), array([1.0])),  # or any other generated value
+E       )
+
+tests/test_distances.py:73: AssertionError
 =============================== warnings summary ===============================
 tests/test_classifier.py: 10 warnings
   /Users/sidchaini/miniconda3/lib/python3.12/site-packages/numpy/core/_methods.py:206: RuntimeWarning: Degrees of freedom <= 0 for slice
@@ -17,9 +71,16 @@ tests/test_classifier.py: 10 warnings
   /Users/sidchaini/miniconda3/lib/python3.12/site-packages/numpy/core/_methods.py:195: RuntimeWarning: invalid value encountered in divide
     ret = um.true_divide(
 
+tests/test_distances.py: 300 warnings
+  /Users/sidchaini/Research/DistClassiPy/distclassipy/distances.py:263: RuntimeWarning: The correlation metric defaults to 0 when used on 1D vectors
+    warnings.warn(
+
 -- Docs: https://docs.pytest.org/en/stable/how-to/capture-warnings.html
 
 ---------- coverage: platform darwin, python 3.12.2-final-0 ----------
 Coverage XML written to file coverage.xml
 
-======================= 62 passed, 20 warnings in 31.77s =======================
+=========================== short test summary info ============================
+FAILED tests/test_distances.py::test_non_negative[marylandbridge] - Assertion...
+FAILED tests/test_distances.py::test_self_distance[motyka] - AssertionError: ...
+================= 2 failed, 69 passed, 320 warnings in 35.83s ==================
