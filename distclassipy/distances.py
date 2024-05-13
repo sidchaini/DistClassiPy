@@ -259,7 +259,7 @@ class Distance:
         - The Pearson correlation distance between the two vectors.
         """
         u, v = np.asarray(u), np.asarray(v)
-        if u.ndim == 1 and v.ndim == 1:
+        if len(u) == 1 and len(v) == 1:
             warnings.warn(
                 "The correlation metric defaults to 0 when used on 1D vectors",
                 RuntimeWarning,
