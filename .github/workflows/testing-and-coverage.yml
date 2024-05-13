@@ -34,7 +34,7 @@ jobs:
       run: |
         python3 -m pip install --upgrade pip
         python3 -m pip install -e .
-        python3 -m pip install pytest pytest-cov
+        python3 -m pip install pytest pytest-cov hypothesis
 
     - name: Test with PyTest and generate coverage report
       run: |
