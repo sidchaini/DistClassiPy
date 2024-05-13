@@ -15,7 +15,7 @@ arrays = st.integers(min_value=1, max_value=20).flatmap(
         st.lists(
             st.floats(
                 min_value=1,
-                max_value=1000,
+                max_value=10000,
                 allow_nan=False,
                 allow_infinity=False,
                 width=32,
@@ -26,7 +26,7 @@ arrays = st.integers(min_value=1, max_value=20).flatmap(
         st.lists(
             st.floats(
                 min_value=1,
-                max_value=1000,
+                max_value=10000,
                 allow_nan=False,
                 allow_infinity=False,
                 width=32,
