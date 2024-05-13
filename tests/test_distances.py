@@ -1,7 +1,8 @@
-# import pytest
 from distclassipy.distances import Distance
 
 import numpy as np
+
+import pytest
 
 from hypothesis import given, strategies as st
 
@@ -24,69 +25,45 @@ arrays = st.integers(min_value=1, max_value=20).flatmap(
     )
 )
 
+# List all metrics
+all_metrics = [
+    "euclidean",
+    "braycurtis",
+    "canberra",
+    "cityblock",
+    "chebyshev",
+    "clark",
+    "correlation",
+    "cosine",
+    "hellinger",
+    "jaccard",
+    "lorentzian",
+    "marylandbridge",
+    "meehl",
+    "motyka",
+    "soergel",
+    "wave_hedges",
+    "kulczynski",
+    "add_chisq",
+]
 
+
+@pytest.mark.parametrize("metric", all_metrics)
 @given(arrays)
-def test_euclidean_non_negative(data):
+def test_non_negative(metric, data):
     u, v = data
-    assert distance.euclidean(u, v) >= 0
+    assert getattr(distance, metric)(u, v) >= 0
 
 
+@pytest.mark.parametrize("metric", all_metrics)
 @given(arrays)
-def test_manhattan_non_negative(data):
-    u, v = data
-    assert distance.cityblock(u, v) >= 0
-
-
-@given(arrays)
-def test_chebyshev_non_negative(data):
-    u, v = data
-    assert distance.chebyshev(u, v) >= 0
-
-
-@given(arrays)
-def test_euclidean_self_distance(data):
+def test_self_distance(metric, data):
     u, _ = data
-    assert distance.euclidean(u, u) == 0
+    assert getattr(distance, metric)(u, u) == 0
 
 
+@pytest.mark.parametrize("metric", all_metrics)
 @given(arrays)
-def test_manhattan_self_distance(data):
-    u, _ = data
-    assert distance.cityblock(u, u) == 0
-
-
-@given(arrays)
-def test_chebyshev_self_distance(data):
-    u, _ = data
-    assert distance.chebyshev(u, u) == 0
-
-
-@given(arrays)
-def test_euclidean_symmetry(data):
+def test_symmetry(metric, data):
     u, v = data
-    assert distance.euclidean(u, v) == distance.euclidean(v, u)
-
-
-@given(arrays)
-def test_manhattan_symmetry(data):
-    u, v = data
-    assert distance.cityblock(u, v) == distance.cityblock(v, u)
-
-
-@given(arrays)
-def test_chebyshev_symmetry(data):
-    u, v = data
-    assert distance.chebyshev(u, v) == distance.chebyshev(v, u)
-
-
-# Run the tests
-if __name__ == "__main__":
-    test_euclidean_non_negative()
-    test_manhattan_non_negative()
-    test_chebyshev_non_negative()
-    test_euclidean_self_distance()
-    test_manhattan_self_distance()
-    test_chebyshev_self_distance()
-    test_euclidean_symmetry()
-    test_manhattan_symmetry()
-    test_chebyshev_symmetry()
+    assert getattr(distance, metric)(u, v) == getattr(distance, metric)(v, u)
