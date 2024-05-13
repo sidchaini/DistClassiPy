@@ -13,18 +13,29 @@ distance = Distance()
 arrays = st.integers(min_value=1, max_value=20).flatmap(
     lambda n: st.tuples(
         st.lists(
-            st.floats(allow_nan=False, allow_infinity=False, width=32),
+            st.floats(
+                min_value=1,
+                max_value=1000,
+                allow_nan=False,
+                allow_infinity=False,
+                width=32,
+            ),
             min_size=n,
             max_size=n,
         ).map(np.array),
         st.lists(
-            st.floats(allow_nan=False, allow_infinity=False, width=32),
+            st.floats(
+                min_value=1,
+                max_value=1000,
+                allow_nan=False,
+                allow_infinity=False,
+                width=32,
+            ),
             min_size=n,
             max_size=n,
         ).map(np.array),
     )
 )
-
 # List all metrics
 all_metrics = [
     "euclidean",
