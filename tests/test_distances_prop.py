@@ -1,10 +1,10 @@
 from distclassipy.distances import Distance
 
+from hypothesis import given, strategies as st
+
 import numpy as np
 
 import pytest
-
-from hypothesis import given, strategies as st
 
 # Initialize the Distance class to use its methods for testing
 distance = Distance()
