@@ -259,15 +259,23 @@ class Distance:
         - The Pearson correlation distance between the two vectors.
         """
         u, v = np.asarray(u), np.asarray(v)
-        if len(u) == 1 and len(v) == 1:
+        if len(u) < 2 or len(v) < 2:
             warnings.warn(
-                "The correlation metric defaults to 0 when used on 1D vectors",
+                "Pearson correlation requires vectors of length at least 2.",
                 RuntimeWarning,
             )
-            return 0
-        elif np.array_equal(u, v):
-            return 0
-        return scipy.spatial.distance.correlation(u, v, w, centered)
+            d = 0
+        else:
+            d = scipy.spatial.distance.correlation(u, v, w, centered)
+            if np.isnan(d) and (
+                np.allclose(u - np.mean(u), 0) or np.allclose(v - np.mean(v), 0)
+            ):
+                warnings.warn(
+                    "One of the vectors is constant; correlation is set to 0",
+                    RuntimeWarning,
+                )
+                d = 0
+        return d
 
     def cosine(self, u, v, w=None):
         """Calculate the cosine distance between two vectors.
