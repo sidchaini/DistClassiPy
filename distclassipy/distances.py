@@ -265,6 +265,8 @@ class Distance:
                 RuntimeWarning,
             )
             return 0
+        elif np.array_equal(u, v):
+            return 0
         return scipy.spatial.distance.correlation(u, v, w, centered)
 
     def cosine(self, u, v, w=None):
