@@ -6,7 +6,7 @@ plugins: hypothesis-6.100.7, anyio-4.3.0, cov-4.1.0
 collected 71 items
 
 tests/test_classifier.py .................                               [ 23%]
-tests/test_distances.py .F....FFFF.F.FFFFF.F....FFFF.F.FF.F..F....FFFF.F [ 91%]
+tests/test_distances.py .F....F.FF.F.FFFFF.F....F.FF.F.FF.F..F....F.FF.F [ 91%]
 FFF.F.                                                                   [100%]
 
 =================================== FAILURES ===================================
@@ -28,8 +28,8 @@ metric = 'braycurtis', data = (array([0.]), array([0.]))
         u, v = data
 >       assert getattr(distance, metric)(u, v) >= 0
 E       AssertionError: assert nan >= 0
-E        +  where nan = <bound method Distance.braycurtis of <distclassipy.distances.Distance object at 0x13b066b10>>(array([0.]), array([0.]))
-E        +    where <bound method Distance.braycurtis of <distclassipy.distances.Distance object at 0x13b066b10>> = getattr(<distclassipy.distances.Distance object at 0x13b066b10>, 'braycurtis')
+E        +  where nan = <bound method Distance.braycurtis of <distclassipy.distances.Distance object at 0x166ccaea0>>(array([0.]), array([0.]))
+E        +    where <bound method Distance.braycurtis of <distclassipy.distances.Distance object at 0x166ccaea0>> = getattr(<distclassipy.distances.Distance object at 0x166ccaea0>, 'braycurtis')
 E       Falsifying example: test_non_negative(
 E           metric='braycurtis',
 E           data=(array([0.0]), array([0.0])),
@@ -53,35 +53,11 @@ metric = 'correlation', data = (array([0.]), array([0.]))
     def test_non_negative(metric, data):
         u, v = data
 >       assert getattr(distance, metric)(u, v) >= 0
-E       AttributeError: 'Distance' object has no attribute 'correlation'
+E       AssertionError: assert nan >= 0
+E        +  where nan = <bound method Distance.correlation of <distclassipy.distances.Distance object at 0x166ccaea0>>(array([0.]), array([0.]))
+E        +    where <bound method Distance.correlation of <distclassipy.distances.Distance object at 0x166ccaea0>> = getattr(<distclassipy.distances.Distance object at 0x166ccaea0>, 'correlation')
 E       Falsifying example: test_non_negative(
 E           metric='correlation',
-E           data=(array([0.0]), array([0.0])),  # or any other generated value
-E       )
-
-tests/test_distances.py:55: AttributeError
-__________________________ test_non_negative[cosine] ___________________________
-
-metric = 'cosine'
-
-    @pytest.mark.parametrize("metric", all_metrics)
->   @given(arrays)
-
-tests/test_distances.py:52: 
-_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
-
-metric = 'cosine', data = (array([0.]), array([0.]))
-
-    @pytest.mark.parametrize("metric", all_metrics)
-    @given(arrays)
-    def test_non_negative(metric, data):
-        u, v = data
->       assert getattr(distance, metric)(u, v) >= 0
-E       AssertionError: assert nan >= 0
-E        +  where nan = <bound method Distance.cosine of <distclassipy.distances.Distance object at 0x13b066b10>>(array([0.]), array([0.]))
-E        +    where <bound method Distance.cosine of <distclassipy.distances.Distance object at 0x13b066b10>> = getattr(<distclassipy.distances.Distance object at 0x13b066b10>, 'cosine')
-E       Falsifying example: test_non_negative(
-E           metric='cosine',
 E           data=(array([0.0]), array([0.0])),
 E       )
 
@@ -104,8 +80,8 @@ metric = 'hellinger', data = (array([0.]), array([-1.]))
         u, v = data
 >       assert getattr(distance, metric)(u, v) >= 0
 E       AssertionError: assert nan >= 0
-E        +  where nan = <bound method Distance.hellinger of <distclassipy.distances.Distance object at 0x13b066b10>>(array([0.]), array([-1.]))
-E        +    where <bound method Distance.hellinger of <distclassipy.distances.Distance object at 0x13b066b10>> = getattr(<distclassipy.distances.Distance object at 0x13b066b10>, 'hellinger')
+E        +  where nan = <bound method Distance.hellinger of <distclassipy.distances.Distance object at 0x166ccaea0>>(array([0.]), array([-1.]))
+E        +    where <bound method Distance.hellinger of <distclassipy.distances.Distance object at 0x166ccaea0>> = getattr(<distclassipy.distances.Distance object at 0x166ccaea0>, 'hellinger')
 E       Falsifying example: test_non_negative(
 E           metric='hellinger',
 E           data=(array([0.0]), array([-1.0])),
@@ -130,8 +106,8 @@ metric = 'jaccard', data = (array([0.]), array([0.]))
         u, v = data
 >       assert getattr(distance, metric)(u, v) >= 0
 E       AssertionError: assert nan >= 0
-E        +  where nan = <bound method Distance.jaccard of <distclassipy.distances.Distance object at 0x13b066b10>>(array([0.]), array([0.]))
-E        +    where <bound method Distance.jaccard of <distclassipy.distances.Distance object at 0x13b066b10>> = getattr(<distclassipy.distances.Distance object at 0x13b066b10>, 'jaccard')
+E        +  where nan = <bound method Distance.jaccard of <distclassipy.distances.Distance object at 0x166ccaea0>>(array([0.]), array([0.]))
+E        +    where <bound method Distance.jaccard of <distclassipy.distances.Distance object at 0x166ccaea0>> = getattr(<distclassipy.distances.Distance object at 0x166ccaea0>, 'jaccard')
 E       Falsifying example: test_non_negative(
 E           metric='jaccard',
 E           data=(array([0.0]), array([0.0])),
@@ -156,8 +132,8 @@ metric = 'marylandbridge', data = (array([0.]), array([0.]))
         u, v = data
 >       assert getattr(distance, metric)(u, v) >= 0
 E       AssertionError: assert nan >= 0
-E        +  where nan = <bound method Distance.marylandbridge of <distclassipy.distances.Distance object at 0x13b066b10>>(array([0.]), array([0.]))
-E        +    where <bound method Distance.marylandbridge of <distclassipy.distances.Distance object at 0x13b066b10>> = getattr(<distclassipy.distances.Distance object at 0x13b066b10>, 'marylandbridge')
+E        +  where nan = <bound method Distance.marylandbridge of <distclassipy.distances.Distance object at 0x166ccaea0>>(array([0.]), array([0.]))
+E        +    where <bound method Distance.marylandbridge of <distclassipy.distances.Distance object at 0x166ccaea0>> = getattr(<distclassipy.distances.Distance object at 0x166ccaea0>, 'marylandbridge')
 E       Falsifying example: test_non_negative(
 E           metric='marylandbridge',
 E           data=(array([0.0]), array([0.0])),
@@ -182,8 +158,8 @@ metric = 'motyka', data = (array([0.]), array([0.]))
         u, v = data
 >       assert getattr(distance, metric)(u, v) >= 0
 E       AssertionError: assert nan >= 0
-E        +  where nan = <bound method Distance.motyka of <distclassipy.distances.Distance object at 0x13b066b10>>(array([0.]), array([0.]))
-E        +    where <bound method Distance.motyka of <distclassipy.distances.Distance object at 0x13b066b10>> = getattr(<distclassipy.distances.Distance object at 0x13b066b10>, 'motyka')
+E        +  where nan = <bound method Distance.motyka of <distclassipy.distances.Distance object at 0x166ccaea0>>(array([0.]), array([0.]))
+E        +    where <bound method Distance.motyka of <distclassipy.distances.Distance object at 0x166ccaea0>> = getattr(<distclassipy.distances.Distance object at 0x166ccaea0>, 'motyka')
 E       Falsifying example: test_non_negative(
 E           metric='motyka',
 E           data=(array([0.0]), array([0.0])),
@@ -208,12 +184,15 @@ metric = 'soergel', data = (array([0.]), array([0.]))
         u, v = data
 >       assert getattr(distance, metric)(u, v) >= 0
 E       AssertionError: assert nan >= 0
-E        +  where nan = <bound method Distance.soergel of <distclassipy.distances.Distance object at 0x13b066b10>>(array([0.]), array([0.]))
-E        +    where <bound method Distance.soergel of <distclassipy.distances.Distance object at 0x13b066b10>> = getattr(<distclassipy.distances.Distance object at 0x13b066b10>, 'soergel')
+E        +  where nan = <bound method Distance.soergel of <distclassipy.distances.Distance object at 0x166ccaea0>>(array([0.]), array([0.]))
+E        +    where <bound method Distance.soergel of <distclassipy.distances.Distance object at 0x166ccaea0>> = getattr(<distclassipy.distances.Distance object at 0x166ccaea0>, 'soergel')
 E       Falsifying example: test_non_negative(
 E           metric='soergel',
 E           data=(array([0.0]), array([0.0])),
 E       )
+E       Explanation:
+E           These lines were always and only run by failing examples:
+E               /Users/sidchaini/miniconda3/lib/python3.12/site-packages/numpy/core/arrayprint.py:949
 
 tests/test_distances.py:55: AssertionError
 ________________________ test_non_negative[wave_hedges] ________________________
@@ -235,8 +214,8 @@ data = (array([ 0.,  0.,  0., -1.]), array([ 0.,  0.,  0., -2.]))
         u, v = data
 >       assert getattr(distance, metric)(u, v) >= 0
 E       AssertionError: assert -1.0 >= 0
-E        +  where -1.0 = <bound method Distance.wave_hedges of <distclassipy.distances.Distance object at 0x13b066b10>>(array([ 0.,  0.,  0., -1.]), array([ 0.,  0.,  0., -2.]))
-E        +    where <bound method Distance.wave_hedges of <distclassipy.distances.Distance object at 0x13b066b10>> = getattr(<distclassipy.distances.Distance object at 0x13b066b10>, 'wave_hedges')
+E        +  where -1.0 = <bound method Distance.wave_hedges of <distclassipy.distances.Distance object at 0x166ccaea0>>(array([ 0.,  0.,  0., -1.]), array([ 0.,  0.,  0., -2.]))
+E        +    where <bound method Distance.wave_hedges of <distclassipy.distances.Distance object at 0x166ccaea0>> = getattr(<distclassipy.distances.Distance object at 0x166ccaea0>, 'wave_hedges')
 E       Falsifying example: test_non_negative(
 E           metric='wave_hedges',
 E           data=(array([0.0, 0.0, 0.0, -1.0]), array([0.0, 0.0, 0.0, -2.0])),
@@ -269,8 +248,8 @@ metric = 'kulczynski', data = (array([0.]), array([0.]))
         u, v = data
 >       assert getattr(distance, metric)(u, v) >= 0
 E       AssertionError: assert nan >= 0
-E        +  where nan = <bound method Distance.kulczynski of <distclassipy.distances.Distance object at 0x13b066b10>>(array([0.]), array([0.]))
-E        +    where <bound method Distance.kulczynski of <distclassipy.distances.Distance object at 0x13b066b10>> = getattr(<distclassipy.distances.Distance object at 0x13b066b10>, 'kulczynski')
+E        +  where nan = <bound method Distance.kulczynski of <distclassipy.distances.Distance object at 0x166ccaea0>>(array([0.]), array([0.]))
+E        +    where <bound method Distance.kulczynski of <distclassipy.distances.Distance object at 0x166ccaea0>> = getattr(<distclassipy.distances.Distance object at 0x166ccaea0>, 'kulczynski')
 E       Falsifying example: test_non_negative(
 E           metric='kulczynski',
 E           data=(array([0.0]), array([0.0])),
@@ -298,8 +277,8 @@ metric = 'add_chisq', data = (array([0., 1.]), array([ 0. , -0.5]))
         u, v = data
 >       assert getattr(distance, metric)(u, v) >= 0
 E       AssertionError: assert -2.25 >= 0
-E        +  where -2.25 = <bound method Distance.add_chisq of <distclassipy.distances.Distance object at 0x13b066b10>>(array([0., 1.]), array([ 0. , -0.5]))
-E        +    where <bound method Distance.add_chisq of <distclassipy.distances.Distance object at 0x13b066b10>> = getattr(<distclassipy.distances.Distance object at 0x13b066b10>, 'add_chisq')
+E        +  where -2.25 = <bound method Distance.add_chisq of <distclassipy.distances.Distance object at 0x166ccaea0>>(array([0., 1.]), array([ 0. , -0.5]))
+E        +    where <bound method Distance.add_chisq of <distclassipy.distances.Distance object at 0x166ccaea0>> = getattr(<distclassipy.distances.Distance object at 0x166ccaea0>, 'add_chisq')
 E       Falsifying example: test_non_negative(
 E           metric='add_chisq',
 E           data=(array([0.0, 1.0]), array([0.0, -0.5])),
@@ -332,8 +311,8 @@ metric = 'braycurtis', data = (array([0.]), array([0.]))
         u, _ = data
 >       assert getattr(distance, metric)(u, u) == 0
 E       AssertionError: assert nan == 0
-E        +  where nan = <bound method Distance.braycurtis of <distclassipy.distances.Distance object at 0x13b066b10>>(array([0.]), array([0.]))
-E        +    where <bound method Distance.braycurtis of <distclassipy.distances.Distance object at 0x13b066b10>> = getattr(<distclassipy.distances.Distance object at 0x13b066b10>, 'braycurtis')
+E        +  where nan = <bound method Distance.braycurtis of <distclassipy.distances.Distance object at 0x166ccaea0>>(array([0.]), array([0.]))
+E        +    where <bound method Distance.braycurtis of <distclassipy.distances.Distance object at 0x166ccaea0>> = getattr(<distclassipy.distances.Distance object at 0x166ccaea0>, 'braycurtis')
 E       Falsifying example: test_self_distance(
 E           metric='braycurtis',
 E           data=(array([0.0]), array([0.0])),
@@ -357,35 +336,11 @@ metric = 'correlation', data = (array([0.]), array([0.]))
     def test_self_distance(metric, data):
         u, _ = data
 >       assert getattr(distance, metric)(u, u) == 0
-E       AttributeError: 'Distance' object has no attribute 'correlation'
+E       AssertionError: assert nan == 0
+E        +  where nan = <bound method Distance.correlation of <distclassipy.distances.Distance object at 0x166ccaea0>>(array([0.]), array([0.]))
+E        +    where <bound method Distance.correlation of <distclassipy.distances.Distance object at 0x166ccaea0>> = getattr(<distclassipy.distances.Distance object at 0x166ccaea0>, 'correlation')
 E       Falsifying example: test_self_distance(
 E           metric='correlation',
-E           data=(array([0.0]), array([0.0])),  # or any other generated value
-E       )
-
-tests/test_distances.py:62: AttributeError
-__________________________ test_self_distance[cosine] __________________________
-
-metric = 'cosine'
-
-    @pytest.mark.parametrize("metric", all_metrics)
->   @given(arrays)
-
-tests/test_distances.py:59: 
-_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
-
-metric = 'cosine', data = (array([0.]), array([0.]))
-
-    @pytest.mark.parametrize("metric", all_metrics)
-    @given(arrays)
-    def test_self_distance(metric, data):
-        u, _ = data
->       assert getattr(distance, metric)(u, u) == 0
-E       AssertionError: assert nan == 0
-E        +  where nan = <bound method Distance.cosine of <distclassipy.distances.Distance object at 0x13b066b10>>(array([0.]), array([0.]))
-E        +    where <bound method Distance.cosine of <distclassipy.distances.Distance object at 0x13b066b10>> = getattr(<distclassipy.distances.Distance object at 0x13b066b10>, 'cosine')
-E       Falsifying example: test_self_distance(
-E           metric='cosine',
 E           data=(array([0.0]), array([0.0])),
 E       )
 
@@ -408,8 +363,8 @@ metric = 'hellinger', data = (array([-1.]), array([0.]))
         u, _ = data
 >       assert getattr(distance, metric)(u, u) == 0
 E       AssertionError: assert nan == 0
-E        +  where nan = <bound method Distance.hellinger of <distclassipy.distances.Distance object at 0x13b066b10>>(array([-1.]), array([-1.]))
-E        +    where <bound method Distance.hellinger of <distclassipy.distances.Distance object at 0x13b066b10>> = getattr(<distclassipy.distances.Distance object at 0x13b066b10>, 'hellinger')
+E        +  where nan = <bound method Distance.hellinger of <distclassipy.distances.Distance object at 0x166ccaea0>>(array([-1.]), array([-1.]))
+E        +    where <bound method Distance.hellinger of <distclassipy.distances.Distance object at 0x166ccaea0>> = getattr(<distclassipy.distances.Distance object at 0x166ccaea0>, 'hellinger')
 E       Falsifying example: test_self_distance(
 E           metric='hellinger',
 E           data=(array([-1.0]), array([0.0])),
@@ -434,8 +389,8 @@ metric = 'jaccard', data = (array([0.]), array([0.]))
         u, _ = data
 >       assert getattr(distance, metric)(u, u) == 0
 E       AssertionError: assert nan == 0
-E        +  where nan = <bound method Distance.jaccard of <distclassipy.distances.Distance object at 0x13b066b10>>(array([0.]), array([0.]))
-E        +    where <bound method Distance.jaccard of <distclassipy.distances.Distance object at 0x13b066b10>> = getattr(<distclassipy.distances.Distance object at 0x13b066b10>, 'jaccard')
+E        +  where nan = <bound method Distance.jaccard of <distclassipy.distances.Distance object at 0x166ccaea0>>(array([0.]), array([0.]))
+E        +    where <bound method Distance.jaccard of <distclassipy.distances.Distance object at 0x166ccaea0>> = getattr(<distclassipy.distances.Distance object at 0x166ccaea0>, 'jaccard')
 E       Falsifying example: test_self_distance(
 E           metric='jaccard',
 E           data=(array([0.0]), array([0.0])),
@@ -460,8 +415,8 @@ metric = 'marylandbridge', data = (array([0.]), array([0.]))
         u, _ = data
 >       assert getattr(distance, metric)(u, u) == 0
 E       AssertionError: assert nan == 0
-E        +  where nan = <bound method Distance.marylandbridge of <distclassipy.distances.Distance object at 0x13b066b10>>(array([0.]), array([0.]))
-E        +    where <bound method Distance.marylandbridge of <distclassipy.distances.Distance object at 0x13b066b10>> = getattr(<distclassipy.distances.Distance object at 0x13b066b10>, 'marylandbridge')
+E        +  where nan = <bound method Distance.marylandbridge of <distclassipy.distances.Distance object at 0x166ccaea0>>(array([0.]), array([0.]))
+E        +    where <bound method Distance.marylandbridge of <distclassipy.distances.Distance object at 0x166ccaea0>> = getattr(<distclassipy.distances.Distance object at 0x166ccaea0>, 'marylandbridge')
 E       Falsifying example: test_self_distance(
 E           metric='marylandbridge',
 E           data=(array([0.0]), array([0.0])),
@@ -486,8 +441,8 @@ metric = 'motyka', data = (array([0.]), array([0.]))
         u, _ = data
 >       assert getattr(distance, metric)(u, u) == 0
 E       AssertionError: assert nan == 0
-E        +  where nan = <bound method Distance.motyka of <distclassipy.distances.Distance object at 0x13b066b10>>(array([0.]), array([0.]))
-E        +    where <bound method Distance.motyka of <distclassipy.distances.Distance object at 0x13b066b10>> = getattr(<distclassipy.distances.Distance object at 0x13b066b10>, 'motyka')
+E        +  where nan = <bound method Distance.motyka of <distclassipy.distances.Distance object at 0x166ccaea0>>(array([0.]), array([0.]))
+E        +    where <bound method Distance.motyka of <distclassipy.distances.Distance object at 0x166ccaea0>> = getattr(<distclassipy.distances.Distance object at 0x166ccaea0>, 'motyka')
 E       Falsifying example: test_self_distance(
 E           metric='motyka',
 E           data=(array([0.0]), array([0.0])),  # or any other generated value
@@ -512,8 +467,8 @@ metric = 'soergel', data = (array([0.]), array([0.]))
         u, _ = data
 >       assert getattr(distance, metric)(u, u) == 0
 E       AssertionError: assert nan == 0
-E        +  where nan = <bound method Distance.soergel of <distclassipy.distances.Distance object at 0x13b066b10>>(array([0.]), array([0.]))
-E        +    where <bound method Distance.soergel of <distclassipy.distances.Distance object at 0x13b066b10>> = getattr(<distclassipy.distances.Distance object at 0x13b066b10>, 'soergel')
+E        +  where nan = <bound method Distance.soergel of <distclassipy.distances.Distance object at 0x166ccaea0>>(array([0.]), array([0.]))
+E        +    where <bound method Distance.soergel of <distclassipy.distances.Distance object at 0x166ccaea0>> = getattr(<distclassipy.distances.Distance object at 0x166ccaea0>, 'soergel')
 E       Falsifying example: test_self_distance(
 E           metric='soergel',
 E           data=(array([0.0]), array([0.0])),
@@ -538,8 +493,8 @@ metric = 'kulczynski', data = (array([0.]), array([0.]))
         u, _ = data
 >       assert getattr(distance, metric)(u, u) == 0
 E       AssertionError: assert nan == 0
-E        +  where nan = <bound method Distance.kulczynski of <distclassipy.distances.Distance object at 0x13b066b10>>(array([0.]), array([0.]))
-E        +    where <bound method Distance.kulczynski of <distclassipy.distances.Distance object at 0x13b066b10>> = getattr(<distclassipy.distances.Distance object at 0x13b066b10>, 'kulczynski')
+E        +  where nan = <bound method Distance.kulczynski of <distclassipy.distances.Distance object at 0x166ccaea0>>(array([0.]), array([0.]))
+E        +    where <bound method Distance.kulczynski of <distclassipy.distances.Distance object at 0x166ccaea0>> = getattr(<distclassipy.distances.Distance object at 0x166ccaea0>, 'kulczynski')
 E       Falsifying example: test_self_distance(
 E           metric='kulczynski',
 E           data=(array([0.0]), array([0.0])),
@@ -564,10 +519,10 @@ metric = 'braycurtis', data = (array([0.]), array([0.]))
         u, v = data
 >       assert getattr(distance, metric)(u, v) == getattr(distance, metric)(v, u)
 E       AssertionError: assert nan == nan
-E        +  where nan = <bound method Distance.braycurtis of <distclassipy.distances.Distance object at 0x13b066b10>>(array([0.]), array([0.]))
-E        +    where <bound method Distance.braycurtis of <distclassipy.distances.Distance object at 0x13b066b10>> = getattr(<distclassipy.distances.Distance object at 0x13b066b10>, 'braycurtis')
-E        +  and   nan = <bound method Distance.braycurtis of <distclassipy.distances.Distance object at 0x13b066b10>>(array([0.]), array([0.]))
-E        +    where <bound method Distance.braycurtis of <distclassipy.distances.Distance object at 0x13b066b10>> = getattr(<distclassipy.distances.Distance object at 0x13b066b10>, 'braycurtis')
+E        +  where nan = <bound method Distance.braycurtis of <distclassipy.distances.Distance object at 0x166ccaea0>>(array([0.]), array([0.]))
+E        +    where <bound method Distance.braycurtis of <distclassipy.distances.Distance object at 0x166ccaea0>> = getattr(<distclassipy.distances.Distance object at 0x166ccaea0>, 'braycurtis')
+E        +  and   nan = <bound method Distance.braycurtis of <distclassipy.distances.Distance object at 0x166ccaea0>>(array([0.]), array([0.]))
+E        +    where <bound method Distance.braycurtis of <distclassipy.distances.Distance object at 0x166ccaea0>> = getattr(<distclassipy.distances.Distance object at 0x166ccaea0>, 'braycurtis')
 E       Falsifying example: test_symmetry(
 E           metric='braycurtis',
 E           data=(array([0.0]), array([0.0])),
@@ -591,37 +546,13 @@ metric = 'correlation', data = (array([0.]), array([0.]))
     def test_symmetry(metric, data):
         u, v = data
 >       assert getattr(distance, metric)(u, v) == getattr(distance, metric)(v, u)
-E       AttributeError: 'Distance' object has no attribute 'correlation'
+E       AssertionError: assert nan == nan
+E        +  where nan = <bound method Distance.correlation of <distclassipy.distances.Distance object at 0x166ccaea0>>(array([0.]), array([0.]))
+E        +    where <bound method Distance.correlation of <distclassipy.distances.Distance object at 0x166ccaea0>> = getattr(<distclassipy.distances.Distance object at 0x166ccaea0>, 'correlation')
+E        +  and   nan = <bound method Distance.correlation of <distclassipy.distances.Distance object at 0x166ccaea0>>(array([0.]), array([0.]))
+E        +    where <bound method Distance.correlation of <distclassipy.distances.Distance object at 0x166ccaea0>> = getattr(<distclassipy.distances.Distance object at 0x166ccaea0>, 'correlation')
 E       Falsifying example: test_symmetry(
 E           metric='correlation',
-E           data=(array([0.0]), array([0.0])),  # or any other generated value
-E       )
-
-tests/test_distances.py:69: AttributeError
-____________________________ test_symmetry[cosine] _____________________________
-
-metric = 'cosine'
-
-    @pytest.mark.parametrize("metric", all_metrics)
->   @given(arrays)
-
-tests/test_distances.py:66: 
-_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
-
-metric = 'cosine', data = (array([0.]), array([0.]))
-
-    @pytest.mark.parametrize("metric", all_metrics)
-    @given(arrays)
-    def test_symmetry(metric, data):
-        u, v = data
->       assert getattr(distance, metric)(u, v) == getattr(distance, metric)(v, u)
-E       AssertionError: assert nan == nan
-E        +  where nan = <bound method Distance.cosine of <distclassipy.distances.Distance object at 0x13b066b10>>(array([0.]), array([0.]))
-E        +    where <bound method Distance.cosine of <distclassipy.distances.Distance object at 0x13b066b10>> = getattr(<distclassipy.distances.Distance object at 0x13b066b10>, 'cosine')
-E        +  and   nan = <bound method Distance.cosine of <distclassipy.distances.Distance object at 0x13b066b10>>(array([0.]), array([0.]))
-E        +    where <bound method Distance.cosine of <distclassipy.distances.Distance object at 0x13b066b10>> = getattr(<distclassipy.distances.Distance object at 0x13b066b10>, 'cosine')
-E       Falsifying example: test_symmetry(
-E           metric='cosine',
 E           data=(array([0.0]), array([0.0])),
 E       )
 
@@ -644,10 +575,10 @@ metric = 'hellinger', data = (array([0.]), array([-1.]))
         u, v = data
 >       assert getattr(distance, metric)(u, v) == getattr(distance, metric)(v, u)
 E       AssertionError: assert nan == nan
-E        +  where nan = <bound method Distance.hellinger of <distclassipy.distances.Distance object at 0x13b066b10>>(array([0.]), array([-1.]))
-E        +    where <bound method Distance.hellinger of <distclassipy.distances.Distance object at 0x13b066b10>> = getattr(<distclassipy.distances.Distance object at 0x13b066b10>, 'hellinger')
-E        +  and   nan = <bound method Distance.hellinger of <distclassipy.distances.Distance object at 0x13b066b10>>(array([-1.]), array([0.]))
-E        +    where <bound method Distance.hellinger of <distclassipy.distances.Distance object at 0x13b066b10>> = getattr(<distclassipy.distances.Distance object at 0x13b066b10>, 'hellinger')
+E        +  where nan = <bound method Distance.hellinger of <distclassipy.distances.Distance object at 0x166ccaea0>>(array([0.]), array([-1.]))
+E        +    where <bound method Distance.hellinger of <distclassipy.distances.Distance object at 0x166ccaea0>> = getattr(<distclassipy.distances.Distance object at 0x166ccaea0>, 'hellinger')
+E        +  and   nan = <bound method Distance.hellinger of <distclassipy.distances.Distance object at 0x166ccaea0>>(array([-1.]), array([0.]))
+E        +    where <bound method Distance.hellinger of <distclassipy.distances.Distance object at 0x166ccaea0>> = getattr(<distclassipy.distances.Distance object at 0x166ccaea0>, 'hellinger')
 E       Falsifying example: test_symmetry(
 E           metric='hellinger',
 E           data=(array([0.0]), array([-1.0])),
@@ -676,10 +607,10 @@ metric = 'jaccard', data = (array([0.]), array([0.]))
         u, v = data
 >       assert getattr(distance, metric)(u, v) == getattr(distance, metric)(v, u)
 E       AssertionError: assert nan == nan
-E        +  where nan = <bound method Distance.jaccard of <distclassipy.distances.Distance object at 0x13b066b10>>(array([0.]), array([0.]))
-E        +    where <bound method Distance.jaccard of <distclassipy.distances.Distance object at 0x13b066b10>> = getattr(<distclassipy.distances.Distance object at 0x13b066b10>, 'jaccard')
-E        +  and   nan = <bound method Distance.jaccard of <distclassipy.distances.Distance object at 0x13b066b10>>(array([0.]), array([0.]))
-E        +    where <bound method Distance.jaccard of <distclassipy.distances.Distance object at 0x13b066b10>> = getattr(<distclassipy.distances.Distance object at 0x13b066b10>, 'jaccard')
+E        +  where nan = <bound method Distance.jaccard of <distclassipy.distances.Distance object at 0x166ccaea0>>(array([0.]), array([0.]))
+E        +    where <bound method Distance.jaccard of <distclassipy.distances.Distance object at 0x166ccaea0>> = getattr(<distclassipy.distances.Distance object at 0x166ccaea0>, 'jaccard')
+E        +  and   nan = <bound method Distance.jaccard of <distclassipy.distances.Distance object at 0x166ccaea0>>(array([0.]), array([0.]))
+E        +    where <bound method Distance.jaccard of <distclassipy.distances.Distance object at 0x166ccaea0>> = getattr(<distclassipy.distances.Distance object at 0x166ccaea0>, 'jaccard')
 E       Falsifying example: test_symmetry(
 E           metric='jaccard',
 E           data=(array([0.0]), array([0.0])),
@@ -704,10 +635,10 @@ metric = 'marylandbridge', data = (array([0.]), array([0.]))
         u, v = data
 >       assert getattr(distance, metric)(u, v) == getattr(distance, metric)(v, u)
 E       AssertionError: assert nan == nan
-E        +  where nan = <bound method Distance.marylandbridge of <distclassipy.distances.Distance object at 0x13b066b10>>(array([0.]), array([0.]))
-E        +    where <bound method Distance.marylandbridge of <distclassipy.distances.Distance object at 0x13b066b10>> = getattr(<distclassipy.distances.Distance object at 0x13b066b10>, 'marylandbridge')
-E        +  and   nan = <bound method Distance.marylandbridge of <distclassipy.distances.Distance object at 0x13b066b10>>(array([0.]), array([0.]))
-E        +    where <bound method Distance.marylandbridge of <distclassipy.distances.Distance object at 0x13b066b10>> = getattr(<distclassipy.distances.Distance object at 0x13b066b10>, 'marylandbridge')
+E        +  where nan = <bound method Distance.marylandbridge of <distclassipy.distances.Distance object at 0x166ccaea0>>(array([0.]), array([0.]))
+E        +    where <bound method Distance.marylandbridge of <distclassipy.distances.Distance object at 0x166ccaea0>> = getattr(<distclassipy.distances.Distance object at 0x166ccaea0>, 'marylandbridge')
+E        +  and   nan = <bound method Distance.marylandbridge of <distclassipy.distances.Distance object at 0x166ccaea0>>(array([0.]), array([0.]))
+E        +    where <bound method Distance.marylandbridge of <distclassipy.distances.Distance object at 0x166ccaea0>> = getattr(<distclassipy.distances.Distance object at 0x166ccaea0>, 'marylandbridge')
 E       Falsifying example: test_symmetry(
 E           metric='marylandbridge',
 E           data=(array([0.0]), array([0.0])),
@@ -734,10 +665,10 @@ data = (array([0., 0., 0., 0., 0., 0., 1.]), array([1.00000000e+00, 0.00000000e+
         u, v = data
 >       assert getattr(distance, metric)(u, v) == getattr(distance, metric)(v, u)
 E       AssertionError: assert 8.112965775742091e+31 == 8.112965775742095e+31
-E        +  where 8.112965775742091e+31 = <bound method Distance.meehl of <distclassipy.distances.Distance object at 0x13b066b10>>(array([0., 0., 0., 0., 0., 0., 1.]), array([1.00000000e+00, 0.00000000e+00, 0.00000000e+00, 0.00000000e+00,\n       0.00000000e+00, 0.00000000e+00, 9.00720033e+15]))
-E        +    where <bound method Distance.meehl of <distclassipy.distances.Distance object at 0x13b066b10>> = getattr(<distclassipy.distances.Distance object at 0x13b066b10>, 'meehl')
-E        +  and   8.112965775742095e+31 = <bound method Distance.meehl of <distclassipy.distances.Distance object at 0x13b066b10>>(array([1.00000000e+00, 0.00000000e+00, 0.00000000e+00, 0.00000000e+00,\n       0.00000000e+00, 0.00000000e+00, 9.00720033e+15]), array([0., 0., 0., 0., 0., 0., 1.]))
-E        +    where <bound method Distance.meehl of <distclassipy.distances.Distance object at 0x13b066b10>> = getattr(<distclassipy.distances.Distance object at 0x13b066b10>, 'meehl')
+E        +  where 8.112965775742091e+31 = <bound method Distance.meehl of <distclassipy.distances.Distance object at 0x166ccaea0>>(array([0., 0., 0., 0., 0., 0., 1.]), array([1.00000000e+00, 0.00000000e+00, 0.00000000e+00, 0.00000000e+00,\n       0.00000000e+00, 0.00000000e+00, 9.00720033e+15]))
+E        +    where <bound method Distance.meehl of <distclassipy.distances.Distance object at 0x166ccaea0>> = getattr(<distclassipy.distances.Distance object at 0x166ccaea0>, 'meehl')
+E        +  and   8.112965775742095e+31 = <bound method Distance.meehl of <distclassipy.distances.Distance object at 0x166ccaea0>>(array([1.00000000e+00, 0.00000000e+00, 0.00000000e+00, 0.00000000e+00,\n       0.00000000e+00, 0.00000000e+00, 9.00720033e+15]), array([0., 0., 0., 0., 0., 0., 1.]))
+E        +    where <bound method Distance.meehl of <distclassipy.distances.Distance object at 0x166ccaea0>> = getattr(<distclassipy.distances.Distance object at 0x166ccaea0>, 'meehl')
 E       Falsifying example: test_symmetry(
 E           metric='meehl',
 E           data=(array([0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 1.0]),
@@ -771,10 +702,10 @@ metric = 'motyka', data = (array([0.]), array([0.]))
         u, v = data
 >       assert getattr(distance, metric)(u, v) == getattr(distance, metric)(v, u)
 E       AssertionError: assert nan == nan
-E        +  where nan = <bound method Distance.motyka of <distclassipy.distances.Distance object at 0x13b066b10>>(array([0.]), array([0.]))
-E        +    where <bound method Distance.motyka of <distclassipy.distances.Distance object at 0x13b066b10>> = getattr(<distclassipy.distances.Distance object at 0x13b066b10>, 'motyka')
-E        +  and   nan = <bound method Distance.motyka of <distclassipy.distances.Distance object at 0x13b066b10>>(array([0.]), array([0.]))
-E        +    where <bound method Distance.motyka of <distclassipy.distances.Distance object at 0x13b066b10>> = getattr(<distclassipy.distances.Distance object at 0x13b066b10>, 'motyka')
+E        +  where nan = <bound method Distance.motyka of <distclassipy.distances.Distance object at 0x166ccaea0>>(array([0.]), array([0.]))
+E        +    where <bound method Distance.motyka of <distclassipy.distances.Distance object at 0x166ccaea0>> = getattr(<distclassipy.distances.Distance object at 0x166ccaea0>, 'motyka')
+E        +  and   nan = <bound method Distance.motyka of <distclassipy.distances.Distance object at 0x166ccaea0>>(array([0.]), array([0.]))
+E        +    where <bound method Distance.motyka of <distclassipy.distances.Distance object at 0x166ccaea0>> = getattr(<distclassipy.distances.Distance object at 0x166ccaea0>, 'motyka')
 E       Falsifying example: test_symmetry(
 E           metric='motyka',
 E           data=(array([0.0]), array([0.0])),
@@ -799,10 +730,10 @@ metric = 'soergel', data = (array([0.]), array([0.]))
         u, v = data
 >       assert getattr(distance, metric)(u, v) == getattr(distance, metric)(v, u)
 E       AssertionError: assert nan == nan
-E        +  where nan = <bound method Distance.soergel of <distclassipy.distances.Distance object at 0x13b066b10>>(array([0.]), array([0.]))
-E        +    where <bound method Distance.soergel of <distclassipy.distances.Distance object at 0x13b066b10>> = getattr(<distclassipy.distances.Distance object at 0x13b066b10>, 'soergel')
-E        +  and   nan = <bound method Distance.soergel of <distclassipy.distances.Distance object at 0x13b066b10>>(array([0.]), array([0.]))
-E        +    where <bound method Distance.soergel of <distclassipy.distances.Distance object at 0x13b066b10>> = getattr(<distclassipy.distances.Distance object at 0x13b066b10>, 'soergel')
+E        +  where nan = <bound method Distance.soergel of <distclassipy.distances.Distance object at 0x166ccaea0>>(array([0.]), array([0.]))
+E        +    where <bound method Distance.soergel of <distclassipy.distances.Distance object at 0x166ccaea0>> = getattr(<distclassipy.distances.Distance object at 0x166ccaea0>, 'soergel')
+E        +  and   nan = <bound method Distance.soergel of <distclassipy.distances.Distance object at 0x166ccaea0>>(array([0.]), array([0.]))
+E        +    where <bound method Distance.soergel of <distclassipy.distances.Distance object at 0x166ccaea0>> = getattr(<distclassipy.distances.Distance object at 0x166ccaea0>, 'soergel')
 E       Falsifying example: test_symmetry(
 E           metric='soergel',
 E           data=(array([0.0]), array([0.0])),
@@ -827,10 +758,10 @@ metric = 'kulczynski', data = (array([0.]), array([0.]))
         u, v = data
 >       assert getattr(distance, metric)(u, v) == getattr(distance, metric)(v, u)
 E       AssertionError: assert nan == nan
-E        +  where nan = <bound method Distance.kulczynski of <distclassipy.distances.Distance object at 0x13b066b10>>(array([0.]), array([0.]))
-E        +    where <bound method Distance.kulczynski of <distclassipy.distances.Distance object at 0x13b066b10>> = getattr(<distclassipy.distances.Distance object at 0x13b066b10>, 'kulczynski')
-E        +  and   nan = <bound method Distance.kulczynski of <distclassipy.distances.Distance object at 0x13b066b10>>(array([0.]), array([0.]))
-E        +    where <bound method Distance.kulczynski of <distclassipy.distances.Distance object at 0x13b066b10>> = getattr(<distclassipy.distances.Distance object at 0x13b066b10>, 'kulczynski')
+E        +  where nan = <bound method Distance.kulczynski of <distclassipy.distances.Distance object at 0x166ccaea0>>(array([0.]), array([0.]))
+E        +    where <bound method Distance.kulczynski of <distclassipy.distances.Distance object at 0x166ccaea0>> = getattr(<distclassipy.distances.Distance object at 0x166ccaea0>, 'kulczynski')
+E        +  and   nan = <bound method Distance.kulczynski of <distclassipy.distances.Distance object at 0x166ccaea0>>(array([0.]), array([0.]))
+E        +    where <bound method Distance.kulczynski of <distclassipy.distances.Distance object at 0x166ccaea0>> = getattr(<distclassipy.distances.Distance object at 0x166ccaea0>, 'kulczynski')
 E       Falsifying example: test_symmetry(
 E           metric='kulczynski',
 E           data=(array([0.0]), array([0.0])),
@@ -855,23 +786,15 @@ tests/test_distances.py::test_self_distance[braycurtis]
 tests/test_distances.py::test_symmetry[braycurtis]
 tests/test_distances.py::test_symmetry[braycurtis]
 tests/test_distances.py::test_symmetry[braycurtis]
-  /Users/sidchaini/Research/DistClassiPy/distclassipy/distances.py:204: RuntimeWarning: invalid value encountered in scalar divide
-    return np.sum(np.abs(u - v)) / np.sum(np.abs(u + v))
+  /Users/sidchaini/miniconda3/lib/python3.12/site-packages/scipy/spatial/distance.py:1129: RuntimeWarning: invalid value encountered in scalar divide
+    return l1_diff.sum() / l1_sum.sum()
 
-tests/test_distances.py::test_non_negative[cosine]
-tests/test_distances.py::test_non_negative[cosine]
-tests/test_distances.py::test_non_negative[cosine]
-tests/test_distances.py::test_self_distance[cosine]
-tests/test_distances.py::test_self_distance[cosine]
-tests/test_distances.py::test_self_distance[cosine]
-tests/test_distances.py::test_symmetry[cosine]
-tests/test_distances.py::test_symmetry[cosine]
-tests/test_distances.py::test_symmetry[cosine]
-  /Users/sidchaini/Research/DistClassiPy/distclassipy/distances.py:329: RuntimeWarning: invalid value encountered in scalar divide
-    return 1 - np.dot(u, v) / (np.sqrt(np.dot(u, u)) * np.sqrt(np.dot(v, v)))
+tests/test_distances.py: 34 warnings
+  /Users/sidchaini/miniconda3/lib/python3.12/site-packages/scipy/spatial/distance.py:647: RuntimeWarning: invalid value encountered in scalar divide
+    dist = 1.0 - uv / math.sqrt(uu * vv)
 
 tests/test_distances.py: 36 warnings
-  /Users/sidchaini/Research/DistClassiPy/distclassipy/distances.py:559: RuntimeWarning: invalid value encountered in sqrt
+  /Users/sidchaini/Research/DistClassiPy/distclassipy/distances.py:337: RuntimeWarning: invalid value encountered in sqrt
     return np.sqrt(2 * np.sum((np.sqrt(u) - np.sqrt(v)) ** 2))
 
 tests/test_distances.py::test_non_negative[jaccard]
@@ -883,7 +806,7 @@ tests/test_distances.py::test_self_distance[jaccard]
 tests/test_distances.py::test_symmetry[jaccard]
 tests/test_distances.py::test_symmetry[jaccard]
 tests/test_distances.py::test_symmetry[jaccard]
-  /Users/sidchaini/Research/DistClassiPy/distclassipy/distances.py:605: RuntimeWarning: invalid value encountered in scalar divide
+  /Users/sidchaini/Research/DistClassiPy/distclassipy/distances.py:361: RuntimeWarning: invalid value encountered in scalar divide
     return 1 - (uv / (np.dot(u, u) + np.dot(v, v) - uv))
 
 tests/test_distances.py::test_non_negative[marylandbridge]
@@ -895,11 +818,11 @@ tests/test_distances.py::test_self_distance[marylandbridge]
 tests/test_distances.py::test_symmetry[marylandbridge]
 tests/test_distances.py::test_symmetry[marylandbridge]
 tests/test_distances.py::test_symmetry[marylandbridge]
-  /Users/sidchaini/Research/DistClassiPy/distclassipy/distances.py:891: RuntimeWarning: invalid value encountered in scalar divide
+  /Users/sidchaini/Research/DistClassiPy/distclassipy/distances.py:407: RuntimeWarning: invalid value encountered in scalar divide
     return 1 - (uvdot / np.dot(u, u) + uvdot / np.dot(v, v)) / 2
 
-tests/test_distances.py: 12 warnings
-  /Users/sidchaini/Research/DistClassiPy/distclassipy/distances.py:1037: RuntimeWarning: invalid value encountered in scalar divide
+tests/test_distances.py: 10 warnings
+  /Users/sidchaini/Research/DistClassiPy/distclassipy/distances.py:463: RuntimeWarning: invalid value encountered in scalar divide
     return np.sum(np.maximum(u, v)) / np.sum(u + v)
 
 tests/test_distances.py::test_non_negative[soergel]
@@ -911,7 +834,7 @@ tests/test_distances.py::test_self_distance[soergel]
 tests/test_distances.py::test_symmetry[soergel]
 tests/test_distances.py::test_symmetry[soergel]
 tests/test_distances.py::test_symmetry[soergel]
-  /Users/sidchaini/Research/DistClassiPy/distclassipy/distances.py:1226: RuntimeWarning: invalid value encountered in scalar divide
+  /Users/sidchaini/Research/DistClassiPy/distclassipy/distances.py:488: RuntimeWarning: invalid value encountered in scalar divide
     return np.sum(np.abs(u - v)) / np.sum(np.maximum(u, v))
 
 tests/test_distances.py::test_non_negative[kulczynski]
@@ -923,7 +846,11 @@ tests/test_distances.py::test_self_distance[kulczynski]
 tests/test_distances.py::test_symmetry[kulczynski]
 tests/test_distances.py::test_symmetry[kulczynski]
 tests/test_distances.py::test_symmetry[kulczynski]
-  /Users/sidchaini/Research/DistClassiPy/distclassipy/distances.py:781: RuntimeWarning: invalid value encountered in scalar divide
+  /Users/sidchaini/Research/DistClassiPy/distclassipy/distances.py:533: RuntimeWarning: invalid value encountered in scalar divide
+    return np.sum(np.abs(u - v)) / np.sum(np.minimum(u, v))
+
+tests/test_distances.py::test_non_negative[kulczynski]
+  /Users/sidchaini/Research/DistClassiPy/distclassipy/distances.py:533: RuntimeWarning: divide by zero encountered in scalar divide
     return np.sum(np.abs(u - v)) / np.sum(np.minimum(u, v))
 
 -- Docs: https://docs.pytest.org/en/stable/how-to/capture-warnings.html
@@ -933,8 +860,7 @@ Coverage XML written to file coverage.xml
 
 =========================== short test summary info ============================
 FAILED tests/test_distances.py::test_non_negative[braycurtis] - AssertionErro...
-FAILED tests/test_distances.py::test_non_negative[correlation] - AttributeErr...
-FAILED tests/test_distances.py::test_non_negative[cosine] - AssertionError: a...
+FAILED tests/test_distances.py::test_non_negative[correlation] - AssertionErr...
 FAILED tests/test_distances.py::test_non_negative[hellinger] - AssertionError...
 FAILED tests/test_distances.py::test_non_negative[jaccard] - AssertionError: ...
 FAILED tests/test_distances.py::test_non_negative[marylandbridge] - Assertion...
@@ -944,8 +870,7 @@ FAILED tests/test_distances.py::test_non_negative[wave_hedges] - AssertionErr...
 FAILED tests/test_distances.py::test_non_negative[kulczynski] - AssertionErro...
 FAILED tests/test_distances.py::test_non_negative[add_chisq] - AssertionError...
 FAILED tests/test_distances.py::test_self_distance[braycurtis] - AssertionErr...
-FAILED tests/test_distances.py::test_self_distance[correlation] - AttributeEr...
-FAILED tests/test_distances.py::test_self_distance[cosine] - AssertionError: ...
+FAILED tests/test_distances.py::test_self_distance[correlation] - AssertionEr...
 FAILED tests/test_distances.py::test_self_distance[hellinger] - AssertionErro...
 FAILED tests/test_distances.py::test_self_distance[jaccard] - AssertionError:...
 FAILED tests/test_distances.py::test_self_distance[marylandbridge] - Assertio...
@@ -953,8 +878,7 @@ FAILED tests/test_distances.py::test_self_distance[motyka] - AssertionError: ...
 FAILED tests/test_distances.py::test_self_distance[soergel] - AssertionError:...
 FAILED tests/test_distances.py::test_self_distance[kulczynski] - AssertionErr...
 FAILED tests/test_distances.py::test_symmetry[braycurtis] - AssertionError: a...
-FAILED tests/test_distances.py::test_symmetry[correlation] - AttributeError: ...
-FAILED tests/test_distances.py::test_symmetry[cosine] - AssertionError: asser...
+FAILED tests/test_distances.py::test_symmetry[correlation] - AssertionError: ...
 FAILED tests/test_distances.py::test_symmetry[hellinger] - AssertionError: as...
 FAILED tests/test_distances.py::test_symmetry[jaccard] - AssertionError: asse...
 FAILED tests/test_distances.py::test_symmetry[marylandbridge] - AssertionErro...
@@ -962,4 +886,4 @@ FAILED tests/test_distances.py::test_symmetry[meehl] - AssertionError: assert...
 FAILED tests/test_distances.py::test_symmetry[motyka] - AssertionError: asser...
 FAILED tests/test_distances.py::test_symmetry[soergel] - AssertionError: asse...
 FAILED tests/test_distances.py::test_symmetry[kulczynski] - AssertionError: a...
-================= 30 failed, 41 passed, 122 warnings in 31.09s =================
+================= 27 failed, 44 passed, 146 warnings in 26.89s =================
