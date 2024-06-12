@@ -19,8 +19,8 @@ You should have received a copy of the GNU General Public License
 along with this program.  If not, see <https://www.gnu.org/licenses/>.
 """
 
-from typing import Callable
 import warnings
+from typing import Callable
 
 import numpy as np
 
@@ -74,11 +74,13 @@ class DistanceMetricClassifier(BaseEstimator, ClassifierMixin):
     calculate_kde : bool, default=False
         Whether to calculate a kernel density estimate based confidence parameter.
         .. deprecated:: 0.2.0
-            This parameter will be removed in a future version and only the distance confidence parameter will be available.
+            This parameter will be removed in a future version and only the
+            distance confidence parameter will be available.
     calculate_1d_dist : bool, default=False
         Whether to calculate the 1-dimensional distance based confidence parameter.
         .. deprecated:: 0.2.0
-            This parameter will be removed in a future version and only the distance confidence parameter will be available.
+            This parameter will be removed in a future version and only the
+            distance confidence parameter will be available.
         Whether to calculate the 1-dimensional distance based confidence parameter.
 
     Attributes
@@ -408,7 +410,8 @@ class DistanceMetricClassifier(BaseEstimator, ClassifierMixin):
 
         if self.calculate_kde:
             warnings.warn(
-                "KDE calculation in predict_and_analyse is deprecated and will be removed in version 0.2.0",
+                "KDE calculation in predict_and_analyse is deprecated "
+                "and will be removed in version 0.2.0",
                 DeprecationWarning,
             )
             # NEW: Rescale in terms of median likelihoods - calculate here
@@ -475,7 +478,8 @@ class DistanceMetricClassifier(BaseEstimator, ClassifierMixin):
             The method to use for calculating confidence. Default is
             'distance_inverse'.
             .. deprecated:: 0.2.0
-                The methods '1d_distance_inverse' and 'kde_likelihood' will be removed in version 0.2.0.
+                The methods '1d_distance_inverse' and
+                'kde_likelihood' will be removed in version 0.2.0.
         """
         check_is_fitted(self, "is_fitted_")
         if not hasattr(self, "analyis_"):
@@ -495,7 +499,8 @@ class DistanceMetricClassifier(BaseEstimator, ClassifierMixin):
 
         elif method == "1d_distance_inverse":
             warnings.warn(
-                "The '1d_distance_inverse' method is deprecated and will be removed in version 0.2.0",
+                "The '1d_distance_inverse' method is deprecated "
+                "and will be removed in version 0.2.0",
                 DeprecationWarning,
             )
             if not self.calculate_1d_dist:
@@ -509,7 +514,8 @@ class DistanceMetricClassifier(BaseEstimator, ClassifierMixin):
 
         elif method == "kde_likelihood":
             warnings.warn(
-                "The 'kde_likelihood' method is deprecated and will be removed in version 0.2.0",
+                "The 'kde_likelihood' method is deprecated and will be "
+                "removed in version 0.2.0",
                 DeprecationWarning,
             )
             if not self.calculate_kde:
