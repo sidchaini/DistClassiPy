@@ -229,6 +229,9 @@ class DistanceMetricClassifier(BaseEstimator, ClassifierMixin):
         """
         X, y = check_X_y(X, y)
         self.classes_ = unique_labels(y)
+        self.n_features_in_ = X.shape[
+            1
+        ]  # Number of features seen during fit - required for sklearn compatibility.
 
         self.initialize_metric_function()
 
