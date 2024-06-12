@@ -101,6 +101,7 @@ class DistanceMetricClassifier(BaseEstimator, ClassifierMixin):
         Indicates whether 1-dimensional distances are calculated.
         .. deprecated:: 0.2.0
             This parameter will be removed in a future version.
+
     See Also
     --------
     scipy.spatial.dist : Other distance metrics provided in SciPy
