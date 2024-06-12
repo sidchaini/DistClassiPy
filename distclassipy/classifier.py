@@ -20,6 +20,7 @@ along with this program.  If not, see <https://www.gnu.org/licenses/>.
 """
 
 from typing import Callable
+import warnings
 
 import numpy as np
 
@@ -72,7 +73,12 @@ class DistanceMetricClassifier(BaseEstimator, ClassifierMixin):
 
     calculate_kde : bool, default=False
         Whether to calculate a kernel density estimate based confidence parameter.
+        .. deprecated:: 0.2.0
+            This parameter will be removed in a future version and only the distance confidence parameter will be available.
     calculate_1d_dist : bool, default=False
+        Whether to calculate the 1-dimensional distance based confidence parameter.
+        .. deprecated:: 0.2.0
+            This parameter will be removed in a future version and only the distance confidence parameter will be available.
         Whether to calculate the 1-dimensional distance based confidence parameter.
 
     Attributes
@@ -87,9 +93,12 @@ class DistanceMetricClassifier(BaseEstimator, ClassifierMixin):
         The statistic used for calculating dispersion.
     calculate_kde : bool
         Indicates whether a kernel density estimate is calculated.
+        .. deprecated:: 0.2.0
+            This parameter will be removed in a future version.
     calculate_1d_dist : bool
         Indicates whether 1-dimensional distances are calculated.
-
+        .. deprecated:: 0.2.0
+            This parameter will be removed in a future version.
     See Also
     --------
     scipy.spatial.dist : Other distance metrics provided in SciPy
@@ -126,15 +135,26 @@ class DistanceMetricClassifier(BaseEstimator, ClassifierMixin):
         scale: bool = True,
         central_stat: str = "median",
         dispersion_stat: str = "std",
-        calculate_kde: bool = True,
-        calculate_1d_dist: bool = True,
+        calculate_kde: bool = True,  # deprecated in 0.2.0
+        calculate_1d_dist: bool = True,  # deprecated in 0.2.0
     ):
         """Initialize the classifier with specified parameters."""
         self.metric = metric
         self.scale = scale
         self.central_stat = central_stat
         self.dispersion_stat = dispersion_stat
+        if calculate_kde:
+            warnings.warn(
+                "calculate_kde is deprecated and will be removed in version 0.2.0",
+                DeprecationWarning,
+            )
         self.calculate_kde = calculate_kde
+
+        if calculate_1d_dist:
+            warnings.warn(
+                "calculate_1d_dist is deprecated and will be removed in version 0.2.0",
+                DeprecationWarning,
+            )
         self.calculate_1d_dist = calculate_1d_dist
 
     def initialize_metric_function(self):
@@ -256,6 +276,10 @@ class DistanceMetricClassifier(BaseEstimator, ClassifierMixin):
             self.df_iqr_ = df_iqr
 
         if self.calculate_kde:
+            warnings.warn(
+                "KDE calculation is deprecated and will be removed in version 0.2.0",
+                DeprecationWarning,
+            )
             self.kde_dict_ = {}
 
             for cl in self.classes_:
@@ -270,7 +294,6 @@ class DistanceMetricClassifier(BaseEstimator, ClassifierMixin):
                 )
                 kde.fit(subX)
                 self.kde_dict_[cl] = kde
-
         self.is_fitted_ = True
 
         return self
@@ -381,6 +404,10 @@ class DistanceMetricClassifier(BaseEstimator, ClassifierMixin):
         y_pred = self.classes_[dist_arr.argmin(axis=1)]
 
         if self.calculate_kde:
+            warnings.warn(
+                "KDE calculation in predict_and_analyse is deprecated and will be removed in version 0.2.0",
+                DeprecationWarning,
+            )
             # NEW: Rescale in terms of median likelihoods - calculate here
             scale_factors = np.exp(
                 [
@@ -400,8 +427,11 @@ class DistanceMetricClassifier(BaseEstimator, ClassifierMixin):
 
             # NEW: Rescale in terms of median likelihoods - rescale here
             self.likelihood_arr_ = self.likelihood_arr_ / scale_factors
-
         if self.calculate_1d_dist:
+            warnings.warn(
+                "calculate_1d_dist is deprecated and will be removed in version 0.2.0",
+                DeprecationWarning,
+            )
             conf_cl = []
             Xdf_temp = pd.DataFrame(data=X, columns=self.df_centroid_.columns)
             for cl in self.classes_:
@@ -424,7 +454,6 @@ class DistanceMetricClassifier(BaseEstimator, ClassifierMixin):
                 conf_cl.append(confs)
             conf_cl = np.array(conf_cl)
             self.conf_cl_ = conf_cl
-
         self.analyis_ = True
 
         return y_pred
@@ -438,10 +467,12 @@ class DistanceMetricClassifier(BaseEstimator, ClassifierMixin):
 
         Parameters
         ----------
-        method : {"distance_inverse", "1d_distance_inverse","kde_likelihood"},
+        method : {"distance_inverse", "1d_distance_inverse", "kde_likelihood"},
                  default="distance_inverse"
             The method to use for calculating confidence. Default is
             'distance_inverse'.
+            .. deprecated:: 0.2.0
+                The methods '1d_distance_inverse' and 'kde_likelihood' will be removed in version 0.2.0.
         """
         check_is_fitted(self, "is_fitted_")
         if not hasattr(self, "analyis_"):
@@ -460,6 +491,10 @@ class DistanceMetricClassifier(BaseEstimator, ClassifierMixin):
             ]
 
         elif method == "1d_distance_inverse":
+            warnings.warn(
+                "The '1d_distance_inverse' method is deprecated and will be removed in version 0.2.0",
+                DeprecationWarning,
+            )
             if not self.calculate_1d_dist:
                 raise ValueError(
                     "method='1d_distance_inverse' is only valid if calculate_1d_dist "
@@ -470,6 +505,10 @@ class DistanceMetricClassifier(BaseEstimator, ClassifierMixin):
             )
 
         elif method == "kde_likelihood":
+            warnings.warn(
+                "The 'kde_likelihood' method is deprecated and will be removed in version 0.2.0",
+                DeprecationWarning,
+            )
             if not self.calculate_kde:
                 raise ValueError(
                     "method='kde_likelihood' is only valid if calculate_kde is set "
