@@ -65,27 +65,30 @@ DistClassiPy is released under the [GNU General Public License v3.0](https://www
 ## Citation
 
 If you use DistClassiPy in your research or project, please consider citing the paper:
-> Chaini, S., Mahabal, A., Kembhavi, A., & Bianco, F. B. (2024). Light Curve Classification with DistClassiPy: a new distance-based classifier. arXiv. https://doi.org/10.48550/arXiv.2403.12120
+> Chaini, S.; Mahabal, A.; Kembhavi, A.; Bianco, F. B. Light Curve Classification with DistClassiPy: A New Distance-Based Classifier. Astronomy and Computing 2024, 48, 100850. https://doi.org/10.1016/j.ascom.2024.100850.
 
 ### Bibtex
 
 
 ```bibtex
-@ARTICLE{chaini2024light,
-       author = {{Chaini}, Siddharth and {Mahabal}, Ashish and {Kembhavi}, Ajit and {Bianco}, Federica B.},
-       title = "{Light Curve Classification with DistClassiPy: a new distance-based classifier}",
-       journal = {arXiv e-prints},
-       keywords = {Astrophysics - Instrumentation and Methods for Astrophysics, Astrophysics - Solar and Stellar Astrophysics, Computer Science - Machine Learning},
-       year = 2024,
-       month = mar,
-       eid = {arXiv:2403.12120},
-       pages = {arXiv:2403.12120},
-       archivePrefix = {arXiv},
+@ARTICLE{2024A&C....4800850C,
+       author = {{Chaini}, S. and {Mahabal}, A. and {Kembhavi}, A. and {Bianco}, F.~B.},
+        title = "{Light curve classification with DistClassiPy: A new distance-based classifier}",
+      journal = {Astronomy and Computing},
+     keywords = {Variable stars (1761), Astronomy data analysis (1858), Open source software (1866), Astrostatistics (1882), Classification (1907), Light curve classification (1954), Astrophysics - Instrumentation and Methods for Astrophysics, Astrophysics - Solar and Stellar Astrophysics, Computer Science - Machine Learning},
+         year = 2024,
+        month = jul,
+       volume = {48},
+          eid = {100850},
+        pages = {100850},
+          doi = {10.1016/j.ascom.2024.100850},
+archivePrefix = {arXiv},
        eprint = {2403.12120},
-       primaryClass = {astro-ph.IM},
-       adsurl = {https://ui.adsabs.harvard.edu/abs/2024arXiv240312120C},
-       adsnote = {Provided by the SAO/NASA Astrophysics Data System}
+ primaryClass = {astro-ph.IM},
+       adsurl = {https://ui.adsabs.harvard.edu/abs/2024A&C....4800850C},
+      adsnote = {Provided by the SAO/NASA Astrophysics Data System}
 }
+
 ```
   
 
