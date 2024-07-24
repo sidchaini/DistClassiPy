@@ -65,7 +65,7 @@ DistClassiPy is released under the [GNU General Public License v3.0](https://www
 ## Citation
 
 If you use DistClassiPy in your research or project, please consider citing the paper:
-> Chaini, S.; Mahabal, A.; Kembhavi, A.; Bianco, F. B. Light Curve Classification with DistClassiPy: A New Distance-Based Classifier. Astronomy and Computing 2024, 48, 100850. https://doi.org/10.1016/j.ascom.2024.100850.
+> Chaini, S., Mahabal, A., Kembhavi, A., & Bianco, F. B. (2024). Light Curve Classification with DistClassiPy: a new distance-based classifier. Astronomy and Computing. https://doi.org/10.1016/j.ascom.2024.100850.
 
 ### Bibtex
 
