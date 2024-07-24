@@ -30,8 +30,8 @@ preferred-citation:
   - family-names: "Bianco"
     given-names: "Federica B."
     orcid: "https://orcid.org/0000-0003-1953-8727"
-  doi: "10.48550/arXiv.2403.12120"
-  journal: "arXiv"
-  month: 3
+  doi: "10.1016/j.ascom.2024.100850"
+  journal: "Astronomy and Computing"
+  month: 7
   title: "Light Curve Classification with DistClassiPy: a new distance-based classifier"
   year: 2024
