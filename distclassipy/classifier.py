@@ -28,7 +28,6 @@ import pandas as pd
 import scipy
 
 from sklearn.base import BaseEstimator, ClassifierMixin
-from sklearn.neighbors import KernelDensity
 from sklearn.utils.multiclass import unique_labels
 from sklearn.utils.validation import check_X_y, check_array, check_is_fitted
 
@@ -362,8 +361,8 @@ class DistanceMetricClassifier(BaseEstimator, ClassifierMixin):
     def calculate_confidence(self):
         """Calculate the confidence for each prediction.
 
-        The confidence is calculated as the inverse of the distance of each data point to
-        the centroids of the training data.
+        The confidence is calculated as the inverse of the distance of each data point
+        to the centroids of the training data.
         """
         check_is_fitted(self, "is_fitted_")
         if not hasattr(self, "analyis_"):
