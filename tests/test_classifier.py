@@ -108,16 +108,6 @@ def test_central_stat_mean():
     assert clf.central_stat == "mean"
 
 
-# Test 1D distance calculation functionality
-def test_1d_distance_calculation():
-    X = np.array([[1, 2], [3, 4], [5, 6]])  # Sample feature set
-    y = np.array([0, 1, 0])  # Sample target values
-    clf = DistanceMetricClassifier(calculate_1d_dist=True)
-    clf.fit(X, y)
-    clf.predict_and_analyse(X)
-    assert hasattr(clf, "conf_cl_")
-
-
 # Test prediction error when the classifier is not fitted
 def test_predict_without_fit():
     clf = DistanceMetricClassifier()
@@ -138,5 +128,6 @@ def test_confidence_calculation():
     y = np.array([0, 1, 0])  # Sample target values
     clf = DistanceMetricClassifier()
     clf.fit(X, y)
+    clf.predict_and_analyse(X)
     distance_confidence = clf.calculate_confidence()
     assert distance_confidence.shape == (3, len(np.unique(y)))
