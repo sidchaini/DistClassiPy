@@ -137,5 +137,6 @@ def test_confidence_calculation():
     X = np.array([[1, 2], [3, 4], [5, 6]])  # Sample feature set
     y = np.array([0, 1, 0])  # Sample target values
     clf = DistanceMetricClassifier()
+    clf.fit(X, y)
     distance_confidence = clf.calculate_confidence()
     assert distance_confidence.shape == (3, len(np.unique(y)))
