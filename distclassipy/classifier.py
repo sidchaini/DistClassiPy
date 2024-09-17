@@ -71,19 +71,6 @@ class DistanceMetricClassifier(BaseEstimator, ClassifierMixin):
 
         .. versionadded:: 0.1.0
 
-    calculate_kde : bool, default=False
-        Whether to calculate a kernel density estimate based confidence parameter.
-
-        .. deprecated:: 0.2.0
-            This parameter will be removed in a future version and only the
-            distance confidence parameter will be available.
-    calculate_1d_dist : bool, default=False
-        Whether to calculate the 1-dimensional distance based confidence parameter.
-
-        .. deprecated:: 0.2.0
-            This parameter will be removed in a future version and only the
-            distance confidence parameter will be available.
-        Whether to calculate the 1-dimensional distance based confidence parameter.
 
     Attributes
     ----------
@@ -95,16 +82,6 @@ class DistanceMetricClassifier(BaseEstimator, ClassifierMixin):
         The statistic used for calculating central tendency.
     dispersion_stat : str
         The statistic used for calculating dispersion.
-    calculate_kde : bool
-        Indicates whether a kernel density estimate is calculated.
-
-        .. deprecated:: 0.2.0
-            This parameter will be removed in a future version.
-    calculate_1d_dist : bool
-        Indicates whether 1-dimensional distances are calculated.
-
-        .. deprecated:: 0.2.0
-            This parameter will be removed in a future version.
 
     See Also
     --------
@@ -142,27 +119,12 @@ class DistanceMetricClassifier(BaseEstimator, ClassifierMixin):
         scale: bool = True,
         central_stat: str = "median",
         dispersion_stat: str = "std",
-        calculate_kde: bool = True,  # deprecated in 0.2.0
-        calculate_1d_dist: bool = True,  # deprecated in 0.2.0
     ):
         """Initialize the classifier with specified parameters."""
         self.metric = metric
         self.scale = scale
         self.central_stat = central_stat
         self.dispersion_stat = dispersion_stat
-        if calculate_kde:
-            warnings.warn(
-                "calculate_kde is deprecated and will be removed in version 0.2.0",
-                DeprecationWarning,
-            )
-        self.calculate_kde = calculate_kde
-
-        if calculate_1d_dist:
-            warnings.warn(
-                "calculate_1d_dist is deprecated and will be removed in version 0.2.0",
-                DeprecationWarning,
-            )
-        self.calculate_1d_dist = calculate_1d_dist
 
     def initialize_metric_function(self):
         """Set the metric function based on the provided metric.
@@ -285,25 +247,6 @@ class DistanceMetricClassifier(BaseEstimator, ClassifierMixin):
             )
             self.df_iqr_ = df_iqr
 
-        if self.calculate_kde:
-            warnings.warn(
-                "KDE calculation is deprecated and will be removed in version 0.2.0",
-                DeprecationWarning,
-            )
-            self.kde_dict_ = {}
-
-            for cl in self.classes_:
-                subX = X[y == cl]
-                # Implement the following in an if-else to save computational time.
-                # kde = KernelDensity(bandwidth='scott', metric=self.metric)
-                # kde.fit(subX)
-                kde = KernelDensity(
-                    bandwidth="scott",
-                    metric="pyfunc",
-                    metric_params={"func": self.metric_fn_},
-                )
-                kde.fit(subX)
-                self.kde_dict_[cl] = kde
         self.is_fitted_ = True
 
         return self
@@ -413,79 +356,15 @@ class DistanceMetricClassifier(BaseEstimator, ClassifierMixin):
 
         y_pred = self.classes_[dist_arr.argmin(axis=1)]
 
-        if self.calculate_kde:
-            warnings.warn(
-                "KDE calculation in predict_and_analyse is deprecated "
-                "and will be removed in version 0.2.0",
-                DeprecationWarning,
-            )
-            # NEW: Rescale in terms of median likelihoods - calculate here
-            scale_factors = np.exp(
-                [
-                    self.kde_dict_[cl].score_samples(
-                        self.df_centroid_.loc[cl].to_numpy().reshape(1, -1)
-                    )[0]
-                    for cl in self.classes_
-                ]
-            )
-
-            likelihood_arr = []
-            for k in self.kde_dict_.keys():
-                log_pdf = self.kde_dict_[k].score_samples(X)
-                likelihood_val = np.exp(log_pdf)
-                likelihood_arr.append(likelihood_val)
-            self.likelihood_arr_ = np.array(likelihood_arr).T
-
-            # NEW: Rescale in terms of median likelihoods - rescale here
-            self.likelihood_arr_ = self.likelihood_arr_ / scale_factors
-        if self.calculate_1d_dist:
-            warnings.warn(
-                "calculate_1d_dist is deprecated and will be removed in version 0.2.0",
-                DeprecationWarning,
-            )
-            conf_cl = []
-            Xdf_temp = pd.DataFrame(data=X, columns=self.df_centroid_.columns)
-            for cl in self.classes_:
-                sum_1d_dists = np.zeros(shape=(len(Xdf_temp)))
-                for feat in Xdf_temp.columns:
-                    dists = scipy.spatial.distance.cdist(
-                        XA=np.zeros(shape=(1, 1)),
-                        XB=(self.df_centroid_.loc[cl] - Xdf_temp)[feat]
-                        .to_numpy()
-                        .reshape(-1, 1),
-                        metric=self.metric_arg_,
-                    ).ravel()
-                    if self.scale and self.dispersion_stat == "std":
-                        sum_1d_dists = sum_1d_dists + dists / self.df_std_.loc[cl, feat]
-                    elif self.scale and self.dispersion_stat == "std":
-                        sum_1d_dists = sum_1d_dists + dists / self.df_iqr_.loc[cl, feat]
-                    else:
-                        sum_1d_dists = sum_1d_dists + dists
-                confs = 1 / np.clip(sum_1d_dists, a_min=np.finfo(float).eps, a_max=None)
-                conf_cl.append(confs)
-            conf_cl = np.array(conf_cl)
-            self.conf_cl_ = conf_cl
         self.analyis_ = True
 
         return y_pred
 
-    def calculate_confidence(self, method: str = "distance_inverse"):
+    def calculate_confidence(self):
         """Calculate the confidence for each prediction.
 
-        The confidence is calculated based on either the distance of each data point to
-        the centroids of the training data, optionally the kernel density estimate or
-        1-dimensional distance.
-
-        Parameters
-        ----------
-        method : {"distance_inverse", "1d_distance_inverse", "kde_likelihood"},
-                 default="distance_inverse"
-            The method to use for calculating confidence. Default is
-            'distance_inverse'.
-
-            .. deprecated:: 0.2.0
-                The methods '1d_distance_inverse' and
-                'kde_likelihood' will be removed in version 0.2.0.
+        The confidence is calculated as the inverse of the distance of each data point to
+        the centroids of the training data.
         """
         check_is_fitted(self, "is_fitted_")
         if not hasattr(self, "analyis_"):
@@ -495,44 +374,11 @@ class DistanceMetricClassifier(BaseEstimator, ClassifierMixin):
             )
 
         # Calculate confidence for each prediction
-        if method == "distance_inverse":
-            self.confidence_df_ = 1 / np.clip(
-                self.centroid_dist_df_, a_min=np.finfo(float).eps, a_max=None
-            )
-            self.confidence_df_.columns = [
-                x.replace("_dist", "_conf") for x in self.confidence_df_.columns
-            ]
-
-        elif method == "1d_distance_inverse":
-            warnings.warn(
-                "The '1d_distance_inverse' method is deprecated "
-                "and will be removed in version 0.2.0",
-                DeprecationWarning,
-            )
-            if not self.calculate_1d_dist:
-                raise ValueError(
-                    "method='1d_distance_inverse' is only valid if calculate_1d_dist "
-                    "is set to True"
-                )
-            self.confidence_df_ = pd.DataFrame(
-                data=self.conf_cl_.T, columns=[f"{x}_conf" for x in self.classes_]
-            )
-
-        elif method == "kde_likelihood":
-            warnings.warn(
-                "The 'kde_likelihood' method is deprecated and will be "
-                "removed in version 0.2.0",
-                DeprecationWarning,
-            )
-            if not self.calculate_kde:
-                raise ValueError(
-                    "method='kde_likelihood' is only valid if calculate_kde is set "
-                    "to True"
-                )
-
-            self.confidence_df_ = pd.DataFrame(
-                data=self.likelihood_arr_,
-                columns=[f"{x}_conf" for x in self.kde_dict_.keys()],
-            )
+        self.confidence_df_ = 1 / np.clip(
+            self.centroid_dist_df_, a_min=np.finfo(float).eps, a_max=None
+        )
+        self.confidence_df_.columns = [
+            x.replace("_dist", "_conf") for x in self.confidence_df_.columns
+        ]
 
         return self.confidence_df_.to_numpy()
