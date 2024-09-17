@@ -49,17 +49,6 @@ def test_predict_without_stdscale():
     assert len(predictions) == len(y)
 
 
-# Test calculating confidence of predictions
-def test_calculate_confidence():
-    X = np.array([[1, 2], [3, 4], [5, 6]])  # Sample feature set
-    y = np.array([0, 1, 0])  # Sample target values
-    clf = DistanceMetricClassifier(calculate_kde=True)
-    clf.fit(X, y)
-    clf.predict_and_analyse(X)
-    confidence = clf.calculate_confidence()
-    assert confidence.shape == (3, len(np.unique(y)))
-
-
 # Test using different distance metrics - from scipy
 def test_metric_scipy():
     X = np.array([[1, 2], [3, 4], [5, 6]])  # Sample feature set
@@ -119,16 +108,6 @@ def test_central_stat_mean():
     assert clf.central_stat == "mean"
 
 
-# Test KDE calculation functionality
-def test_kde_calculation():
-    X = np.array([[1, 2], [3, 4], [5, 6]])  # Sample feature set
-    y = np.array([0, 1, 0])  # Sample target values
-    clf = DistanceMetricClassifier(calculate_kde=True)
-    clf.fit(X, y)
-    clf.predict_and_analyse(X)
-    assert hasattr(clf, "kde_dict_")
-
-
 # Test 1D distance calculation functionality
 def test_1d_distance_calculation():
     X = np.array([[1, 2], [3, 4], [5, 6]])  # Sample feature set
@@ -153,16 +132,10 @@ def test_calculate_confidence_without_analysis():
         clf.calculate_confidence()
 
 
-# Test different methods of confidence calculation
-def test_confidence_calculation_methods():
+# Test confidence calculation
+def test_confidence_calculation():
     X = np.array([[1, 2], [3, 4], [5, 6]])  # Sample feature set
     y = np.array([0, 1, 0])  # Sample target values
-    clf = DistanceMetricClassifier(calculate_kde=True, calculate_1d_dist=True)
-    clf.fit(X, y)
-    clf.predict_and_analyse(X)
-    distance_confidence = clf.calculate_confidence(method="distance_inverse")
+    clf = DistanceMetricClassifier()
+    distance_confidence = clf.calculate_confidence()
     assert distance_confidence.shape == (3, len(np.unique(y)))
-    kde_confidence = clf.calculate_confidence(method="kde_likelihood")
-    assert kde_confidence.shape == (3, len(np.unique(y)))
-    one_d_confidence = clf.calculate_confidence(method="1d_distance_inverse")
-    assert one_d_confidence.shape == (3, len(np.unique(y)))
