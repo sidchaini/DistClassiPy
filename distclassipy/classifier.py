@@ -73,11 +73,13 @@ class DistanceMetricClassifier(BaseEstimator, ClassifierMixin):
 
     calculate_kde : bool, default=False
         Whether to calculate a kernel density estimate based confidence parameter.
+
         .. deprecated:: 0.2.0
             This parameter will be removed in a future version and only the
             distance confidence parameter will be available.
     calculate_1d_dist : bool, default=False
         Whether to calculate the 1-dimensional distance based confidence parameter.
+
         .. deprecated:: 0.2.0
             This parameter will be removed in a future version and only the
             distance confidence parameter will be available.
@@ -95,10 +97,12 @@ class DistanceMetricClassifier(BaseEstimator, ClassifierMixin):
         The statistic used for calculating dispersion.
     calculate_kde : bool
         Indicates whether a kernel density estimate is calculated.
+
         .. deprecated:: 0.2.0
             This parameter will be removed in a future version.
     calculate_1d_dist : bool
         Indicates whether 1-dimensional distances are calculated.
+
         .. deprecated:: 0.2.0
             This parameter will be removed in a future version.
 
@@ -478,6 +482,7 @@ class DistanceMetricClassifier(BaseEstimator, ClassifierMixin):
                  default="distance_inverse"
             The method to use for calculating confidence. Default is
             'distance_inverse'.
+
             .. deprecated:: 0.2.0
                 The methods '1d_distance_inverse' and
                 'kde_likelihood' will be removed in version 0.2.0.
