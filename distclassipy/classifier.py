@@ -261,8 +261,8 @@ class DistanceMetricClassifier(BaseEstimator, ClassifierMixin):
         Notes
         -----
         If using distance metrics supported by SciPy, it is desirable to pass a string,
-        which allows SciPy to use an optimized C version of the code instead of the slower
-        Python version.
+        which allows SciPy to use an optimized C version of the code instead of the
+        slower Python version.
         """
         check_is_fitted(self, "is_fitted_")
         X = check_array(X)
@@ -330,8 +330,8 @@ class DistanceMetricClassifier(BaseEstimator, ClassifierMixin):
         Notes
         -----
         If using distance metrics supported by SciPy, it is desirable to pass a string,
-        which allows SciPy to use an optimized C version of the code instead of the slower
-        Python version.
+        which allows SciPy to use an optimized C version of the code instead
+        of the slower Python version.
 
         """
         check_is_fitted(self, "is_fitted_")
