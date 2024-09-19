@@ -1292,7 +1292,8 @@ class Distance:
     #     #     """
     #     #     Calculate the inner product distance between two vectors.
 
-    #     #     The inner product distance is a measure of similarity between two vectors,
+    #     #     The inner product distance is a measure of
+    #     #     similarity between two vectors,
     #     #     based on their inner product.
 
     #     #     Parameters
