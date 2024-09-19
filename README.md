@@ -40,9 +40,9 @@ X, y = make_classification(
     random_state=0,
     shuffle=False,
 )
-clf = dcpy.DistanceMetricClassifier(metric="canberra")
+clf = dcpy.DistanceMetricClassifier()
 clf.fit(X, y)
-print(clf.predict([[0, 0, 0, 0]]))
+print(clf.predict([[0, 0, 0, 0]]), metric="canberra")
 ```
 
 ## Features

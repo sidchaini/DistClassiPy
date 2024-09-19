@@ -1,3 +1,5 @@
+import math
+
 from distclassipy.distances import Distance
 
 from hypothesis import given, strategies as st
@@ -56,6 +58,30 @@ _ALL_METRICS = [
     "wave_hedges",
     "kulczynski",
     "add_chisq",
+    "acc",
+    "chebyshev_min",
+    "czekanowski",
+    "dice",
+    "divergence",
+    "google",
+    "gower",
+    "jeffreys",
+    "jensenshannon_divergence",
+    "jensen_difference",
+    "kumarjohnson",
+    "matusita",
+    "minkowski",
+    "penroseshape",
+    "prob_chisq",
+    "ruzicka",
+    "sorensen",
+    "squared_chisq",
+    "squaredchord",
+    "squared_euclidean",
+    "taneja",
+    "tanimoto",
+    "topsoe",
+    "vicis_symmetric_chisq",
 ]
 
 
@@ -74,11 +100,13 @@ def test_non_negative(metric, data):
 @given(arrays)
 def test_self_distance(metric, data):
     u, _ = data
-    assert getattr(distance, metric)(u, u) == 0
+    assert math.isclose(getattr(distance, metric)(u, u), 0)
 
 
 @pytest.mark.parametrize("metric", _ALL_METRICS)
 @given(arrays)
 def test_symmetry(metric, data):
     u, v = data
-    assert getattr(distance, metric)(u, v) == getattr(distance, metric)(v, u)
+    assert math.isclose(
+        getattr(distance, metric)(u, v), getattr(distance, metric)(v, u)
+    )
