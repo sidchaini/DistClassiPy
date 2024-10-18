@@ -82,6 +82,7 @@ _ALL_METRICS = [
     "tanimoto",
     "topsoe",
     "vicis_symmetric_chisq",
+    "vicis_wave_hedges",
 ]
 
 
