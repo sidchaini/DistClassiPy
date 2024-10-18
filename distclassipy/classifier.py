@@ -135,10 +135,10 @@ class DistanceMetricClassifier(BaseEstimator, ClassifierMixin):
     >>> X, y = make_classification(n_samples=1000, n_features=4,
     ...                            n_informative=2, n_redundant=0,
     ...                            random_state=0, shuffle=False)
-    >>> clf = dcpy.DistanceMetricClassifier(metric="canberra")
+    >>> clf = dcpy.DistanceMetricClassifier()
     >>> clf.fit(X, y)
     DistanceMetricClassifier(...)
-    >>> print(clf.predict([[0, 0, 0, 0]]))
+    >>> print(clf.predict([[0, 0, 0, 0]]), metric="canberra")
     [0]
     """
 
@@ -248,6 +248,10 @@ class DistanceMetricClassifier(BaseEstimator, ClassifierMixin):
         metric : str or callable, default="euclidean"
             The distance metric to use for calculating the distance between features.
 
+            .. versionchanged:: 0.2.0
+               The metric is now specified at prediction time rather
+               than during initialization, providing greater flexibility.
+
         Returns
         -------
         y : ndarray of shape (n_samples,)
@@ -266,9 +270,7 @@ class DistanceMetricClassifier(BaseEstimator, ClassifierMixin):
         """
         check_is_fitted(self, "is_fitted_")
         X = check_array(X)
-
         metric_fn_, metric_arg_ = initialize_metric_function(metric)
-
         if not self.scale:
             dist_arr = scipy.spatial.distance.cdist(
                 XA=X, XB=self.df_centroid_.to_numpy(), metric=metric_arg_
