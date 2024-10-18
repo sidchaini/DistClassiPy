@@ -42,7 +42,7 @@ X, y = make_classification(
 )
 clf = dcpy.DistanceMetricClassifier()
 clf.fit(X, y)
-print(clf.predict([[0, 0, 0, 0]]), metric="canberra")
+print(clf.predict([[0, 0, 0, 0]], metric="canberra"))
 ```
 
 ## Features

@@ -138,7 +138,7 @@ class DistanceMetricClassifier(BaseEstimator, ClassifierMixin):
     >>> clf = dcpy.DistanceMetricClassifier()
     >>> clf.fit(X, y)
     DistanceMetricClassifier(...)
-    >>> print(clf.predict([[0, 0, 0, 0]]), metric="canberra")
+    >>> print(clf.predict([[0, 0, 0, 0]], metric="canberra"))
     [0]
     """
 
