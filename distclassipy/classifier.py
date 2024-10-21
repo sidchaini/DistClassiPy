@@ -30,6 +30,7 @@ import scipy
 from sklearn.base import BaseEstimator, ClassifierMixin
 from sklearn.utils.multiclass import unique_labels
 from sklearn.utils.validation import check_X_y, check_array, check_is_fitted
+from sklearn.metrics import accuracy_score
 
 from .distances import Distance
 
@@ -399,3 +400,24 @@ class DistanceMetricClassifier(BaseEstimator, ClassifierMixin):
         ]
 
         return self.confidence_df_.to_numpy()
+
+    def score(self, X, y, metric: str | Callable = "euclidean"):
+        """Return the mean accuracy on the given test data and labels.
+
+        Parameters
+        ----------
+        X : array-like of shape (n_samples, n_features)
+            Test samples.
+        y : array-like of shape (n_samples,)
+            True labels for X.
+        metric : str or callable, default="euclidean"
+            The distance metric to use for calculating the distance between features.
+
+        Returns
+        -------
+        score : float
+            Mean accuracy of self.predict(X) wrt. y.
+        """
+
+        y_pred = self.predict(X, metric=metric)
+        return accuracy_score(y, y_pred)
