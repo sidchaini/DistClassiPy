@@ -22,7 +22,10 @@ You should have received a copy of the GNU General Public License
 along with this program.  If not, see <https://www.gnu.org/licenses/>.
 """
 
-from .classifier import DistanceMetricClassifier  # noqa
-from .distances import Distance  # noqa
+from .classifier import (
+    DistanceMetricClassifier,
+    EnsembleDistanceMetricClassifier,
+)  # noqa
+from .distances import Distance, _ALL_METRICS  # noqa
 
-__version__ = "0.2.0a1"
+__version__ = "0.2.0"
