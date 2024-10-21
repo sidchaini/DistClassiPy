@@ -506,7 +506,7 @@ def find_best_metrics(
     return quantile_scores_df, best_metrics_per_quantile, group_bins
 
 
-class EnsembleDistanceMetricClassifier(BaseEstimator, ClassifierMixin):
+class EnsembleDistanceClassifier(BaseEstimator, ClassifierMixin):
     """An ensemble classifier that uses different metrics for each quantile."""
 
     def __init__(
@@ -541,7 +541,7 @@ class EnsembleDistanceMetricClassifier(BaseEstimator, ClassifierMixin):
 
     def fit(
         self, X: np.ndarray, y: np.ndarray, n_quantiles: int = 4
-    ) -> "EnsembleDistanceMetricClassifier":
+    ) -> "EnsembleDistanceClassifier":
         """Fit the ensemble classifier using the best metrics for each quantile.
 
         Parameters

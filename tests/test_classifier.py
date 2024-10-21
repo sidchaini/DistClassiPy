@@ -1,9 +1,13 @@
-from distclassipy.classifier import DistanceMetricClassifier
+from distclassipy.classifier import (
+    DistanceMetricClassifier,
+    EnsembleDistanceClassifier,
+)
 
 import numpy as np
 
 import pytest
 
+from sklearn.datasets import make_classification
 from sklearn.utils.estimator_checks import check_estimator
 
 
@@ -134,3 +138,18 @@ def test_confidence_calculation():
     clf.predict_and_analyse(X)
     distance_confidence = clf.calculate_confidence()
     assert distance_confidence.shape == (3, len(np.unique(y)))
+
+
+# Test basic functionality of EnsembleDistanceClassifier
+def test_ensemble_distance_classifier():
+    X, y = make_classification(
+        n_samples=1000,
+        n_features=4,
+        n_informative=2,
+        shuffle=True,
+    )
+    clf = EnsembleDistanceClassifier(feat_idx=0)
+    clf.fit(X, y)
+    predictions = clf.predict(X)
+    assert len(predictions) == len(y)
+    assert set(predictions).issubset(set(y))
