@@ -473,7 +473,7 @@ def find_best_metrics(
 
     X_df = pd.DataFrame(X, columns=feature_labels)
     y_df = pd.DataFrame(y, columns=["Target"])
-    quantiles = pd.qcut(X_df[feature_name], q=n_quantiles)
+    quantiles, group_bins = pd.qcut(X_df[feature_name], q=n_quantiles, retbins=True)
 
     X_train, X_test, y_train, y_test = train_test_split(
         X_df, y_df, test_size=0.25, stratify=quantiles
@@ -507,9 +507,9 @@ def find_best_metrics(
 
     # alt, but slower:
     # loop through each quantile, and append pred
-    group_bins = []
-    for bins, group in grouped_test_data:
-        group_bins.append(bins)
+    # group_bins = []
+    # for bins, group in grouped_test_data:
+    #     group_bins.append(bins)
     return quantile_scores_df, best_metrics_per_quantile, group_bins
 
 
@@ -522,12 +522,14 @@ class EnsembleDistanceMetricClassifier(BaseEstimator, ClassifierMixin):
         scale: bool = True,
         central_stat: str = "median",
         dispersion_stat: str = "std",
+        metrics_to_consider: list = None,
     ) -> None:
         """Initialize the classifier with specified parameters."""
         self.feat_idx = feat_idx
         self.scale = scale
         self.central_stat = central_stat
         self.dispersion_stat = dispersion_stat
+        self.metrics_to_consider = metrics_to_consider
 
     def fit(
         self, X: np.ndarray, y: np.ndarray, n_quantiles: int = 4
@@ -542,7 +544,13 @@ class EnsembleDistanceMetricClassifier(BaseEstimator, ClassifierMixin):
             self.quantile_scores_df_,
             self.best_metrics_per_quantile_,
             self.group_bins,
-        ) = find_best_metrics(self.clf_, X, y, self.feat_idx, n_quantiles)
+        ) = find_best_metrics(
+            self.clf_, X, y, self.feat_idx, n_quantiles, self.metrics_to_consider
+        )
+        # To make sure the bins work with values outside of training data
+        self.group_bins[0] = -np.inf
+        self.group_bins[-1] = np.inf
+
         self.group_labels = [f"Quantile {i+1}" for i in range(n_quantiles)]
         self.clf_.fit(X, y)
         self.is_fitted_ = True
@@ -556,8 +564,7 @@ class EnsembleDistanceMetricClassifier(BaseEstimator, ClassifierMixin):
         quantiles = pd.cut(
             X[:, self.feat_idx], bins=self.group_bins, labels=self.group_labels
         )
-        self.grouped_data = pd.DataFrame(X).groupby(quantiles, observed=False)
-        return 0
+        grouped_data = pd.DataFrame(X).groupby(quantiles, observed=False)
         predictions = np.empty(X.shape[0], dtype=int)
         for i, (lim, subdf) in enumerate(grouped_data):
             best_metric = self.best_metrics_per_quantile_.loc[self.group_labels[i]]
