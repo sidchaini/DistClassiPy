@@ -398,7 +398,11 @@ class Distance:
               1(4), 300-307.
         """
         u, v = np.asarray(u), np.asarray(v)
-        return np.sqrt(2 * np.sum((np.sqrt(u) - np.sqrt(v)) ** 2))
+        # Clip negative values to zero for valid sqrt
+        with np.errstate(divide="ignore", invalid="ignore"):
+            u = np.clip(u, a_min=0, a_max=None)
+            v = np.clip(v, a_min=0, a_max=None)
+            return np.sqrt(2 * np.sum((np.sqrt(u) - np.sqrt(v)) ** 2))
 
     def jaccard(self, u, v):
         """Calculate the Jaccard distance between two vectors.
@@ -448,7 +452,8 @@ class Distance:
             eschew the log of zero.
         """
         u, v = np.asarray(u), np.asarray(v)
-        return np.sum(np.log(np.abs(u - v) + 1))
+        with np.errstate(divide="ignore", invalid="ignore"):
+            return np.sum(np.log(np.abs(u - v) + 1))
 
     def marylandbridge(self, u, v):
         """Calculate the Maryland Bridge distance between two vectors.
@@ -679,7 +684,8 @@ class Distance:
     #         3. https://en.wikipedia.org/wiki/Bhattacharyya_distance
     #     """
     #     u, v = np.asarray(u), np.asarray(v)
-    #     return -np.log(np.sum(np.sqrt(u * v)))
+    #     with np.errstate(divide="ignore", invalid="ignore"):
+    #         return -np.log(np.sum(np.sqrt(u * v)))
 
     def chebyshev_min(self, u, v):
         """Calculate the minimum value distance between two vectors.
@@ -854,9 +860,12 @@ class Distance:
         # vectors could be ignored or masked (see below).
         # u = ma.masked_where(u == 0, u)
         # v = ma.masked_where(v == 0, u)
-        u = np.where(u == 0, self.epsilon, u)
-        v = np.where(v == 0, self.epsilon, v)
-        return np.sum((u - v) * np.log(u / v))
+        with np.errstate(divide="ignore", invalid="ignore"):
+            u[u == 0] = self.epsilon
+            v[v == 0] = self.epsilon
+            # Clip negative values to zero for valid log
+            udivv = np.clip(u / v, a_min=self.epsilon, a_max=None)
+            return np.sum((u - v) * np.log(udivv))
 
     def jensenshannon_divergence(self, u, v):
         """Calculate the Jensen-Shannon divergence between two vectors.
@@ -890,11 +899,17 @@ class Distance:
             return np.sum(el1 - el2 * el3)
         """
         u, v = np.asarray(u), np.asarray(v)
-        u = np.where(u == 0, self.epsilon, u)
-        v = np.where(v == 0, self.epsilon, v)
-        dl = u * np.log(2 * u / (u + v))
-        dr = v * np.log(2 * v / (u + v))
-        return (np.sum(dl) + np.sum(dr)) / 2
+        with np.errstate(divide="ignore", invalid="ignore"):
+            # Clip negative values to zero for valid log
+            u[u == 0] = self.epsilon
+            v[v == 0] = self.epsilon
+
+            term1 = np.clip(2 * u / (u + v), a_min=self.epsilon, a_max=None)
+            term2 = np.clip(2 * v / (u + v), a_min=self.epsilon, a_max=None)
+
+            dl = u * np.log(term1)
+            dr = v * np.log(term2)
+            return (np.sum(dl) + np.sum(dr)) / 2
 
     def jensen_difference(self, u, v):
         """Calculate the Jensen difference between two vectors.
@@ -923,11 +938,14 @@ class Distance:
                1(4), 300-307.
         """
         u, v = np.asarray(u), np.asarray(v)
-        u = np.where(u == 0, self.epsilon, u)
-        v = np.where(v == 0, self.epsilon, v)
-        el1 = (u * np.log(u) + v * np.log(v)) / 2
-        el2 = (u + v) / 2
-        return np.sum(el1 - el2 * np.log(el2))
+
+        with np.errstate(divide="ignore", invalid="ignore"):
+            # Clip negative values to eps for valid log
+            u = np.clip(u, self.epsilon, None)
+            v = np.clip(v, self.epsilon, None)
+            el1 = (u * np.log(u) + v * np.log(v)) / 2
+            el2 = np.clip((u + v) / 2, a_min=self.epsilon, a_max=None)
+            return np.sum(el1 - el2 * np.log(el2))
 
     def kumarjohnson(self, u, v):
         """Calculate the Kumar-Johnson distance between two vectors.
@@ -980,7 +998,8 @@ class Distance:
             Equals square root of Squared-chord distance.
         """
         u, v = np.asarray(u), np.asarray(v)
-        return np.sqrt(np.sum((np.sqrt(u) - np.sqrt(v)) ** 2))
+        with np.errstate(divide="ignore", invalid="ignore"):
+            return np.sqrt(np.sum((np.sqrt(u) - np.sqrt(v)) ** 2))
 
     def minkowski(self, u, v, p=2):
         """Calculate the Minkowski distance between two vectors.
@@ -1027,7 +1046,8 @@ class Distance:
         u, v = np.asarray(u), np.asarray(v)
         umu = np.mean(u)
         vmu = np.mean(v)
-        return np.sqrt(np.sum(((u - umu) - (v - vmu)) ** 2))
+        with np.errstate(divide="ignore", invalid="ignore"):
+            return np.sqrt(np.sum(((u - umu) - (v - vmu)) ** 2))
 
     def prob_chisq(self, u, v):
         """Calculate the Probabilistic chi-square distance between two vectors.
@@ -1139,7 +1159,8 @@ class Distance:
             Equals to squared Matusita distance.
         """
         u, v = np.asarray(u), np.asarray(v)
-        return np.sum((np.sqrt(u) - np.sqrt(v)) ** 2)
+        with np.errstate(divide="ignore", invalid="ignore"):
+            return np.sum((np.sqrt(u) - np.sqrt(v)) ** 2)
 
     def squared_euclidean(self, u, v):
         """Calculate the Squared Euclidean distance between two vectors.
@@ -1191,10 +1212,14 @@ class Distance:
                1(4), 300-307.
         """
         u, v = np.asarray(u), np.asarray(v)
-        u = np.where(u == 0, self.epsilon, u)
-        v = np.where(v == 0, self.epsilon, v)
-        uvsum = u + v
-        return np.sum((uvsum / 2) * np.log(uvsum / (2 * np.sqrt(u * v))))
+        with np.errstate(divide="ignore", invalid="ignore"):
+            u[u == 0] = self.epsilon
+            v[v == 0] = self.epsilon
+            uvsum = u + v
+            logarg = np.clip(
+                uvsum / (2 * np.sqrt(u * v)), a_min=self.epsilon, a_max=None
+            )
+            return np.sum((uvsum / 2) * np.log(logarg))
 
     def tanimoto(self, u, v):
         """Calculate the Tanimoto distance between two vectors.
@@ -1248,11 +1273,14 @@ class Distance:
             Equals two times Jensen-Shannon divergence.
         """
         u, v = np.asarray(u), np.asarray(v)
-        u = np.where(u == 0, self.epsilon, u)
-        v = np.where(v == 0, self.epsilon, v)
-        dl = u * np.log(2 * u / (u + v))
-        dr = v * np.log(2 * v / (u + v))
-        return np.sum(dl + dr)
+        with np.errstate(divide="ignore", invalid="ignore"):
+            u[u == 0] = self.epsilon
+            v[v == 0] = self.epsilon
+            logarg1 = np.clip(2 * u / (u + v), a_min=self.epsilon, a_max=None)
+            logarg2 = np.clip(2 * v / (u + v), a_min=self.epsilon, a_max=None)
+            dl = u * np.log(logarg1)
+            dr = v * np.log(logarg2)
+            return np.sum(dl + dr)
 
     def vicis_symmetric_chisq(self, u, v):
         """Calculate the Vicis Symmetric chi-square distance.
@@ -1376,9 +1404,10 @@ class Distance:
     #            1(4), 300-307.
     #     """
     #     u, v = np.asarray(u), np.asarray(v)
-    #     u = np.where(u == 0, self.epsilon, u)
-    #     v = np.where(v == 0, self.epsilon, v)
-    #     return np.sum(u * np.log(2 * u / (u + v)))
+    #     u[u == 0] = self.epsilon
+    #     v[v == 0] = self.epsilon
+    #     with np.errstate(divide="ignore", invalid="ignore"):
+    #         return np.sum(u * np.log(2 * u / (u + v)))
 
     # def kl_divergence(self, u, v):
     #     """Calculate the Kullback-Leibler divergence between two vectors.
@@ -1404,9 +1433,10 @@ class Distance:
     #            1(4):300-307.
     #     """
     #     u, v = np.asarray(u), np.asarray(v)
-    #     u = np.where(u == 0, self.epsilon, u)
-    #     v = np.where(v == 0, self.epsilon, v)
-    #     return np.sum(u * np.log(u / v))
+    #     u[u == 0] = self.epsilon
+    #     v[v == 0] = self.epsilon
+    #     with np.errstate(divide="ignore", invalid="ignore"):
+    #         return np.sum(u * np.log(u / v))
 
     # def max_symmetric_chisq(self, u, v):
     #     """Calculate the maximum symmetric chi-square distance.
