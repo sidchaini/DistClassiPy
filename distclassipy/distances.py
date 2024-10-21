@@ -48,6 +48,52 @@ import numpy as np
 
 import scipy
 
+_ALL_METRICS = [
+    "euclidean",
+    "braycurtis",
+    "canberra",
+    "cityblock",
+    "chebyshev",
+    "clark",
+    "correlation",
+    "cosine",
+    "hellinger",
+    "jaccard",
+    "lorentzian",
+    "marylandbridge",
+    "meehl",
+    "motyka",
+    "soergel",
+    "wave_hedges",
+    "kulczynski",
+    "add_chisq",
+    "acc",
+    "chebyshev_min",
+    "czekanowski",
+    "dice",
+    "divergence",
+    "google",
+    "gower",
+    "jeffreys",
+    "jensenshannon_divergence",
+    "jensen_difference",
+    "kumarjohnson",
+    "matusita",
+    "minkowski",
+    "penroseshape",
+    "prob_chisq",
+    "ruzicka",
+    "sorensen",
+    "squared_chisq",
+    "squaredchord",
+    "squared_euclidean",
+    "taneja",
+    "tanimoto",
+    "topsoe",
+    "vicis_symmetric_chisq",
+    "vicis_wave_hedges",
+]
+
 
 class Distance:
     """A class to calculate various distance metrics between vectors.

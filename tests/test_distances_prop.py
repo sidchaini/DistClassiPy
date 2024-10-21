@@ -1,6 +1,6 @@
 import math
 
-from distclassipy.distances import Distance
+from distclassipy.distances import Distance, _ALL_METRICS
 
 from hypothesis import given, strategies as st
 
@@ -38,52 +38,6 @@ arrays = st.integers(min_value=1, max_value=20).flatmap(
         ).map(np.array),
     )
 )
-# List of all distance metrics
-_ALL_METRICS = [
-    "euclidean",
-    "braycurtis",
-    "canberra",
-    "cityblock",
-    "chebyshev",
-    "clark",
-    "correlation",
-    "cosine",
-    "hellinger",
-    "jaccard",
-    "lorentzian",
-    "marylandbridge",
-    "meehl",
-    "motyka",
-    "soergel",
-    "wave_hedges",
-    "kulczynski",
-    "add_chisq",
-    "acc",
-    "chebyshev_min",
-    "czekanowski",
-    "dice",
-    "divergence",
-    "google",
-    "gower",
-    "jeffreys",
-    "jensenshannon_divergence",
-    "jensen_difference",
-    "kumarjohnson",
-    "matusita",
-    "minkowski",
-    "penroseshape",
-    "prob_chisq",
-    "ruzicka",
-    "sorensen",
-    "squared_chisq",
-    "squaredchord",
-    "squared_euclidean",
-    "taneja",
-    "tanimoto",
-    "topsoe",
-    "vicis_symmetric_chisq",
-    "vicis_wave_hedges",
-]
 
 
 @pytest.mark.parametrize(
