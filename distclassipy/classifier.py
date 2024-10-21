@@ -28,10 +28,10 @@ import pandas as pd
 import scipy
 
 from sklearn.base import BaseEstimator, ClassifierMixin
-from sklearn.utils.multiclass import unique_labels
-from sklearn.utils.validation import check_X_y, check_array, check_is_fitted
 from sklearn.metrics import accuracy_score
 from sklearn.model_selection import train_test_split
+from sklearn.utils.multiclass import unique_labels
+from sklearn.utils.validation import check_X_y, check_array, check_is_fitted
 
 from .distances import Distance, _ALL_METRICS
 
@@ -421,7 +421,6 @@ class DistanceMetricClassifier(BaseEstimator, ClassifierMixin):
         score : float
             Mean accuracy of self.predict(X) wrt. y.
         """
-
         y_pred = self.predict(X, metric=metric)
         return accuracy_score(y, y_pred)
 
