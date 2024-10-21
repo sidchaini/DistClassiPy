@@ -19,7 +19,7 @@ You should have received a copy of the GNU General Public License
 along with this program.  If not, see <https://www.gnu.org/licenses/>.
 """
 
-from typing import Callable
+from typing import Callable, Tuple
 
 import numpy as np
 
@@ -31,8 +31,9 @@ from sklearn.base import BaseEstimator, ClassifierMixin
 from sklearn.utils.multiclass import unique_labels
 from sklearn.utils.validation import check_X_y, check_array, check_is_fitted
 from sklearn.metrics import accuracy_score
+from sklearn.model_selection import train_test_split
 
-from .distances import Distance
+from .distances import Distance, _ALL_METRICS
 
 # Hardcoded source packages to check for distance metrics.
 METRIC_SOURCES_ = {
@@ -148,13 +149,15 @@ class DistanceMetricClassifier(BaseEstimator, ClassifierMixin):
         scale: bool = True,
         central_stat: str = "median",
         dispersion_stat: str = "std",
-    ):
+    ) -> None:
         """Initialize the classifier with specified parameters."""
         self.scale = scale
         self.central_stat = central_stat
         self.dispersion_stat = dispersion_stat
 
-    def fit(self, X: np.array, y: np.array, feat_labels: list[str] = None):
+    def fit(
+        self, X: np.array, y: np.array, feat_labels: list[str] = None
+    ) -> "DistanceMetricClassifier":
         """Calculate the feature space centroid for all classes.
 
         This function calculates the feature space centroid in the training
@@ -235,7 +238,7 @@ class DistanceMetricClassifier(BaseEstimator, ClassifierMixin):
         self,
         X: np.array,
         metric: str | Callable = "euclidean",
-    ):
+    ) -> np.ndarray:
         """Predict the class labels for the provided X.
 
         The prediction is based on the distance of each data point in the input sample
@@ -302,7 +305,7 @@ class DistanceMetricClassifier(BaseEstimator, ClassifierMixin):
         self,
         X: np.array,
         metric: str | Callable = "euclidean",
-    ):
+    ) -> np.ndarray:
         """Predict the class labels for the provided X and perform analysis.
 
         The prediction is based on the distance of each data point in the input sample
@@ -401,7 +404,7 @@ class DistanceMetricClassifier(BaseEstimator, ClassifierMixin):
 
         return self.confidence_df_.to_numpy()
 
-    def score(self, X, y, metric: str | Callable = "euclidean"):
+    def score(self, X, y, metric: str | Callable = "euclidean") -> float:
         """Return the mean accuracy on the given test data and labels.
 
         Parameters
