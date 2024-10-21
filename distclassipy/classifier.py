@@ -3,6 +3,15 @@
 This module contains the DistanceMetricClassifier introduced by Chaini et al. (2024)
 in "Light Curve Classification with DistClassiPy: a new distance-based classifier"
 
+
+.. autoclass:: distclassipy.classifier.DistanceMetricClassifier
+   :members:
+   :exclude-members: set_fit_request, set_predict_request
+
+.. doctest-skip::
+
+.. skip::
+
 Copyright (C) 2024  Siddharth Chaini
 -----
 This program is free software: you can redistribute it and/or modify
@@ -440,6 +449,8 @@ def find_best_metrics(
     into quantiles based on the specified feature and calculates the accuracy
     of the classifier for each metric within these quantiles.
 
+    .. versionadded:: 0.2.0
+
     Parameters
     ----------
     clf : DistanceMetricClassifier
@@ -507,7 +518,17 @@ def find_best_metrics(
 
 
 class EnsembleDistanceClassifier(BaseEstimator, ClassifierMixin):
-    """An ensemble classifier that uses different metrics for each quantile."""
+    """An ensemble classifier that uses different metrics for each quantile.
+
+    This classifier splits the data into quantiles based on a specified
+    feature and uses different distance metrics for each quantile to
+    construct an ensemble classifier for each quantile, generally leading
+    to better performance.
+    Note, however, this involves fitting the training set for each metric
+    to evaluate performance, making this more computationally expensive.
+
+    .. versionadded:: 0.2.0
+    """
 
     def __init__(
         self,
