@@ -25,7 +25,14 @@ along with this program.  If not, see <https://www.gnu.org/licenses/>.
 from .classifier import (
     DistanceMetricClassifier,
     EnsembleDistanceMetricClassifier,
-)  # noqa
-from .distances import Distance, _ALL_METRICS  # noqa
+)
+from .distances import Distance, _ALL_METRICS
 
 __version__ = "0.2.0"
+
+__all__ = [
+    "DistanceMetricClassifier",
+    "EnsembleDistanceMetricClassifier",
+    "Distance",
+    "_ALL_METRICS",
+]
