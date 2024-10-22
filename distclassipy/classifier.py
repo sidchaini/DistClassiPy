@@ -6,6 +6,7 @@ in "Light Curve Classification with DistClassiPy: a new distance-based classifie
 
 .. autoclass:: distclassipy.classifier.DistanceMetricClassifier
    :members:
+   :inherited-members:
    :exclude-members: set_fit_request, set_predict_request
 
 .. doctest-skip::
