@@ -28,7 +28,7 @@ from .classifier import (
 )
 from .distances import Distance, _ALL_METRICS
 
-__version__ = "0.2.0"
+__version__ = "0.2.1"
 
 __all__ = [
     "DistanceMetricClassifier",

@@ -434,89 +434,6 @@ class DistanceMetricClassifier(BaseEstimator, ClassifierMixin):
         return accuracy_score(y, y_pred)
 
 
-def find_best_metrics(
-    clf: "DistanceMetricClassifier",
-    X: np.ndarray,
-    y: np.ndarray,
-    feat_idx: int,
-    n_quantiles: int = 4,
-    metrics_to_consider: list[str] = None,
-) -> Tuple[pd.DataFrame, pd.Series, np.ndarray]:
-    """Evaluate and find the best distance metrics for a given feature.
-
-    This function evaluates different distance metrics to determine which
-    performs best for a specific feature in the dataset. It splits the data
-    into quantiles based on the specified feature and calculates the accuracy
-    of the classifier for each metric within these quantiles.
-
-    .. versionadded:: 0.2.0
-
-    Parameters
-    ----------
-    clf : DistanceMetricClassifier
-        The classifier instance to be used for evaluation.
-    X : np.ndarray
-        The input feature matrix.
-    y : np.ndarray
-        The target labels.
-    feat_idx : int
-        The index of the feature to be used for quantile splitting.
-    n_quantiles : int, default=4
-        The number of quantiles to split the data into.
-    metrics_to_consider : list of str, optional
-        A list of distance metrics to evaluate. If None, all available
-        metrics within DistClassiPy will be considered.
-
-    Returns
-    -------
-    quantile_scores_df : pd.DataFrame
-        A DataFrame containing the accuracy scores for each metric across
-        different quantiles.
-    best_metrics_per_quantile : pd.Series
-        A Series indicating the best-performing metric for each quantile.
-    group_bins : np.ndarray
-        The bins used for quantile splitting.
-    """
-    X = check_array(X)
-    feature_labels = [f"Feature_{i}" for i in range(X.shape[1])]
-    feature_name = f"Feature_{feat_idx}"
-
-    if metrics_to_consider is None:
-        metrics_to_consider = _ALL_METRICS
-
-    X_df = pd.DataFrame(X, columns=feature_labels)
-    y_df = pd.DataFrame(y, columns=["Target"])
-    quantiles, group_bins = pd.qcut(X_df[feature_name], q=n_quantiles, retbins=True)
-
-    X_train, X_test, y_train, y_test = train_test_split(
-        X_df, y_df, test_size=0.25, stratify=quantiles
-    )
-
-    clf.fit(X_train, y_train.to_numpy().ravel())
-    grouped_test_data = X_test.groupby(quantiles, observed=False)
-
-    quantile_scores = []
-    for metric in metrics_to_consider:
-        scores_for_metric = [
-            accuracy_score(
-                y_test.loc[subdf.index], clf.predict(subdf.to_numpy(), metric=metric)
-            )
-            for _, subdf in grouped_test_data
-        ]
-        quantile_scores.append(scores_for_metric)
-
-    quantile_scores = np.array(quantile_scores) * 100
-    quantile_scores_df = pd.DataFrame(
-        data=quantile_scores,
-        index=metrics_to_consider,
-        columns=[f"Quantile {i+1}" for i in range(n_quantiles)],
-    )
-
-    best_metrics_per_quantile = quantile_scores_df.idxmax()
-
-    return quantile_scores_df, best_metrics_per_quantile, group_bins
-
-
 class EnsembleDistanceClassifier(BaseEstimator, ClassifierMixin):
     """An ensemble classifier that uses different metrics for each quantile.
 
@@ -537,6 +454,7 @@ class EnsembleDistanceClassifier(BaseEstimator, ClassifierMixin):
         central_stat: str = "median",
         dispersion_stat: str = "std",
         metrics_to_consider: list[str] = None,
+        random_state: int = None,
     ) -> None:
         """Initialize the classifier with specified parameters.
 
@@ -553,12 +471,18 @@ class EnsembleDistanceClassifier(BaseEstimator, ClassifierMixin):
         metrics_to_consider : list of str, optional
             A list of distance metrics to evaluate. If None, all available
             metrics within DistClassiPy will be considered.
+        random_state : int, RandomState instance or None, optional (default=None)
+            Controls the randomness of the estimator. Pass an int for reproducible
+            output across multiple function calls.
+
+            .. versionadded:: 0.2.1
         """
         self.feat_idx = feat_idx
         self.scale = scale
         self.central_stat = central_stat
         self.dispersion_stat = dispersion_stat
         self.metrics_to_consider = metrics_to_consider
+        self.random_state = random_state
 
     def fit(
         self, X: np.ndarray, y: np.ndarray, n_quantiles: int = 4
@@ -625,26 +549,26 @@ class EnsembleDistanceClassifier(BaseEstimator, ClassifierMixin):
         quantiles = pd.cut(
             X[:, self.feat_idx], bins=self.group_bins, labels=self.group_labels
         )
-        # grouped_data = pd.DataFrame(X).groupby(quantiles, observed=False)
-        quantile_indices = quantiles.codes  # Get integer codes for quantiles
-        predictions = np.empty(X.shape[0], dtype=int)
-        # for i, (lim, subdf) in enumerate(grouped_data):
-        #     best_metric = self.best_metrics_per_quantile_.loc[self.group_labels[i]]
-        #     preds = self.clf_.predict(subdf.to_numpy(), metric=best_metric)
-        #     predictions[subdf.index] = preds
-        # Precompute predictions for each quantile
-        quantile_predictions = {}
-        for i, label in enumerate(self.group_labels):
-            best_metric = self.best_metrics_per_quantile_.loc[label]
-            quantile_data = X[quantile_indices == i]
-            if quantile_data.size > 0:
-                quantile_predictions[i] = self.clf_.predict(
-                    quantile_data, metric=best_metric
-                )
+        grouped_data = pd.DataFrame(X).groupby(quantiles, observed=False)
+        # quantile_indices = quantiles.codes  # Get integer codes for quantiles
+        predictions = np.empty(X.shape[0], dtype=object)  # Change dtype to object
+        for i, (lim, subdf) in enumerate(grouped_data):
+            best_metric = self.best_metrics_per_quantile_.loc[self.group_labels[i]]
+            preds = self.clf_.predict(subdf.to_numpy(), metric=best_metric)
+            predictions[subdf.index] = preds
+        # # Precompute predictions for each quantile
+        # quantile_predictions = {}
+        # for i, label in enumerate(self.group_labels):
+        #     best_metric = self.best_metrics_per_quantile_.loc[label]
+        #     quantile_data = X[quantile_indices == i]
+        #     if quantile_data.size > 0:
+        #         quantile_predictions[i] = self.clf_.predict(
+        #             quantile_data, metric=best_metric
+        #         )
 
         # Assign predictions to the corresponding indices
-        for i, preds in quantile_predictions.items():
-            predictions[quantile_indices == i] = preds
+        # for i, preds in quantile_predictions.items():
+        #     predictions[quantile_indices == i] = preds
 
         return predictions
 
@@ -677,5 +601,100 @@ class EnsembleDistanceClassifier(BaseEstimator, ClassifierMixin):
             The bins used for quantile splitting.
         """
         return find_best_metrics(
-            self.clf_, X, y, self.feat_idx, n_quantiles, self.metrics_to_consider
+            self.clf_,
+            X,
+            y,
+            self.feat_idx,
+            n_quantiles,
+            self.metrics_to_consider,
+            self.random_state,
         )
+
+
+def find_best_metrics(
+    clf: "DistanceMetricClassifier",
+    X: np.ndarray,
+    y: np.ndarray,
+    feat_idx: int,
+    n_quantiles: int = 4,
+    metrics_to_consider: list[str] = None,
+    random_state: int = None,
+) -> Tuple[pd.DataFrame, pd.Series, np.ndarray]:
+    """Evaluate and find the best distance metrics for a given feature.
+
+    This function evaluates different distance metrics to determine which
+    performs best for a specific feature in the dataset. It splits the data
+    into quantiles based on the specified feature and calculates the accuracy
+    of the classifier for each metric within these quantiles.
+
+    .. versionadded:: 0.2.0
+
+    Parameters
+    ----------
+    clf : DistanceMetricClassifier
+        The classifier instance to be used for evaluation.
+    X : np.ndarray
+        The input feature matrix.
+    y : np.ndarray
+        The target labels.
+    feat_idx : int
+        The index of the feature to be used for quantile splitting.
+    n_quantiles : int, default=4
+        The number of quantiles to split the data into.
+    metrics_to_consider : list of str, optional
+        A list of distance metrics to evaluate. If None, all available
+        metrics within DistClassiPy will be considered.
+    random_state : int, RandomState instance or None, optional (default=None)
+        Controls the randomness of the estimator. Pass an int for reproducible
+        output across multiple function calls.
+
+        .. versionadded:: 0.2.1
+
+    Returns
+    -------
+    quantile_scores_df : pd.DataFrame
+        A DataFrame containing the accuracy scores for each metric across
+        different quantiles.
+    best_metrics_per_quantile : pd.Series
+        A Series indicating the best-performing metric for each quantile.
+    group_bins : np.ndarray
+        The bins used for quantile splitting.
+    """
+    X = check_array(X)
+    feature_labels = [f"Feature_{i}" for i in range(X.shape[1])]
+    feature_name = f"Feature_{feat_idx}"
+
+    if metrics_to_consider is None:
+        metrics_to_consider = _ALL_METRICS
+
+    X_df = pd.DataFrame(X, columns=feature_labels)
+    y_df = pd.DataFrame(y, columns=["Target"])
+    quantiles, group_bins = pd.qcut(X_df[feature_name], q=n_quantiles, retbins=True)
+
+    X_train, X_test, y_train, y_test = train_test_split(
+        X_df, y_df, test_size=0.25, stratify=quantiles, random_state=random_state
+    )
+
+    clf.fit(X_train, y_train.to_numpy().ravel())
+    grouped_test_data = X_test.groupby(quantiles, observed=False)
+
+    quantile_scores = []
+    for metric in metrics_to_consider:
+        scores_for_metric = [
+            accuracy_score(
+                y_test.loc[subdf.index], clf.predict(subdf.to_numpy(), metric=metric)
+            )
+            for _, subdf in grouped_test_data
+        ]
+        quantile_scores.append(scores_for_metric)
+
+    quantile_scores = np.array(quantile_scores) * 100
+    quantile_scores_df = pd.DataFrame(
+        data=quantile_scores,
+        index=metrics_to_consider,
+        columns=[f"Quantile {i+1}" for i in range(n_quantiles)],
+    )
+
+    best_metrics_per_quantile = quantile_scores_df.idxmax()
+
+    return quantile_scores_df, best_metrics_per_quantile, group_bins
