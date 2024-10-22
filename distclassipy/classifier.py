@@ -9,6 +9,11 @@ in "Light Curve Classification with DistClassiPy: a new distance-based classifie
    :inherited-members:
    :exclude-members: set_fit_request, set_predict_request
 
+.. autoclass:: distclassipy.classifier.EnsembleDistanceClassifier
+   :members:
+   :inherited-members:
+   :exclude-members: set_fit_request, set_predict_request
+
 .. doctest-skip::
 
 .. skip::
@@ -124,16 +129,6 @@ class DistanceMetricClassifier(BaseEstimator, ClassifierMixin):
         for inter-quartile range.
 
         .. versionadded:: 0.1.0
-
-
-    Attributes
-    ----------
-    scale : bool
-        Indicates whether the data is scaled.
-    central_stat : str
-        The statistic used for calculating central tendency.
-    dispersion_stat : str
-        The statistic used for calculating dispersion.
 
     References
     ----------
