@@ -17,10 +17,10 @@ To install DistClassiPy, run the following command:
 
     pip install distclassipy
 
-Usage
+Quick Start
 -----
 
-Here's a quick example to get you started with DistClassiPy:
+Here's a quick start guide to using DistClassiPy:
 
 .. code-block:: python
 
@@ -64,8 +64,20 @@ API Documentation
 -----------------
 
 .. toctree::
-   :maxdepth: 2
+   :maxdepth: 1
+   :caption: Get Started
+   
+   tutorial
+
+.. toctree::
+   :maxdepth: 1
    :caption: API Reference
 
    classifier
    distances
+
+.. toctree::
+   :maxdepth: 1
+   :caption: Index
+
+   genindex

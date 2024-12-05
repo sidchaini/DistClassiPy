@@ -4,3 +4,4 @@ myst_parser
 sphinx-book-theme
 sphinx-favicon
 sphinx-copybutton
+nbsphinx
