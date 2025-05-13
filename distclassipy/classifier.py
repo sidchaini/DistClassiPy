@@ -152,11 +152,13 @@ class DistanceMetricClassifier(ClassifierMixin, BaseEstimator):
 
     def __init__(
         self,
+        metric: str | Callable = None,
         scale: bool = True,
         central_stat: str = "median",
         dispersion_stat: str = "std",
     ) -> None:
         """Initialize the classifier with specified parameters."""
+        self.metric = metric
         self.scale = scale
         self.central_stat = central_stat
         self.dispersion_stat = dispersion_stat
@@ -240,7 +242,7 @@ class DistanceMetricClassifier(ClassifierMixin, BaseEstimator):
     def predict(
         self,
         X: np.array,
-        metric: str | Callable = "euclidean",
+        metric: str | Callable = None,
     ) -> np.ndarray:
         """Predict the class labels for the provided X.
 
@@ -278,7 +280,12 @@ class DistanceMetricClassifier(ClassifierMixin, BaseEstimator):
         check_is_fitted(self)
         X = self._validate_data(X, reset=False)
 
-        metric_fn_, metric_arg_ = initialize_metric_function(metric)
+        metric_to_use = metric if metric is not None else self.metric
+        if metric_to_use is None:
+            # defaults to euclidean
+            metric_to_use = "euclidean"
+        metric_fn_, metric_arg_ = initialize_metric_function(metric_to_use)
+
         if not self.scale:
             dist_arr = scipy.spatial.distance.cdist(
                 XA=X, XB=self.df_centroid_.to_numpy(), metric=metric_arg_
@@ -308,7 +315,7 @@ class DistanceMetricClassifier(ClassifierMixin, BaseEstimator):
     def predict_and_analyse(
         self,
         X: np.array,
-        metric: str | Callable = "euclidean",
+        metric: str | Callable = None,
     ) -> np.ndarray:
         """Predict the class labels for the provided X and perform analysis.
 
@@ -347,7 +354,11 @@ class DistanceMetricClassifier(ClassifierMixin, BaseEstimator):
         check_is_fitted(self)
         X = self._validate_data(X, reset=False)
 
-        metric_fn_, metric_arg_ = initialize_metric_function(metric)
+        metric_to_use = metric if metric is not None else self.metric
+        if metric_to_use is None:
+            # defaults to euclidean
+            metric_to_use = "euclidean"
+        metric_fn_, metric_arg_ = initialize_metric_function(metric_to_use)
 
         if not self.scale:
             dist_arr = scipy.spatial.distance.cdist(
@@ -408,7 +419,7 @@ class DistanceMetricClassifier(ClassifierMixin, BaseEstimator):
 
         return self.confidence_df_.to_numpy()
 
-    def score(self, X, y, metric: str | Callable = "euclidean") -> float:
+    def score(self, X, y, metric: str | Callable = None) -> float:
         """Return the mean accuracy on the given test data and labels.
 
         Parameters
@@ -425,7 +436,8 @@ class DistanceMetricClassifier(ClassifierMixin, BaseEstimator):
         score : float
             Mean accuracy of self.predict(X) wrt. y.
         """
-        y_pred = self.predict(X, metric=metric)
+        metric_to_use = metric if metric is not None else self.metric
+        y_pred = self.predict(X, metric=metric_to_use)
         return accuracy_score(y, y_pred)
 
 

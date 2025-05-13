@@ -31,7 +31,7 @@ def test_fit():
     assert clf.n_features_in_ == 2
 
 
-# Test making predictions with the classifier
+# Test making predictions with the classifier: pass metric during predict
 def test_dcpy():
     X = np.array([[1, 2], [3, 4], [5, 6]])  # Sample feature set
     y = np.array([0, 1, 0])  # Sample target values
@@ -69,6 +69,27 @@ def test_metric_pred():
     clf = DistanceMetricClassifier()
     clf.fit(X, y)
     clf.predict(X, metric="soergel")
+    pass
+
+
+# Test passing a distance metric during init, not predict
+def test_metric_initpass():
+    X = np.array([[1, 2], [3, 4], [5, 6]])  # Sample feature set
+    y = np.array([0, 1, 0])  # Sample target values
+    clf = DistanceMetricClassifier(metric="soergel")
+    clf.fit(X, y)
+    clf.predict(X)
+    pass
+
+
+# Test passing a distance metric during init, and override during predict
+def test_metric_initpass_override():
+    X = np.array([[1, 2], [3, 4], [5, 6]])  # Sample feature set
+    y = np.array([0, 1, 0])  # Sample target values
+    clf = DistanceMetricClassifier(metric="soergel")
+    clf.fit(X, y)
+    clf.predict(X)
+    clf.predict(X, metric="canberra")
     pass
 
 
