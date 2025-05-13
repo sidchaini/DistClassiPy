@@ -46,7 +46,7 @@ from sklearn.base import BaseEstimator, ClassifierMixin
 from sklearn.metrics import accuracy_score
 from sklearn.model_selection import train_test_split
 from sklearn.utils.multiclass import unique_labels
-from sklearn.utils.validation import check_is_fitted, check_array
+from sklearn.utils.validation import check_is_fitted, check_array, validate_data
 
 from . import distances
 from .distances import _ALL_METRICS
@@ -189,7 +189,7 @@ class DistanceMetricClassifier(ClassifierMixin, BaseEstimator):
         self : object
             Fitted estimator.
         """
-        X, y = self._validate_data(X, y)
+        X, y = validate_data(self, X, y)
         self.classes_ = unique_labels(y)
 
         if feat_labels is None:
@@ -278,7 +278,7 @@ class DistanceMetricClassifier(ClassifierMixin, BaseEstimator):
         slower Python version.
         """
         check_is_fitted(self)
-        X = self._validate_data(X, reset=False)
+        X = validate_data(self, X, reset=False)
 
         metric_to_use = metric if metric is not None else self.metric
         if metric_to_use is None:
@@ -352,7 +352,7 @@ class DistanceMetricClassifier(ClassifierMixin, BaseEstimator):
 
         """
         check_is_fitted(self)
-        X = self._validate_data(X, reset=False)
+        X = validate_data(self, X, reset=False)
 
         metric_to_use = metric if metric is not None else self.metric
         if metric_to_use is None:
@@ -544,7 +544,7 @@ class EnsembleDistanceClassifier(ClassifierMixin, BaseEstimator):
             The predicted class labels.
         """
         check_is_fitted(self)
-        X = self._validate_data(X, reset=False)
+        X = validate_data(self, X, reset=False)
 
         # notes for pred during best:
         # option 1:
