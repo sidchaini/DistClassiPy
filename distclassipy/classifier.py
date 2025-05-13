@@ -46,14 +46,15 @@ from sklearn.base import BaseEstimator, ClassifierMixin
 from sklearn.metrics import accuracy_score
 from sklearn.model_selection import train_test_split
 from sklearn.utils.multiclass import unique_labels
-from sklearn.utils.validation import check_X_y, check_array, check_is_fitted
+from sklearn.utils.validation import check_is_fitted, check_array
 
-from .distances import Distance, _ALL_METRICS
+from . import distances
+from .distances import _ALL_METRICS
 
 # Hardcoded source packages to check for distance metrics.
 METRIC_SOURCES_ = {
     "scipy.spatial.distance": scipy.spatial.distance,
-    "distances.Distance": Distance(),
+    "distclassipy.distances": distances,
 }
 
 
@@ -61,7 +62,7 @@ def initialize_metric_function(metric):
     """Set the metric function based on the provided metric.
 
     If the metric is a string, the function will look for a corresponding
-    function in scipy.spatial.distance or distances.Distance. If the metric
+    function in scipy.spatial.distance or distclassipy.distances. If the metric
     is a function, it will be used directly.
     """
     if callable(metric):
@@ -95,7 +96,7 @@ def initialize_metric_function(metric):
             raise ValueError(
                 f"{metric} metric not found. Please pass a string of the "
                 "name of a metric in scipy.spatial.distance or "
-                "distances.Distance, or pass a metric function directly. For a "
+                "distclassipy.distances, or pass a metric function directly. For a "
                 "list of available metrics, see: "
                 "https://sidchaini.github.io/DistClassiPy/distances.html or "
                 "https://docs.scipy.org/doc/scipy/reference/spatial.distance.html"
@@ -103,7 +104,7 @@ def initialize_metric_function(metric):
     return metric_fn_, metric_arg_
 
 
-class DistanceMetricClassifier(BaseEstimator, ClassifierMixin):
+class DistanceMetricClassifier(ClassifierMixin, BaseEstimator):
     """A distance-based classifier that supports different distance metrics.
 
     The distance metric classifier determines the similarity between features in a
@@ -186,11 +187,8 @@ class DistanceMetricClassifier(BaseEstimator, ClassifierMixin):
         self : object
             Fitted estimator.
         """
-        X, y = check_X_y(X, y)
+        X, y = self._validate_data(X, y)
         self.classes_ = unique_labels(y)
-        self.n_features_in_ = X.shape[
-            1
-        ]  # Number of features seen during fit - required for sklearn compatibility.
 
         if feat_labels is None:
             feat_labels = [f"Feature_{x}" for x in range(X.shape[1])]
@@ -269,7 +267,7 @@ class DistanceMetricClassifier(BaseEstimator, ClassifierMixin):
         See Also
         --------
         scipy.spatial.dist : Other distance metrics provided in SciPy
-        distclassipy.Distance : Distance metrics included with DistClassiPy
+        distclassipy.distances : Distance metrics included with DistClassiPy
 
         Notes
         -----
@@ -277,8 +275,9 @@ class DistanceMetricClassifier(BaseEstimator, ClassifierMixin):
         which allows SciPy to use an optimized C version of the code instead of the
         slower Python version.
         """
-        check_is_fitted(self, "is_fitted_")
-        X = check_array(X)
+        check_is_fitted(self)
+        X = self._validate_data(X, reset=False)
+
         metric_fn_, metric_arg_ = initialize_metric_function(metric)
         if not self.scale:
             dist_arr = scipy.spatial.distance.cdist(
@@ -336,7 +335,7 @@ class DistanceMetricClassifier(BaseEstimator, ClassifierMixin):
         See Also
         --------
         scipy.spatial.dist : Other distance metrics provided in SciPy
-        distclassipy.Distance : Distance metrics included with DistClassiPy
+        distclassipy.distances : Distance metrics included with DistClassiPy
 
         Notes
         -----
@@ -345,8 +344,8 @@ class DistanceMetricClassifier(BaseEstimator, ClassifierMixin):
         of the slower Python version.
 
         """
-        check_is_fitted(self, "is_fitted_")
-        X = check_array(X)
+        check_is_fitted(self)
+        X = self._validate_data(X, reset=False)
 
         metric_fn_, metric_arg_ = initialize_metric_function(metric)
 
@@ -430,7 +429,7 @@ class DistanceMetricClassifier(BaseEstimator, ClassifierMixin):
         return accuracy_score(y, y_pred)
 
 
-class EnsembleDistanceClassifier(BaseEstimator, ClassifierMixin):
+class EnsembleDistanceClassifier(ClassifierMixin, BaseEstimator):
     """An ensemble classifier that uses different metrics for each quantile.
 
     This classifier splits the data into quantiles based on a specified
@@ -532,8 +531,8 @@ class EnsembleDistanceClassifier(BaseEstimator, ClassifierMixin):
         predictions : np.ndarray
             The predicted class labels.
         """
-        check_is_fitted(self, "is_fitted_")
-        X = check_array(X)
+        check_is_fitted(self)
+        X = self._validate_data(X, reset=False)
 
         # notes for pred during best:
         # option 1:

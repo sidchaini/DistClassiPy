@@ -164,3 +164,7 @@ cython_debug/
 
 # Custom
 distclassipy/__pycache__/
+.specstory
+.cursorindexingignore
+# SpecStory explanation file
+.specstory/.what-is-this.md

@@ -26,9 +26,9 @@ from .classifier import (
     DistanceMetricClassifier,
     EnsembleDistanceClassifier,
 )
-from .distances import Distance, _ALL_METRICS
+from .distances import _ALL_METRICS
 
-__version__ = "0.2.1"
+__version__ = "0.2.2a0"
 
 __all__ = [
     "DistanceMetricClassifier",
