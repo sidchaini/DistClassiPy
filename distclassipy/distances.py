@@ -96,6 +96,25 @@ _ALL_METRICS = [
     "vicis_wave_hedges",
 ]
 
+_UNIQUE_METRICS = [
+    "euclidean",
+    "braycurtis",
+    "canberra",
+    "cityblock",
+    "chebyshev",
+    "clark",
+    "correlation",
+    "cosine",
+    "hellinger",
+    "jaccard",
+    "lorentzian",
+    "meehl",
+    "motyka",
+    "soergel",
+    "wave_hedges",
+    "kulczynski",
+]
+
 
 def euclidean(u, v, w=None):
     """Calculate the Euclidean distance between two vectors.
