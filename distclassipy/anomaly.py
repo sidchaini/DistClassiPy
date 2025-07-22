@@ -152,12 +152,16 @@ class DistanceAnomaly(OutlierMixin, BaseEstimator):
             metric_scores.append(score_for_metric)
 
         metric_scores_arr = np.array(metric_scores).T  # shape (n_samples, n_metrics)
+        # remove infinities
+        metric_scores_arr[metric_scores_arr == np.inf] = 1e9 # A large number
+        metric_scores_arr[metric_scores_arr == -np.inf] = -1e9 # A large negative number
+
 
         if self.normalize_scores:
             # Scale scores for each metric (column) to be between 0 and 1
             # Compare with Rio notebook once.
             metric_scores_arr = minmax_scale(metric_scores_arr, axis=0)
-
+            
         # 2. Aggregate scores across all metrics for final anomaly score
         if self.metric_agg == "median":
             scores = np.median(metric_scores_arr, axis=1)
