@@ -109,8 +109,8 @@ class DistanceAnomaly(OutlierMixin, BaseEstimator):
             self.metrics_ = self.metrics
 
         # Calculate anomaly threshold based on train scores
-        train_scores = self.decision_function(X)
-        self.offset_ = np.quantile(train_scores, 1.0 - self.contamination)
+        # train_scores = self.decision_function(X)
+        # self.offset_ = np.quantile(train_scores, 1.0 - self.contamination)
 
         return self
 
@@ -186,25 +186,25 @@ class DistanceAnomaly(OutlierMixin, BaseEstimator):
         """
         return -self.decision_function(X)
 
-    def predict(self, X: np.ndarray) -> np.ndarray:
-        """
-        Predict if a particular sample is an inlier (1) or outlie (-1).
+    # def predict(self, X: np.ndarray) -> np.ndarray:
+    #     """
+    #     Predict if a particular sample is an inlier (1) or outlie (-1).
 
-        Parameters
-        ----------
-        X : array-like of shape (n_samples,)
-            The input samples.
+    #     Parameters
+    #     ----------
+    #     X : array-like of shape (n_samples,)
+    #         The input samples.
 
-        Returns
-        -------
-        is_outlier : ndarray of shape (n_samples,)
-            Returns -1 for outliers and 1 for inliers.
-        """
-        check_is_fitted(self)
-        scores = self.decision_function(X)
-        is_outlier = np.ones(X.shape[0], dtype=int)
-        is_outlier[scores >= self.offset_] = -1
-        return is_outlier
+    #     Returns
+    #     -------
+    #     is_outlier : ndarray of shape (n_samples,)
+    #         Returns -1 for outliers and 1 for inliers.
+    #     """
+    #     check_is_fitted(self)
+    #     scores = self.decision_function(X)
+    #     is_outlier = np.ones(X.shape[0], dtype=int)
+    #     is_outlier[scores >= self.offset_] = -1
+    #     return is_outlier
 
     # def predict(self, X: np.ndarray) -> np.ndarray:
     # NOTE: UNCOMMENT AFTER FIXING ABOVE offset_ DATA LEAKAGE CONCERN
