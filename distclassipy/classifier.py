@@ -72,6 +72,13 @@ def initialize_metric_function(metric):
     elif isinstance(metric, str):
         metric_str_lowercase = metric.lower()
         metric_found = False
+        
+        # Map DistClassiPy metric names to SciPy equivalents where possible
+        scipy_metric_mapping = {
+            'squared_euclidean': 'sqeuclidean',
+            'jensenshannon_divergence': 'jensenshannon',
+        }
+        
         for package_str, source in METRIC_SOURCES_.items():
 
             # Don't use scipy for jaccard as their implementation only works with
@@ -81,6 +88,24 @@ def initialize_metric_function(metric):
                 and metric_str_lowercase == "jaccard"
             ):
                 continue
+
+            # Check for direct mapping to SciPy equivalents
+            if package_str == "scipy.spatial.distance":
+                scipy_metric_name = scipy_metric_mapping.get(metric_str_lowercase, metric_str_lowercase)
+                if hasattr(source, scipy_metric_name):
+                    if metric_str_lowercase == 'jensenshannon_divergence':
+                        # Special handling for Jensen-Shannon divergence
+                        # We need to wrap it to square the result
+                        import functools
+                        base_fn = getattr(source, scipy_metric_name)
+                        metric_fn_ = lambda u, v: base_fn(u, v) ** 2
+                        # Still use the optimized scipy function for cdist
+                        metric_arg_ = scipy_metric_name
+                    else:
+                        metric_fn_ = getattr(source, scipy_metric_name)
+                        metric_arg_ = scipy_metric_name
+                    metric_found = True
+                    break
 
             if hasattr(source, metric_str_lowercase):
                 metric_fn_ = getattr(source, metric_str_lowercase)
