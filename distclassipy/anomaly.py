@@ -1,3 +1,9 @@
+"""
+A module for distance anomalies.
+
+This module implements the methods for distance anomalies.
+"""
+
 import numpy as np
 from sklearn.base import BaseEstimator, OutlierMixin
 from sklearn.utils.validation import check_is_fitted, check_array
@@ -26,9 +32,12 @@ class DistanceAnomaly(OutlierMixin, BaseEstimator):
     cluster_agg : {'min', 'mean', 'median'}, default='min'
         The aggregation method for distances to different class centroids for a
         single metric.
-        - 'min': An object's distance is its distance to the *nearest* known class.
-        - 'mean': An object's distance is its mean distance to all *nearest* known classes.
-        - 'median': A more robust measure of an object's typical distance to all classes.
+        - 'min': An object's distance is its distance to the *nearest* known
+        class.
+        - 'mean': An object's distance is its mean distance to all *nearest*
+        known classes.
+        - 'median': A more robust measure of an object's typical distance
+        to all classes.
 
     metric_agg : {'median', 'mean', 'min', 'percentile_25'}, default='median'
         The method to aggregate scores from the ensemble of metrics.
@@ -81,8 +90,10 @@ class DistanceAnomaly(OutlierMixin, BaseEstimator):
 
     def fit(self, X: np.ndarray, y: np.ndarray) -> "DistanceAnomaly":
         """
-        Fit the anomaly detector by training the underlying DistanceMetricClassifier
-        on the normal data.
+        Fit the anomaly detector.
+
+        Fit the anomaly detector by training the underlying
+        DistanceMetricClassifier on the normal data.
 
         Parameters
         ----------
@@ -109,15 +120,18 @@ class DistanceAnomaly(OutlierMixin, BaseEstimator):
             self.metrics_ = self.metrics
 
         # Calculate anomaly threshold based on train scores
-        # train_scores = self.decision_function(X)
-        # self.offset_ = np.quantile(train_scores, 1.0 - self.contamination)
+        train_scores = self.decision_function(X)
+
+        self.offset_ = np.quantile(train_scores, 1.0 - self.contamination)
 
         return self
 
     def decision_function(self, X: np.ndarray) -> np.ndarray:
         """
-        Calculate the raw anomaly score for each sample. Higher scores are
-        more anomalous.
+        Decision function.
+
+        Calculates the raw anomaly score for each sample.
+        Higher scores are more anomalous.
 
         Parameters
         ----------
@@ -135,11 +149,10 @@ class DistanceAnomaly(OutlierMixin, BaseEstimator):
         metric_scores = []
 
         for metric in self.metrics_:
-            # Get dataframe for distances to all centroids from dcpy
             self.clf_.predict_and_analyse(X, metric=metric)
             dist_df = self.clf_.centroid_dist_df_
 
-            # 1. Aggregate distances across clusters the current metric
+            # Aggregate distances across clusters the current metric
             if self.cluster_agg == "min":
                 score_for_metric = dist_df.min(axis=1).values
             elif self.cluster_agg == "median":
@@ -153,31 +166,28 @@ class DistanceAnomaly(OutlierMixin, BaseEstimator):
 
         metric_scores_arr = np.array(metric_scores).T  # shape (n_samples, n_metrics)
         # remove infinities
-        metric_scores_arr[metric_scores_arr == np.inf] = 1e9 # A large number
-        metric_scores_arr[metric_scores_arr == -np.inf] = -1e9 # A large negative number
-
+        metric_scores_arr[metric_scores_arr == np.inf] = 1e9  # A large number
+        metric_scores_arr[metric_scores_arr == -np.inf] = (
+            -1e9
+        )  # A large negative number
 
         if self.normalize_scores:
-            # Scale scores for each metric (column) to be between 0 and 1
-            # Compare with Rio notebook once.
+            col_means = np.nanmean(metric_scores_arr, axis=0)
+            inds = np.where(np.isnan(metric_scores_arr))
+            metric_scores_arr[inds] = np.take(col_means, inds[1])
             metric_scores_arr = minmax_scale(metric_scores_arr, axis=0)
-            
-        # 2. Aggregate scores across all metrics for final anomaly score
+
+        # Aggregate scores across all metrics for final anomaly score
         if self.metric_agg == "median":
-            scores = np.median(metric_scores_arr, axis=1)
+            scores = np.nanmedian(metric_scores_arr, axis=1)
         elif self.metric_agg == "mean":
-            scores = np.mean(metric_scores_arr, axis=1)
+            scores = np.nanmean(metric_scores_arr, axis=1)
         elif self.metric_agg == "min":
-            scores = np.min(metric_scores_arr, axis=1)
+            scores = np.nanmin(metric_scores_arr, axis=1)
         elif self.metric_agg == "percentile_25":
-            scores = np.quantile(metric_scores_arr, 0.25, axis=1)
+            scores = np.nanquantile(metric_scores_arr, 0.25, axis=1)
         else:
             raise ValueError(f"Unknown metric_agg method: {self.metric_agg}")
-
-        # # Threshold for predict() as per sklearn conventions
-        # ## NOTE: DATA LEAKAGE CONCERN
-        # ## FIX LATER
-        # self.offset_ = np.quantile(scores, (1 - self.contamination))
 
         return scores
 
@@ -185,51 +195,34 @@ class DistanceAnomaly(OutlierMixin, BaseEstimator):
         """
         Calculate the anomaly score, matching scikit-learn's convention.
 
-        Note: Opposite of decision_function. Higher scores mean less anomalous (more normal).
-        This is for compatibility with tools that expect this behavior, like IsolationForest.
+        Note: Opposite of decision_function. Higher scores mean less
+        anomalous (more normal).
+        This is for compatibility with tools that expect this
+        behavior, like IsolationForest.
         """
         return -self.decision_function(X)
 
-    # def predict(self, X: np.ndarray) -> np.ndarray:
-    #     """
-    #     Predict if a particular sample is an inlier (1) or outlie (-1).
+    def predict(self, X: np.ndarray) -> np.ndarray:
+        """
+        Predict if a particular sample is an inlier (1) or outlier (-1).
 
-    #     Parameters
-    #     ----------
-    #     X : array-like of shape (n_samples,)
-    #         The input samples.
+        This method uses the threshold learned during the `fit` phase.
 
-    #     Returns
-    #     -------
-    #     is_outlier : ndarray of shape (n_samples,)
-    #         Returns -1 for outliers and 1 for inliers.
-    #     """
-    #     check_is_fitted(self)
-    #     scores = self.decision_function(X)
-    #     is_outlier = np.ones(X.shape[0], dtype=int)
-    #     is_outlier[scores >= self.offset_] = -1
-    #     return is_outlier
+        Parameters
+        ----------
+        X : array-like of shape (n_samples, n_features)
+            The input samples.
 
-    # def predict(self, X: np.ndarray) -> np.ndarray:
-    # NOTE: UNCOMMENT AFTER FIXING ABOVE offset_ DATA LEAKAGE CONCERN
-    #     """
-    #     Predict if a particular sample is an inlier or outlier.
+        Returns
+        -------
+        is_outlier : ndarray of shape (n_samples,)
+            Returns -1 for outliers and 1 for inliers.
+        """
+        check_is_fitted(self)
+        scores = self.decision_function(X)
 
-    #     Parameters
-    #     ----------
-    #     X : array-like of shape (n_samples,)
-    #         The input samples.
+        # Compare scores against the pre-computed threshold
+        is_outlier = np.full(X.shape[0], 1, dtype=int)
+        is_outlier[scores >= self.offset_] = -1
 
-    #     Returns
-    #     -------
-    #     is_outlier : ndarray of shape (n_samples,)
-    #         Returns -1 for outliers and 1 for inliers.
-    #     """
-    #     scores = self.decision_function(X)
-    #     is_outlier = np.ones(X.shape[0], dtype=int)
-    #     is_outlier[scores >= self.offset_] = -1
-    #     return is_outlier
-
-
-# ref:
-# DOI: 10.2196/27172
+        return is_outlier
