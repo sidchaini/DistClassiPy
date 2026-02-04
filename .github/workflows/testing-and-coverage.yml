@@ -23,7 +23,7 @@ jobs:
     # Next we need to checkout out repository, and set up Python
     # A 'name' is just an optional label shown in the log - helpful to clarify progress - and can be anything
     - name: Checkout repository
-      uses: actions/checkout@v4
+      uses: actions/checkout@v6
 
     - name: Set up Python ${{ matrix.python-version }}
       uses: actions/setup-python@v6
@@ -41,7 +41,7 @@ jobs:
         python3 -m pytest tests/ --cov=distclassipy --cov-report=xml
 
     - name: Upload coverage report to codecov
-      uses: codecov/codecov-action@v5.4.0
+      uses: codecov/codecov-action@v5.5.2
       with:
         token: ${{ secrets.CODECOV_TOKEN }}
         slug: sidchaini/DistClassiPy
