@@ -1,9 +1,9 @@
 import codecs
 import os.path
 
-from setuptools import setup, Extension
-
 from Cython.Build import cythonize
+
+from setuptools import Extension, setup
 
 
 def read(rel_path):

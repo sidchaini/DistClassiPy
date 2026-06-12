@@ -13,12 +13,17 @@ Notes
   last ulp. ``assert_allclose`` with a tight tolerance is the right check.
 """
 
-import numpy as np
-import pytest
 
 from distclassipy import distances
 from distclassipy._cdistances import CYTHON_METRICS, cdist as cy_cdist
 from distclassipy.classifier import initialize_metric_function
+
+from hypothesis import given, strategies as st
+
+import numpy as np
+
+import pytest
+
 
 # The 5 edge-case pairs from test_distances.py
 EDGE_PAIRS = [
@@ -41,17 +46,21 @@ ALL_METRICS = sorted(CYTHON_METRICS)
 
 
 def reference_value(name, u, v):
-    """Evaluate the pure-Python reference on copies (some mutate inputs).
-
-    The `google` reference divides Python floats, so 0/0 raises
-    ZeroDivisionError instead of yielding IEEE nan like the numpy-based
-    metrics; the Cython kernel returns nan in that case.
-    """
+    """Evaluate the pure-Python reference on copies (defensive isolation)."""
     func = getattr(distances, name)
-    try:
-        return func(u.copy(), v.copy())
-    except ZeroDivisionError:
-        return np.nan
+    return func(u.copy(), v.copy())
+
+
+@pytest.mark.parametrize("name", ALL_METRICS)
+def test_reference_does_not_mutate_inputs(name):
+    # Regression guard: jeffreys/jensenshannon_divergence/taneja/topsoe used
+    # to replace zeros with EPSILON in the caller's arrays
+    u = np.array([0.5, 0.0, 0.3])
+    v = np.array([0.0, 0.2, 0.3])
+    u_orig, v_orig = u.copy(), v.copy()
+    getattr(distances, name)(u, v)
+    np.testing.assert_array_equal(u, u_orig)
+    np.testing.assert_array_equal(v, v_orig)
 
 
 @pytest.mark.parametrize("name", ALL_METRICS)
@@ -82,8 +91,46 @@ def test_matrix_parity_random(name, n_features):
         for j in range(3):
             expected[i, j] = reference_value(name, XA[i], XB[j])
     np.testing.assert_allclose(
-        actual, expected, rtol=1e-9, atol=1e-12, equal_nan=True,
+        actual,
+        expected,
+        rtol=1e-9,
+        atol=1e-12,
+        equal_nan=True,
         err_msg=f"metric={name}, n_features={n_features}",
+    )
+
+
+# Element strategy: mostly well-behaved values, with zeros and negatives mixed
+# in to fuzz the guard/epsilon/nan code paths of the kernels
+_elements = st.one_of(
+    st.just(0.0),
+    st.floats(
+        min_value=-1e4, max_value=1e4, allow_nan=False, allow_infinity=False, width=32
+    ),
+)
+
+_vector_pairs = st.integers(min_value=1, max_value=20).flatmap(
+    lambda n: st.tuples(
+        st.lists(_elements, min_size=n, max_size=n).map(np.array),
+        st.lists(_elements, min_size=n, max_size=n).map(np.array),
+    )
+)
+
+
+@pytest.mark.parametrize("name", ALL_METRICS)
+@given(_vector_pairs)
+def test_property_parity_fuzz(name, data):
+    """Hypothesis fuzz: compiled kernel == Python reference on arbitrary input."""
+    u, v = data
+    expected = reference_value(name, u, v)
+    actual = cy_cdist(u[None, :], v[None, :], name)[0, 0]
+    np.testing.assert_allclose(
+        actual,
+        expected,
+        rtol=1e-7,
+        atol=1e-8,
+        equal_nan=True,
+        err_msg=f"metric={name}, u={u!r}, v={v!r}",
     )
 
 
@@ -101,7 +148,9 @@ def test_cdist_accepts_non_contiguous_and_other_dtypes():
     rng = np.random.default_rng(0)
     X = rng.uniform(0.1, 1.0, size=(6, 8))
     sliced = X[::2, ::2]  # non-contiguous view
-    expected = cy_cdist(np.ascontiguousarray(sliced), np.ascontiguousarray(sliced), "clark")
+    expected = cy_cdist(
+        np.ascontiguousarray(sliced), np.ascontiguousarray(sliced), "clark"
+    )
     np.testing.assert_array_equal(cy_cdist(sliced, sliced, "clark"), expected)
     as_f32 = X.astype(np.float32)
     out = cy_cdist(as_f32, as_f32, "gower")
@@ -222,3 +271,36 @@ class TestEndToEnd:
         assert np.all(np.isfinite(scores))
         preds = det.predict(X)
         assert set(np.unique(preds)) <= {-1, 1}
+
+    @pytest.mark.parametrize("scale", [True, False])
+    @pytest.mark.parametrize("cluster_agg", ["min", "median", "mean"])
+    def test_distance_anomaly_matches_legacy_implementation(
+        self, data, scale, cluster_agg
+    ):
+        # Regression guard for the optimized decision_function: replicate the
+        # pre-0.3.0 implementation (predict_and_analyse per metric + pandas
+        # aggregation) and require identical scores
+        from sklearn.preprocessing import minmax_scale
+
+        from distclassipy.anomaly import DistanceAnomaly
+
+        X, y = data
+        det = DistanceAnomaly(scale=scale, cluster_agg=cluster_agg)
+        det.fit(X, y)
+        scores_new = det.decision_function(X)
+
+        metric_scores = []
+        for metric in det.metrics_:
+            det.clf_.predict_and_analyse(X, metric=metric)
+            dist_df = det.clf_.centroid_dist_df_
+            metric_scores.append(getattr(dist_df, cluster_agg)(axis=1).values)
+        arr = np.array(metric_scores).T
+        arr[arr == np.inf] = 1e9
+        arr[arr == -np.inf] = -1e9
+        col_means = np.nanmean(arr, axis=0)
+        inds = np.where(np.isnan(arr))
+        arr[inds] = np.take(col_means, inds[1])
+        arr = minmax_scale(arr, axis=0)
+        scores_legacy = np.nanmedian(arr, axis=1)
+
+        np.testing.assert_allclose(scores_new, scores_legacy, rtol=1e-12, atol=1e-12)

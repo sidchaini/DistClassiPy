@@ -5,11 +5,13 @@ This module implements the methods for distance anomalies.
 """
 
 import numpy as np
-from sklearn.base import BaseEstimator, OutlierMixin
-from sklearn.utils.validation import check_is_fitted, check_array
-from sklearn.preprocessing import minmax_scale
 
-from .classifier import DistanceMetricClassifier
+from sklearn.base import BaseEstimator, OutlierMixin
+from sklearn.preprocessing import minmax_scale
+from sklearn.utils.validation import check_array, check_is_fitted
+
+from ._dispatch import pairwise_distance
+from .classifier import DistanceMetricClassifier, initialize_metric_function
 from .distances import _UNIQUE_METRICS
 
 
@@ -146,19 +148,44 @@ class DistanceAnomaly(OutlierMixin, BaseEstimator):
         check_is_fitted(self)
         X = check_array(X)
 
+        clf = self.clf_
+        metric_args = [initialize_metric_function(m)[1] for m in self.metrics_]
+
+        # Compute the distance matrix (n_samples, n_classes) for every metric.
+        # The per-class scaling of X is metric-independent, so loop classes
+        # on the outside and reuse each scaled copy across all metrics.
+        if clf.scale:
+            if clf.dispersion_stat == "std":
+                # Clip to avoid zero error later
+                wtdf = 1 / np.clip(clf.df_std_, a_min=np.finfo(float).eps, a_max=None)
+            elif clf.dispersion_stat == "iqr":
+                wtdf = 1 / np.clip(clf.df_iqr_, a_min=np.finfo(float).eps, a_max=None)
+
+            per_metric_cols = [[] for _ in metric_args]
+            for cl in clf.classes_:
+                w = wtdf.loc[cl].to_numpy()  # 1/std dev
+                XA = X * w  # w is for this class only
+                XB = clf.df_centroid_.loc[cl].to_numpy().reshape(1, -1) * w
+                for cols, metric_arg in zip(per_metric_cols, metric_args):
+                    cols.append(pairwise_distance(XA, XB, metric_arg))
+            dist_arrs = [np.column_stack(cols) for cols in per_metric_cols]
+        else:
+            XB = clf.df_centroid_.to_numpy()
+            dist_arrs = [
+                pairwise_distance(X, XB, metric_arg) for metric_arg in metric_args
+            ]
+
         metric_scores = []
 
-        for metric in self.metrics_:
-            self.clf_.predict_and_analyse(X, metric=metric)
-            dist_df = self.clf_.centroid_dist_df_
-
-            # Aggregate distances across clusters the current metric
+        for dist_arr in dist_arrs:
+            # Aggregate distances across clusters for the current metric
+            # (nan-aware to match the previous pandas skipna behaviour)
             if self.cluster_agg == "min":
-                score_for_metric = dist_df.min(axis=1).values
+                score_for_metric = np.nanmin(dist_arr, axis=1)
             elif self.cluster_agg == "median":
-                score_for_metric = dist_df.median(axis=1).values
+                score_for_metric = np.nanmedian(dist_arr, axis=1)
             elif self.cluster_agg == "mean":
-                score_for_metric = dist_df.mean(axis=1).values
+                score_for_metric = np.nanmean(dist_arr, axis=1)
             else:
                 raise ValueError(f"Unknown cluster_agg method: {self.cluster_agg}")
 

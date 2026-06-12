@@ -26,6 +26,26 @@ Notes
     In addition, the following code was added to all functions for array conversion:
         u,v = np.asarray(u), np.asarray(v)
 
+    Equivalent metrics
+    ------------------
+    Several metrics in this module are formula-equivalent and always return
+    identical values; ensembles built from ``_ALL_METRICS`` will double-weight
+    these geometries (``_UNIQUE_METRICS`` already deduplicates them):
+        - sorensen == czekanowski
+        - soergel == tanimoto == ruzicka
+        - prob_chisq == 2 * squared_chisq
+        - topsoe == 2 * jensenshannon_divergence
+        - squaredchord == matusita ** 2
+        - divergence == 2 * clark ** 2
+
+    Performance
+    -----------
+    All metrics in this module without native SciPy ``cdist`` support are also
+    implemented as compiled C kernels in ``distclassipy._cdistances``. The
+    classifier and ``distclassipy.cdist`` route metric *names* (and these
+    module-level function objects) to the compiled kernels automatically; the
+    pure-Python functions here serve as the reference implementations.
+
 Copyright (C) 2024  Siddharth Chaini
 -----
 This program is free software: you can redistribute it and/or modify
@@ -806,10 +826,13 @@ def google(u, v):
             doi:10.1109/ITSIM.2008.4631601.
     """
     u, v = np.asarray(u), np.asarray(v)
-    x = float(np.sum(u))
-    y = float(np.sum(v))
-    summin = float(np.sum(np.minimum(u, v)))
-    return (max([x, y]) - summin) / ((x + y) - min([x, y]))
+    # Keep numpy scalars so the all-zero edge case yields IEEE nan (0/0),
+    # consistent with the other metrics, instead of ZeroDivisionError
+    x = np.float64(np.sum(u))
+    y = np.float64(np.sum(v))
+    summin = np.float64(np.sum(np.minimum(u, v)))
+    with np.errstate(divide="ignore", invalid="ignore"):
+        return (max([x, y]) - summin) / ((x + y) - min([x, y]))
 
 
 def gower(u, v):
@@ -861,7 +884,8 @@ def jeffreys(u, v):
             Journal of Mathematical Models and Methods in Applied Sciences.
             1(4), 300-307.
     """
-    u, v = np.asarray(u), np.asarray(v)
+    # Copy so the epsilon replacement below never mutates the caller's arrays
+    u, v = np.array(u, dtype=np.float64), np.array(v, dtype=np.float64)
     # Add epsilon to zeros in vectors to avoid division
     # by 0 and/or log of 0. Alternatively, zeros in the
     # vectors could be ignored or masked (see below).
@@ -906,7 +930,8 @@ def jensenshannon_divergence(u, v):
         el3 = np.log(el2)
         return np.sum(el1 - el2 * el3)
     """
-    u, v = np.asarray(u), np.asarray(v)
+    # Copy so the epsilon replacement below never mutates the caller's arrays
+    u, v = np.array(u, dtype=np.float64), np.array(v, dtype=np.float64)
     with np.errstate(divide="ignore", invalid="ignore"):
         # Clip negative values to zero for valid log
         u[u == 0] = EPSILON
@@ -1231,7 +1256,8 @@ def taneja(u, v):
             Journal of Mathematical Models and Methods in Applied Sciences.
             1(4), 300-307.
     """
-    u, v = np.asarray(u), np.asarray(v)
+    # Copy so the epsilon replacement below never mutates the caller's arrays
+    u, v = np.array(u, dtype=np.float64), np.array(v, dtype=np.float64)
     with np.errstate(divide="ignore", invalid="ignore"):
         u[u == 0] = EPSILON
         v[v == 0] = EPSILON
@@ -1292,7 +1318,8 @@ def topsoe(u, v):
     -----
         Equals two times Jensen-Shannon divergence.
     """
-    u, v = np.asarray(u), np.asarray(v)
+    # Copy so the epsilon replacement below never mutates the caller's arrays
+    u, v = np.array(u, dtype=np.float64), np.array(v, dtype=np.float64)
     with np.errstate(divide="ignore", invalid="ignore"):
         u[u == 0] = EPSILON
         v[v == 0] = EPSILON

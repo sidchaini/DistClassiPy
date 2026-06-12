@@ -1,1 +1,3 @@
 include distclassipy/*.pyx
+include distclassipy/*.pyi
+include distclassipy/py.typed

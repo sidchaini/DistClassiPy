@@ -46,7 +46,7 @@ from sklearn.base import BaseEstimator, ClassifierMixin
 from sklearn.metrics import accuracy_score
 from sklearn.model_selection import train_test_split
 from sklearn.utils.multiclass import unique_labels
-from sklearn.utils.validation import check_is_fitted, check_array, validate_data
+from sklearn.utils.validation import check_array, check_is_fitted, validate_data
 
 from . import distances
 from ._dispatch import CYTHON_METRICS, pairwise_distance
@@ -288,9 +288,12 @@ class DistanceMetricClassifier(ClassifierMixin, BaseEstimator):
 
         Notes
         -----
-        If using distance metrics supported by SciPy, it is desirable to pass a string,
-        which allows SciPy to use an optimized C version of the code instead of the
-        slower Python version.
+        Passing a metric by name (string) always selects an optimized C
+        implementation: SciPy's own for SciPy-supported metrics, and
+        DistClassiPy's compiled kernels for the custom metrics. Passing the
+        ``distclassipy.distances`` function objects also uses the compiled
+        kernels; only arbitrary user-defined callables fall back to the slower
+        per-pair Python path.
         """
         check_is_fitted(self)
         X = validate_data(self, X, reset=False)
@@ -359,9 +362,12 @@ class DistanceMetricClassifier(ClassifierMixin, BaseEstimator):
 
         Notes
         -----
-        If using distance metrics supported by SciPy, it is desirable to pass a string,
-        which allows SciPy to use an optimized C version of the code instead
-        of the slower Python version.
+        Passing a metric by name (string) always selects an optimized C
+        implementation: SciPy's own for SciPy-supported metrics, and
+        DistClassiPy's compiled kernels for the custom metrics. Passing the
+        ``distclassipy.distances`` function objects also uses the compiled
+        kernels; only arbitrary user-defined callables fall back to the slower
+        per-pair Python path.
 
         """
         check_is_fitted(self)
