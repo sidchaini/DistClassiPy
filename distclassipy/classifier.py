@@ -49,6 +49,7 @@ from sklearn.utils.multiclass import unique_labels
 from sklearn.utils.validation import check_is_fitted, check_array, validate_data
 
 from . import distances
+from ._dispatch import CYTHON_METRICS, pairwise_distance
 from .distances import _ALL_METRICS
 
 # Hardcoded source packages to check for distance metrics.
@@ -67,18 +68,27 @@ def initialize_metric_function(metric):
     """
     if callable(metric):
         metric_fn_ = metric
-        metric_arg_ = metric
+
+        # If the callable is one of the distclassipy reference functions, use
+        # its name so that dispatch routes to the equivalent compiled kernel.
+        # The identity check ensures a user-defined function that merely
+        # shares a name is not hijacked.
+        name = getattr(metric, "__name__", "").lower()
+        if name in CYTHON_METRICS and getattr(distances, name, None) is metric:
+            metric_arg_ = name
+        else:
+            metric_arg_ = metric
 
     elif isinstance(metric, str):
         metric_str_lowercase = metric.lower()
         metric_found = False
         for package_str, source in METRIC_SOURCES_.items():
 
-            # Don't use scipy for jaccard as their implementation only works with
-            # booleans - use custom jaccard instead
-            if (
-                package_str == "scipy.spatial.distance"
-                and metric_str_lowercase == "jaccard"
+            # Don't use scipy for jaccard and dice as their implementations
+            # only work with booleans - use the custom versions instead
+            if package_str == "scipy.spatial.distance" and metric_str_lowercase in (
+                "jaccard",
+                "dice",
             ):
                 continue
 
@@ -86,11 +96,16 @@ def initialize_metric_function(metric):
                 metric_fn_ = getattr(source, metric_str_lowercase)
                 metric_found = True
 
-                # Use the string as an argument if it belongs to scipy as it is
-                # optimized
-                metric_arg_ = (
-                    metric if package_str == "scipy.spatial.distance" else metric_fn_
-                )
+                # Use the string as an argument for scipy metrics (scipy's
+                # optimized C code) and for metrics with a compiled Cython
+                # kernel (routed by pairwise_distance); otherwise fall back
+                # to the Python callable.
+                if package_str == "scipy.spatial.distance":
+                    metric_arg_ = metric
+                elif metric_str_lowercase in CYTHON_METRICS:
+                    metric_arg_ = metric_str_lowercase
+                else:
+                    metric_arg_ = metric_fn_
                 break
         if not metric_found:
             raise ValueError(
@@ -287,9 +302,7 @@ class DistanceMetricClassifier(ClassifierMixin, BaseEstimator):
         metric_fn_, metric_arg_ = initialize_metric_function(metric_to_use)
 
         if not self.scale:
-            dist_arr = scipy.spatial.distance.cdist(
-                XA=X, XB=self.df_centroid_.to_numpy(), metric=metric_arg_
-            )
+            dist_arr = pairwise_distance(X, self.df_centroid_.to_numpy(), metric_arg_)
 
         else:
             dist_arr_list = []
@@ -305,7 +318,7 @@ class DistanceMetricClassifier(ClassifierMixin, BaseEstimator):
                 w = wtdf.loc[cl].to_numpy()  # 1/std dev
                 XB = XB * w  # w is for this class only
                 XA = X * w  # w is for this class only
-                cl_dist = scipy.spatial.distance.cdist(XA=XA, XB=XB, metric=metric_arg_)
+                cl_dist = pairwise_distance(XA, XB, metric_arg_)
                 dist_arr_list.append(cl_dist)
             dist_arr = np.column_stack(dist_arr_list)
 
@@ -361,9 +374,7 @@ class DistanceMetricClassifier(ClassifierMixin, BaseEstimator):
         metric_fn_, metric_arg_ = initialize_metric_function(metric_to_use)
 
         if not self.scale:
-            dist_arr = scipy.spatial.distance.cdist(
-                XA=X, XB=self.df_centroid_.to_numpy(), metric=metric_arg_
-            )
+            dist_arr = pairwise_distance(X, self.df_centroid_.to_numpy(), metric_arg_)
 
         else:
             dist_arr_list = []
@@ -379,7 +390,7 @@ class DistanceMetricClassifier(ClassifierMixin, BaseEstimator):
                 w = wtdf.loc[cl].to_numpy()  # 1/std dev
                 XB = XB * w  # w is for this class only
                 XA = X * w  # w is for this class only
-                cl_dist = scipy.spatial.distance.cdist(XA=XA, XB=XB, metric=metric_arg_)
+                cl_dist = pairwise_distance(XA, XB, metric_arg_)
                 dist_arr_list.append(cl_dist)
             dist_arr = np.column_stack(dist_arr_list)
 

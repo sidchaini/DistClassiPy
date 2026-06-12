@@ -492,8 +492,8 @@ def meehl(u, v):
 
     xi = u[:-1]
     yi = v[:-1]
-    xiplus1 = np.roll(u, 1)[:-1]
-    yiplus1 = np.roll(v, 1)[:-1]
+    xiplus1 = u[1:]
+    yiplus1 = v[1:]
 
     with np.errstate(divide="ignore", invalid="ignore"):
         return np.nansum((xi - yi - xiplus1 + yiplus1) ** 2)

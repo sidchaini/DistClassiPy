@@ -1,7 +1,9 @@
 import codecs
 import os.path
 
-from setuptools import setup
+from setuptools import setup, Extension
+
+from Cython.Build import cythonize
 
 
 def read(rel_path):
@@ -19,4 +21,11 @@ def get_version(rel_path):
         raise RuntimeError("Unable to find version string.")
 
 
-setup(version=get_version("distclassipy/__init__.py"))
+extensions = [
+    Extension("distclassipy._cdistances", ["distclassipy/_cdistances.pyx"]),
+]
+
+setup(
+    version=get_version("distclassipy/__init__.py"),
+    ext_modules=cythonize(extensions, language_level="3"),
+)
