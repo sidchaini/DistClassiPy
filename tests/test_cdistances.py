@@ -13,7 +13,6 @@ Notes
   last ulp. ``assert_allclose`` with a tight tolerance is the right check.
 """
 
-
 from distclassipy import distances
 from distclassipy._cdistances import CYTHON_METRICS, cdist as cy_cdist
 from distclassipy.classifier import initialize_metric_function
@@ -23,7 +22,6 @@ from hypothesis import given, strategies as st
 import numpy as np
 
 import pytest
-
 
 # The 5 edge-case pairs from test_distances.py
 EDGE_PAIRS = [

@@ -14,8 +14,9 @@ STATS = ["std", "iqr", "aiqr", "cdf"]
 
 @pytest.fixture
 def data():
-    X, y = make_classification(n_samples=300, n_features=6, n_informative=4,
-                               n_classes=3, random_state=7)
+    X, y = make_classification(
+        n_samples=300, n_features=6, n_informative=4, n_classes=3, random_state=7
+    )
     return X - X.min() + 0.1, y  # shift positive: many metrics assume >= 0
 
 
@@ -24,10 +25,9 @@ def skewed_data():
     """Strongly right-skewed features - the case aiqr/cdf are built for."""
     rng = np.random.default_rng(0)
     y = np.repeat([0, 1], 150)
-    X = np.column_stack([
-        rng.lognormal(mean=(0.0 if c else 0.6), sigma=1.2, size=300)
-        for c in range(4)
-    ])
+    X = np.column_stack(
+        [rng.lognormal(mean=(0.0 if c else 0.6), sigma=1.2, size=300) for c in range(4)]
+    )
     X[y == 1] *= 1.8
     return X, y
 
@@ -47,11 +47,13 @@ def test_std_path_unchanged(data):
     X, y = data
     clf = dcpy.DistanceMetricClassifier(dispersion_stat="std").fit(X, y)
     XA, XB = clf._class_transform(X, clf.classes_[0])
-    w = 1 / np.clip(clf.df_std_.loc[clf.classes_[0]].to_numpy(),
-                    np.finfo(float).eps, None)
+    w = 1 / np.clip(
+        clf.df_std_.loc[clf.classes_[0]].to_numpy(), np.finfo(float).eps, None
+    )
     np.testing.assert_array_equal(XA, X * w)
     np.testing.assert_array_equal(
-        XB, clf.df_centroid_.loc[clf.classes_[0]].to_numpy().reshape(1, -1) * w)
+        XB, clf.df_centroid_.loc[clf.classes_[0]].to_numpy().reshape(1, -1) * w
+    )
 
 
 def test_cdf_maps_class_to_uniform(data):
@@ -110,6 +112,7 @@ def test_anomaly_detector_accepts_stat(data, stat):
 @pytest.mark.parametrize("stat", STATS)
 def test_sklearn_clone_roundtrip(stat):
     from sklearn.base import clone
+
     clf = dcpy.DistanceMetricClassifier(dispersion_stat=stat, cdf_grid_size=201)
     c2 = clone(clf)
     assert c2.get_params()["dispersion_stat"] == stat

@@ -283,8 +283,7 @@ class DistanceMetricClassifier(ClassifierMixin, BaseEstimator):
             # object actually falls on.
             q1, q2, q3 = (
                 np.array(
-                    [np.quantile(X[y == c], q=q, axis=0).ravel()
-                     for c in self.classes_]
+                    [np.quantile(X[y == c], q=q, axis=0).ravel() for c in self.classes_]
                 )
                 for q in (0.25, 0.5, 0.75)
             )
@@ -345,8 +344,7 @@ class DistanceMetricClassifier(ClassifierMixin, BaseEstimator):
             # evaluate |d| / (2*q2 + d), which saturates to zero sensitivity
             # whenever the median is large.
             ref = 1.0
-            rescale = lambda A: ref + (A - q2) / np.where(  # noqa: E731
-                A > q2, hi, lo)
+            rescale = lambda A: ref + (A - q2) / np.where(A > q2, hi, lo)  # noqa: E731
             return rescale(X), rescale(XB)
 
         if self.dispersion_stat == "cdf":
