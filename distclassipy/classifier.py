@@ -139,12 +139,37 @@ class DistanceMetricClassifier(ClassifierMixin, BaseEstimator):
     central_stat : {"mean", "median"}, default="median"
         The statistic used to calculate the central tendency of the data to construct
         the feature-space centroid. Supported statistics are "mean" and "median".
-    dispersion_stat : {"std", "iqr"}, default="std"
-        The statistic used to calculate the dispersion of the data for scaling the
-        distance. Supported  statistics are "std" for standard deviation and "iqr"
-        for inter-quartile range.
+    dispersion_stat : {"std", "iqr", "aiqr", "cdf"}, default="std"
+        How each class's feature space is rescaled before the distance is taken.
+
+        - "std" : divide by the per-feature standard deviation (the original
+          Mahalanobis-inspired scaling).
+        - "iqr" : divide by the inter-quartile range; more robust to outliers.
+        - "aiqr" : *asymmetric* quantile scaling. Deviations above the median
+          are measured in units of (q3 - q2) and deviations below it in units
+          of (q2 - q1), so a skewed feature is no longer forced to be
+          symmetric. Note this makes the transform depend on which side of the
+          median the test object lies, so the resulting dissimilarity is a
+          score rather than a metric distance in a fixed space.
+        - "cdf" : map each feature through the class's empirical CDF, making
+          the class uniform on [0, 1]. This generalises the scaling from the
+          second moment to the whole marginal distribution, and so absorbs
+          skew, heavy tails and marginal multimodality at once. Because the
+          map is a fixed monotone reparametrisation per class, the metric
+          axioms still hold in the transformed space. Caveat: extreme values
+          saturate at 0 or 1, which is desirable for classification but
+          discards magnitude information for anomaly ranking.
 
         .. versionadded:: 0.1.0
+        .. versionchanged:: 0.4.0
+           Added "aiqr" and "cdf".
+
+    cdf_grid_size : int, default=1001
+        Number of quantile grid points stored per class and feature when
+        ``dispersion_stat="cdf"``. Keeps memory independent of training-set
+        size.
+
+        .. versionadded:: 0.4.0
 
     References
     ----------
@@ -171,12 +196,14 @@ class DistanceMetricClassifier(ClassifierMixin, BaseEstimator):
         scale: bool = True,
         central_stat: str = "median",
         dispersion_stat: str = "std",
+        cdf_grid_size: int = 1001,
     ) -> None:
         """Initialize the classifier with specified parameters."""
         self.metric = metric
         self.scale = scale
         self.central_stat = central_stat
         self.dispersion_stat = dispersion_stat
+        self.cdf_grid_size = cdf_grid_size
 
     def fit(
         self, X: np.array, y: np.array, feat_labels: list[str] = None
@@ -249,10 +276,92 @@ class DistanceMetricClassifier(ClassifierMixin, BaseEstimator):
                 data=np.array(iqr_list), index=self.classes_, columns=feat_labels
             )
             self.df_iqr_ = df_iqr
+        elif self.scale and self.dispersion_stat == "aiqr":
+            # Asymmetric (two-sided) quantile scale: the half-width below the
+            # median and the half-width above it are stored separately, so a
+            # skewed feature is measured in the units of the side the test
+            # object actually falls on.
+            q1, q2, q3 = (
+                np.array(
+                    [np.quantile(X[y == c], q=q, axis=0).ravel()
+                     for c in self.classes_]
+                )
+                for q in (0.25, 0.5, 0.75)
+            )
+            self.df_q1_ = pd.DataFrame(q1, index=self.classes_, columns=feat_labels)
+            self.df_q2_ = pd.DataFrame(q2, index=self.classes_, columns=feat_labels)
+            self.df_q3_ = pd.DataFrame(q3, index=self.classes_, columns=feat_labels)
+        elif self.scale and self.dispersion_stat == "cdf":
+            # Full per-class marginal: each feature is mapped through that
+            # class's empirical CDF, so the class becomes uniform on [0, 1]
+            # regardless of skew, heavy tails or marginal multimodality.
+            # A fixed quantile grid keeps the memory cost independent of the
+            # training-set size.
+            self.cdf_q_ = np.linspace(0.0, 1.0, self.cdf_grid_size)
+            self.cdf_grid_ = {
+                c: np.maximum.accumulate(
+                    np.quantile(X[y == c], q=self.cdf_q_, axis=0), axis=0
+                )
+                for c in self.classes_
+            }
 
         self.is_fitted_ = True
 
         return self
+
+    def _class_transform(self, X: np.ndarray, cl) -> tuple:
+        """Map X and class `cl`'s centroid into that class's scaled space.
+
+        Returns ``(XA, XB)`` ready for a pairwise distance call. The ``std``
+        and ``iqr`` options reproduce the original multiplicative scaling
+        exactly; ``aiqr`` and ``cdf`` apply a monotone per-feature transform
+        instead (see the class docstring).
+        """
+        XB = self.df_centroid_.loc[cl].to_numpy().reshape(1, -1)
+        if not self.scale:
+            return X, XB
+
+        eps = np.finfo(float).eps
+        if self.dispersion_stat in ("std", "iqr"):
+            disp = self.df_std_ if self.dispersion_stat == "std" else self.df_iqr_
+            w = (1 / np.clip(disp, a_min=eps, a_max=None)).loc[cl].to_numpy()
+            return X * w, XB * w
+
+        if self.dispersion_stat == "aiqr":
+            q1 = self.df_q1_.loc[cl].to_numpy()
+            q2 = self.df_q2_.loc[cl].to_numpy()
+            q3 = self.df_q3_.loc[cl].to_numpy()
+            # Floor each half-width against the full IQR, not machine epsilon:
+            # spiky features routinely have one degenerate side (q2 == q1),
+            # and an epsilon floor would turn that into a ~1e16 scale factor
+            # that swamps every other feature.
+            iqr = np.clip(q3 - q1, a_min=eps, a_max=None)
+            floor = 0.05 * iqr
+            lo = np.maximum(q2 - q1, floor)
+            hi = np.maximum(q3 - q2, floor)
+            # Express the result in half-widths around a *unit* reference
+            # rather than around the raw median. Keeping q2 as an additive
+            # offset would make ratio-type metrics (Canberra, Clark, ...)
+            # evaluate |d| / (2*q2 + d), which saturates to zero sensitivity
+            # whenever the median is large.
+            ref = 1.0
+            rescale = lambda A: ref + (A - q2) / np.where(  # noqa: E731
+                A > q2, hi, lo)
+            return rescale(X), rescale(XB)
+
+        if self.dispersion_stat == "cdf":
+            return self._cdf_transform(X, cl), self._cdf_transform(XB, cl)
+
+        raise ValueError(f"Unknown dispersion_stat: {self.dispersion_stat}")
+
+    def _cdf_transform(self, X: np.ndarray, cl) -> np.ndarray:
+        """Empirical-CDF map for one class: feature values -> [0, 1] ranks."""
+        grid = self.cdf_grid_[cl]
+        out = np.empty(X.shape, dtype=float)
+        for j in range(X.shape[1]):
+            out[:, j] = np.interp(X[:, j], grid[:, j], self.cdf_q_)
+        # keep strictly positive: several metrics divide by (u + v)
+        return np.clip(out, np.finfo(float).eps, 1.0)
 
     def predict(
         self,
@@ -309,18 +418,8 @@ class DistanceMetricClassifier(ClassifierMixin, BaseEstimator):
 
         else:
             dist_arr_list = []
-
-            if self.dispersion_stat == "std":
-                # Clip to avoid zero error later
-                wtdf = 1 / np.clip(self.df_std_, a_min=np.finfo(float).eps, a_max=None)
-            elif self.dispersion_stat == "iqr":
-                wtdf = 1 / np.clip(self.df_iqr_, a_min=np.finfo(float).eps, a_max=None)
-
             for cl in self.classes_:
-                XB = self.df_centroid_.loc[cl].to_numpy().reshape(1, -1)
-                w = wtdf.loc[cl].to_numpy()  # 1/std dev
-                XB = XB * w  # w is for this class only
-                XA = X * w  # w is for this class only
+                XA, XB = self._class_transform(X, cl)
                 cl_dist = pairwise_distance(XA, XB, metric_arg_)
                 dist_arr_list.append(cl_dist)
             dist_arr = np.column_stack(dist_arr_list)
@@ -384,18 +483,8 @@ class DistanceMetricClassifier(ClassifierMixin, BaseEstimator):
 
         else:
             dist_arr_list = []
-
-            if self.dispersion_stat == "std":
-                # Clip to avoid zero error later
-                wtdf = 1 / np.clip(self.df_std_, a_min=np.finfo(float).eps, a_max=None)
-            elif self.dispersion_stat == "iqr":
-                wtdf = 1 / np.clip(self.df_iqr_, a_min=np.finfo(float).eps, a_max=None)
-
             for cl in self.classes_:
-                XB = self.df_centroid_.loc[cl].to_numpy().reshape(1, -1)
-                w = wtdf.loc[cl].to_numpy()  # 1/std dev
-                XB = XB * w  # w is for this class only
-                XA = X * w  # w is for this class only
+                XA, XB = self._class_transform(X, cl)
                 cl_dist = pairwise_distance(XA, XB, metric_arg_)
                 dist_arr_list.append(cl_dist)
             dist_arr = np.column_stack(dist_arr_list)

@@ -34,7 +34,7 @@ from .classifier import (
 )
 from .distances import _ALL_METRICS, _UNIQUE_METRICS
 
-__version__ = "0.3.0"
+__version__ = "0.4.0"
 
 __all__ = [
     "DistanceMetricClassifier",

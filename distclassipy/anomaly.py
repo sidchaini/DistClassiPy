@@ -155,17 +155,9 @@ class DistanceAnomaly(OutlierMixin, BaseEstimator):
         # The per-class scaling of X is metric-independent, so loop classes
         # on the outside and reuse each scaled copy across all metrics.
         if clf.scale:
-            if clf.dispersion_stat == "std":
-                # Clip to avoid zero error later
-                wtdf = 1 / np.clip(clf.df_std_, a_min=np.finfo(float).eps, a_max=None)
-            elif clf.dispersion_stat == "iqr":
-                wtdf = 1 / np.clip(clf.df_iqr_, a_min=np.finfo(float).eps, a_max=None)
-
             per_metric_cols = [[] for _ in metric_args]
             for cl in clf.classes_:
-                w = wtdf.loc[cl].to_numpy()  # 1/std dev
-                XA = X * w  # w is for this class only
-                XB = clf.df_centroid_.loc[cl].to_numpy().reshape(1, -1) * w
+                XA, XB = clf._class_transform(X, cl)
                 for cols, metric_arg in zip(per_metric_cols, metric_args):
                     cols.append(pairwise_distance(XA, XB, metric_arg))
             dist_arrs = [np.column_stack(cols) for cols in per_metric_cols]
@@ -192,6 +184,15 @@ class DistanceAnomaly(OutlierMixin, BaseEstimator):
             metric_scores.append(score_for_metric)
 
         metric_scores_arr = np.array(metric_scores).T  # shape (n_samples, n_metrics)
+        # Drop metrics that are undefined for every object. This happens for
+        # correlation-type metrics under dispersion_stat="cdf", where the
+        # transformed centroid is a constant vector and the correlation is
+        # therefore undefined; such a column carries no information and would
+        # otherwise propagate NaNs through the aggregation.
+        usable = np.isfinite(metric_scores_arr).any(axis=0)
+        if not usable.all():
+            metric_scores_arr = metric_scores_arr[:, usable]
+
         # remove infinities
         metric_scores_arr[metric_scores_arr == np.inf] = 1e9  # A large number
         metric_scores_arr[metric_scores_arr == -np.inf] = (
