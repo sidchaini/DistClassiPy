@@ -1,5 +1,7 @@
 [build-system]
-requires = ["setuptools", "wheel"]
+# numpy is not needed at build time: the Cython extension uses typed
+# memoryviews only (no `cimport numpy`), so no numpy headers are required.
+requires = ["setuptools>=68", "wheel", "Cython>=3.0"]
 build-backend = "setuptools.build_meta"
 
 [project]
@@ -31,6 +33,9 @@ dependencies = [
 
 [tool.setuptools.dynamic]
 version = {attr = "distclassipy.__version__"}
+
+[tool.setuptools.package-data]
+distclassipy = ["py.typed", "*.pyi"]
 
 [project.urls]
 Repository = "https://github.com/sidchaini/DistClassiPy"

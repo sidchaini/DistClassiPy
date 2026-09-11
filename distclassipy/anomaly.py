@@ -5,11 +5,13 @@ This module implements the methods for distance anomalies.
 """
 
 import numpy as np
-from sklearn.base import BaseEstimator, OutlierMixin
-from sklearn.utils.validation import check_is_fitted, check_array
-from sklearn.preprocessing import minmax_scale
 
-from .classifier import DistanceMetricClassifier
+from sklearn.base import BaseEstimator, OutlierMixin
+from sklearn.preprocessing import minmax_scale
+from sklearn.utils.validation import check_array, check_is_fitted
+
+from ._dispatch import pairwise_distance
+from .classifier import DistanceMetricClassifier, initialize_metric_function
 from .distances import _UNIQUE_METRICS
 
 
@@ -146,25 +148,51 @@ class DistanceAnomaly(OutlierMixin, BaseEstimator):
         check_is_fitted(self)
         X = check_array(X)
 
+        clf = self.clf_
+        metric_args = [initialize_metric_function(m)[1] for m in self.metrics_]
+
+        # Compute the distance matrix (n_samples, n_classes) for every metric.
+        # The per-class scaling of X is metric-independent, so loop classes
+        # on the outside and reuse each scaled copy across all metrics.
+        if clf.scale:
+            per_metric_cols = [[] for _ in metric_args]
+            for cl in clf.classes_:
+                XA, XB = clf._class_transform(X, cl)
+                for cols, metric_arg in zip(per_metric_cols, metric_args):
+                    cols.append(pairwise_distance(XA, XB, metric_arg))
+            dist_arrs = [np.column_stack(cols) for cols in per_metric_cols]
+        else:
+            XB = clf.df_centroid_.to_numpy()
+            dist_arrs = [
+                pairwise_distance(X, XB, metric_arg) for metric_arg in metric_args
+            ]
+
         metric_scores = []
 
-        for metric in self.metrics_:
-            self.clf_.predict_and_analyse(X, metric=metric)
-            dist_df = self.clf_.centroid_dist_df_
-
-            # Aggregate distances across clusters the current metric
+        for dist_arr in dist_arrs:
+            # Aggregate distances across clusters for the current metric
+            # (nan-aware to match the previous pandas skipna behaviour)
             if self.cluster_agg == "min":
-                score_for_metric = dist_df.min(axis=1).values
+                score_for_metric = np.nanmin(dist_arr, axis=1)
             elif self.cluster_agg == "median":
-                score_for_metric = dist_df.median(axis=1).values
+                score_for_metric = np.nanmedian(dist_arr, axis=1)
             elif self.cluster_agg == "mean":
-                score_for_metric = dist_df.mean(axis=1).values
+                score_for_metric = np.nanmean(dist_arr, axis=1)
             else:
                 raise ValueError(f"Unknown cluster_agg method: {self.cluster_agg}")
 
             metric_scores.append(score_for_metric)
 
         metric_scores_arr = np.array(metric_scores).T  # shape (n_samples, n_metrics)
+        # Drop metrics that are undefined for every object. This happens for
+        # correlation-type metrics under dispersion_stat="cdf", where the
+        # transformed centroid is a constant vector and the correlation is
+        # therefore undefined; such a column carries no information and would
+        # otherwise propagate NaNs through the aggregation.
+        usable = np.isfinite(metric_scores_arr).any(axis=0)
+        if not usable.all():
+            metric_scores_arr = metric_scores_arr[:, usable]
+
         # remove infinities
         metric_scores_arr[metric_scores_arr == np.inf] = 1e9  # A large number
         metric_scores_arr[metric_scores_arr == -np.inf] = (

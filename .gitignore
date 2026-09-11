@@ -162,6 +162,9 @@ cython_debug/
 #  option (not recommended) you can uncomment the following to ignore the entire idea folder.
 #.idea/
 
+# Cython-generated C sources (built from the .pyx; never commit)
+distclassipy/_cdistances.c
+
 # Custom
 distclassipy/__pycache__/
 .specstory
