@@ -1,5 +1,10 @@
-# This workflow will upload a Python Package using Twine when a release is created
+# Build the sdist and compiled wheels, then upload them to PyPI when a
+# GitHub release is published.
 # For more information see: https://github.com/pypa/gh-action-pypi-publish#trusted-publishing
+#
+# NOTE: keep this filename. PyPI trusted publishing is registered against
+# "publish-to-pypi.yml"; renaming the file (or adding an `environment:` to
+# the publish job) requires updating the trusted publisher on PyPI first.
 
 # This workflow uses actions that are not certified by GitHub.
 # They are provided by a third-party and are governed by
@@ -16,22 +21,64 @@ permissions:
   contents: read
 
 jobs:
-  deploy:
-
+  build_sdist:
+    name: Build sdist
     runs-on: ubuntu-latest
-    permissions:
-      id-token: write
     steps:
     - uses: actions/checkout@v7
     - name: Set up Python
       uses: actions/setup-python@v7
       with:
-        python-version: '3.11'
-    - name: Install dependencies
+        python-version: '3.12'
+    - name: Build sdist
       run: |
-        python -m pip install --upgrade pip
-        pip install build
-    - name: Build package
-      run: python -m build
+        python -m pip install --upgrade pip build
+        python -m build --sdist
+    - uses: actions/upload-artifact@v7
+      with:
+        name: sdist
+        path: dist/*.tar.gz
+
+  # distclassipy ships a compiled Cython extension, so it needs one wheel per
+  # platform / architecture / Python version (a single `python -m build`
+  # wheel would only cover the build machine).
+  build_wheels:
+    name: Build wheels (${{ matrix.os }})
+    runs-on: ${{ matrix.os }}
+    strategy:
+      matrix:
+        # x86_64 + aarch64 Linux, AMD64 Windows, Intel + Apple Silicon macOS
+        os: [ubuntu-latest, ubuntu-24.04-arm, windows-latest, macos-15-intel, macos-latest]
+    steps:
+    - uses: actions/checkout@v7
+    - name: Build and test wheels
+      uses: pypa/cibuildwheel@v4.3.5
+      env:
+        CIBW_BUILD: "cp310-* cp311-* cp312-* cp313-* cp314-*"
+        # Native architecture only (no 32-bit), and no musllinux: SciPy and
+        # friends lack wheels there, so the wheel tests could not install them.
+        CIBW_ARCHS: native
+        CIBW_SKIP: "*-musllinux_*"
+        CIBW_TEST_REQUIRES: pytest hypothesis
+        # Copy tests/ into cibuildwheel's temporary test directory so they
+        # import the installed wheel, not the uncompiled source checkout.
+        CIBW_TEST_SOURCES: tests
+        CIBW_TEST_COMMAND: python -m pytest tests -q
+    - uses: actions/upload-artifact@v7
+      with:
+        name: wheels-${{ matrix.os }}
+        path: wheelhouse/*.whl
+
+  publish:
+    name: Publish to PyPI
+    needs: [build_sdist, build_wheels]
+    runs-on: ubuntu-latest
+    permissions:
+      id-token: write  # trusted publishing
+    steps:
+    - uses: actions/download-artifact@v8
+      with:
+        path: dist
+        merge-multiple: true
     - name: Publish package
       uses: pypa/gh-action-pypi-publish@release/v1
