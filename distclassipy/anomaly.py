@@ -7,11 +7,19 @@ This module implements the methods for distance anomalies.
 import numpy as np
 
 from sklearn.base import BaseEstimator, OutlierMixin
-from sklearn.preprocessing import minmax_scale
+from sklearn.preprocessing import MinMaxScaler
 from sklearn.utils.validation import check_array, check_is_fitted
 
 from .classifier import DistanceMetricClassifier, initialize_metric_function
 from .distances import _UNIQUE_METRICS
+
+
+def _replace_inf(scores: np.ndarray) -> np.ndarray:
+    """Copy of ``scores`` with +/-inf replaced by +/-1e9 (large finite values)."""
+    scores = scores.copy(order="K")  # keep layout: same summation order as before
+    scores[scores == np.inf] = 1e9
+    scores[scores == -np.inf] = -1e9
+    return scores
 
 
 class DistanceAnomaly(OutlierMixin, BaseEstimator):
@@ -141,11 +149,29 @@ class DistanceAnomaly(OutlierMixin, BaseEstimator):
         else:
             self.metrics_ = self.metrics
 
-        # Calculate anomaly threshold based on train scores. Leave-one-out for
-        # reference="knn": otherwise every training object is its own nearest
-        # neighbour, its score is biased low, and so is the threshold.
-        train_scores = self._scores(X, exclude_self=True)
+        # Per-metric training scores. Leave-one-out for reference="knn":
+        # otherwise every training object is its own nearest neighbour, its
+        # score is biased low, and so is the threshold.
+        train_raw = self._metric_scores(X, exclude_self=True)
 
+        # Everything that turns per-metric scores into the final score is
+        # learned here, once, from the training scores. Recomputing it on each
+        # scored batch made a sample's score depend on the rest of the batch
+        # (a lone sample always scored 0 under min-max scaling).
+        #
+        # Drop metrics that are undefined for every training object. This
+        # happens for correlation-type metrics under dispersion_stat="cdf",
+        # where the transformed centroid is a constant vector and the
+        # correlation is therefore undefined; such a column carries no
+        # information and would otherwise propagate NaNs through aggregation.
+        self.usable_metrics_ = np.isfinite(train_raw).any(axis=0)
+        train_raw = _replace_inf(train_raw[:, self.usable_metrics_])
+        if self.normalize_scores:
+            # NaN fill value and min-max scaling per metric, from training data
+            self.score_fill_ = np.nanmean(train_raw, axis=0)
+            self.score_scaler_ = MinMaxScaler().fit(self._fill_nan(train_raw))
+
+        train_scores = self._combine(train_raw)
         self.offset_ = np.quantile(train_scores, 1.0 - self.contamination)
 
         return self
@@ -165,13 +191,42 @@ class DistanceAnomaly(OutlierMixin, BaseEstimator):
         Returns
         -------
         scores : ndarray of shape (n_samples,)
-            The anomaly score for each sample. Higher is more anomalous.
+            The anomaly score for each sample. Higher is more anomalous. Each
+            sample is scored independently of the others in X. With
+            ``normalize_scores=True`` every metric's score is min-max scaled
+            using the *training* scores, so training objects score within
+            [0, 1] and objects beyond the training range can score above 1.
         """
         check_is_fitted(self)
-        return self._scores(X)
+        raw = self._metric_scores(X)[:, self.usable_metrics_]
+        return self._combine(_replace_inf(raw))
 
-    def _scores(self, X: np.ndarray, exclude_self: bool = False) -> np.ndarray:
-        """Anomaly scores; ``exclude_self`` marks X as the fit data (see fit)."""
+    def _fill_nan(self, scores: np.ndarray) -> np.ndarray:
+        """Replace NaN per-metric scores by that metric's mean training score."""
+        rows, cols = np.nonzero(np.isnan(scores))
+        scores = scores.copy(order="K")  # keep layout: same summation order as before
+        scores[rows, cols] = self.score_fill_[cols]
+        return scores
+
+    def _combine(self, metric_scores: np.ndarray) -> np.ndarray:
+        """Normalise per-metric scores (if enabled) and aggregate over metrics."""
+        if self.normalize_scores:
+            metric_scores = self.score_scaler_.transform(self._fill_nan(metric_scores))
+        if self.metric_agg == "median":
+            return np.nanmedian(metric_scores, axis=1)
+        if self.metric_agg == "mean":
+            return np.nanmean(metric_scores, axis=1)
+        if self.metric_agg == "min":
+            return np.nanmin(metric_scores, axis=1)
+        if self.metric_agg == "percentile_25":
+            return np.nanquantile(metric_scores, 0.25, axis=1)
+        raise ValueError(f"Unknown metric_agg method: {self.metric_agg}")
+
+    def _metric_scores(self, X: np.ndarray, exclude_self: bool = False) -> np.ndarray:
+        """Per-metric scores (n_samples, n_metrics), aggregated over classes.
+
+        ``exclude_self`` marks X as the fit data (see fit).
+        """
         X = check_array(X)
 
         metric_args = [initialize_metric_function(m)[1] for m in self.metrics_]
@@ -197,41 +252,7 @@ class DistanceAnomaly(OutlierMixin, BaseEstimator):
 
             metric_scores.append(score_for_metric)
 
-        metric_scores_arr = np.array(metric_scores).T  # shape (n_samples, n_metrics)
-        # Drop metrics that are undefined for every object. This happens for
-        # correlation-type metrics under dispersion_stat="cdf", where the
-        # transformed centroid is a constant vector and the correlation is
-        # therefore undefined; such a column carries no information and would
-        # otherwise propagate NaNs through the aggregation.
-        usable = np.isfinite(metric_scores_arr).any(axis=0)
-        if not usable.all():
-            metric_scores_arr = metric_scores_arr[:, usable]
-
-        # remove infinities
-        metric_scores_arr[metric_scores_arr == np.inf] = 1e9  # A large number
-        metric_scores_arr[metric_scores_arr == -np.inf] = (
-            -1e9
-        )  # A large negative number
-
-        if self.normalize_scores:
-            col_means = np.nanmean(metric_scores_arr, axis=0)
-            inds = np.where(np.isnan(metric_scores_arr))
-            metric_scores_arr[inds] = np.take(col_means, inds[1])
-            metric_scores_arr = minmax_scale(metric_scores_arr, axis=0)
-
-        # Aggregate scores across all metrics for final anomaly score
-        if self.metric_agg == "median":
-            scores = np.nanmedian(metric_scores_arr, axis=1)
-        elif self.metric_agg == "mean":
-            scores = np.nanmean(metric_scores_arr, axis=1)
-        elif self.metric_agg == "min":
-            scores = np.nanmin(metric_scores_arr, axis=1)
-        elif self.metric_agg == "percentile_25":
-            scores = np.nanquantile(metric_scores_arr, 0.25, axis=1)
-        else:
-            raise ValueError(f"Unknown metric_agg method: {self.metric_agg}")
-
-        return scores
+        return np.array(metric_scores).T  # shape (n_samples, n_metrics)
 
     def score_samples(self, X: np.ndarray) -> np.ndarray:
         """
