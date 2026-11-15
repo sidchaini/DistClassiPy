@@ -34,6 +34,7 @@ You should have received a copy of the GNU General Public License
 along with this program.  If not, see <https://www.gnu.org/licenses/>.
 """
 
+import numbers
 from typing import Callable, Tuple
 
 import numpy as np
@@ -57,6 +58,10 @@ METRIC_SOURCES_ = {
     "scipy.spatial.distance": scipy.spatial.distance,
     "distclassipy.distances": distances,
 }
+
+# Accepted values for DistanceMetricClassifier parameters (checked in fit)
+_CENTRAL_STATS = ("median", "mean")
+_DISPERSION_STATS = ("std", "iqr", "aiqr", "cdf")
 
 
 def initialize_metric_function(metric):
@@ -148,9 +153,10 @@ class DistanceMetricClassifier(ClassifierMixin, BaseEstimator):
         - "aiqr" : *asymmetric* quantile scaling. Deviations above the median
           are measured in units of (q3 - q2) and deviations below it in units
           of (q2 - q1), so a skewed feature is no longer forced to be
-          symmetric. Note this makes the transform depend on which side of the
-          median the test object lies, so the resulting dissimilarity is a
-          score rather than a metric distance in a fixed space.
+          symmetric. The map is continuous and monotone (piecewise linear with
+          its kink at the median), i.e. a fixed reparametrisation of each
+          feature per class, so as with "cdf" the metric axioms hold in the
+          transformed space.
         - "cdf" : map each feature through the class's empirical CDF, making
           the class uniform on [0, 1]. This generalises the scaling from the
           second moment to the whole marginal distribution, and so absorbs
@@ -231,6 +237,7 @@ class DistanceMetricClassifier(ClassifierMixin, BaseEstimator):
         self : object
             Fitted estimator.
         """
+        self._validate_params()
         X, y = validate_data(self, X, y)
         self.classes_ = unique_labels(y)
 
@@ -307,6 +314,25 @@ class DistanceMetricClassifier(ClassifierMixin, BaseEstimator):
         self.is_fitted_ = True
 
         return self
+
+    def _validate_params(self) -> None:
+        """Raise ValueError for invalid constructor parameters."""
+        if self.central_stat not in _CENTRAL_STATS:
+            raise ValueError(
+                f"Unknown central_stat: {self.central_stat!r}; "
+                f"expected one of {_CENTRAL_STATS}."
+            )
+        if self.dispersion_stat not in _DISPERSION_STATS:
+            raise ValueError(
+                f"Unknown dispersion_stat: {self.dispersion_stat!r}; "
+                f"expected one of {_DISPERSION_STATS}."
+            )
+        if not (
+            isinstance(self.cdf_grid_size, numbers.Integral) and self.cdf_grid_size >= 2
+        ):
+            raise ValueError(
+                f"cdf_grid_size must be an integer >= 2, got {self.cdf_grid_size!r}."
+            )
 
     def _class_transform(self, X: np.ndarray, cl) -> tuple:
         """Map X and class `cl`'s centroid into that class's scaled space.

@@ -119,8 +119,22 @@ def test_sklearn_clone_roundtrip(stat):
     assert c2.get_params()["cdf_grid_size"] == 201
 
 
-def test_unknown_stat_raises(data):
+@pytest.mark.parametrize(
+    "params, match",
+    [
+        (dict(dispersion_stat="nonsense"), "Unknown dispersion_stat"),
+        (dict(central_stat="mode"), "Unknown central_stat"),
+        (dict(dispersion_stat="cdf", cdf_grid_size=1), "cdf_grid_size"),
+    ],
+)
+def test_invalid_params_raise_in_fit(data, params, match):
+    """Bad parameters fail fast in fit(), not later in predict()."""
     X, y = data
-    clf = dcpy.DistanceMetricClassifier(dispersion_stat="nonsense").fit(X, y)
+    with pytest.raises(ValueError, match=match):
+        dcpy.DistanceMetricClassifier(**params).fit(X, y)
+
+
+def test_anomaly_invalid_params_raise_in_fit(data):
+    X, y = data
     with pytest.raises(ValueError, match="Unknown dispersion_stat"):
-        clf.predict(X, metric="euclidean")
+        DistanceAnomaly(dispersion_stat="nonsense").fit(X, y)
