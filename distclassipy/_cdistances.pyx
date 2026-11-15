@@ -520,8 +520,10 @@ def cdist(XA, XB, str metric):
             f"{sorted(CYTHON_METRICS)}"
         ) from None
 
-    cdef double[:, ::1] A = XA
-    cdef double[:, ::1] B = XB
+    # const: accept read-only buffers (joblib memmaps, pandas CoW arrays);
+    # the kernels only ever read from the inputs.
+    cdef const double[:, ::1] A = XA
+    cdef const double[:, ::1] B = XB
     out = np.empty((A.shape[0], B.shape[0]), dtype=np.float64)
     cdef double[:, ::1] D = out
     cdef kernel_t f = _KERNELS[idx]

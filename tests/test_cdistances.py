@@ -155,6 +155,34 @@ def test_cdist_accepts_non_contiguous_and_other_dtypes():
     assert out.dtype == np.float64
 
 
+@pytest.mark.parametrize("read_only", ["XA", "XB", "both"])
+def test_cdist_accepts_read_only_inputs(read_only):
+    # Read-only float64 C-contiguous arrays pass through np.ascontiguousarray
+    # uncopied; real-world sources include joblib memmaps (n_jobs > 1),
+    # np.load(mmap_mode="r") and pandas copy-on-write .to_numpy().
+    rng = np.random.default_rng(0)
+    XA = rng.uniform(0.1, 1.0, size=(5, 4))
+    XB = rng.uniform(0.1, 1.0, size=(3, 4))
+    expected = cy_cdist(XA, XB, "clark")
+    if read_only in ("XA", "both"):
+        XA.setflags(write=False)
+    if read_only in ("XB", "both"):
+        XB.setflags(write=False)
+    np.testing.assert_array_equal(cy_cdist(XA, XB, "clark"), expected)
+
+
+def test_classifier_predict_on_read_only_input():
+    from distclassipy import DistanceMetricClassifier
+
+    rng = np.random.default_rng(1)
+    X = rng.uniform(0.1, 1.0, size=(40, 4))
+    y = np.repeat([0, 1], 20)
+    clf = DistanceMetricClassifier(scale=False).fit(X, y)
+    expected = clf.predict(X, metric="clark")
+    X.setflags(write=False)
+    np.testing.assert_array_equal(clf.predict(X, metric="clark"), expected)
+
+
 class TestDispatch:
     def test_custom_string_routes_to_cython(self):
         _, metric_arg = initialize_metric_function("clark")
