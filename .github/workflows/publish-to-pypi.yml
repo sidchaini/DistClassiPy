@@ -16,6 +16,10 @@ name: Upload Python Package
 on:
   release:
     types: [published]
+  # Manual build-only run (Actions tab -> "Run workflow", any branch): builds
+  # and tests the sdist and all wheels without uploading anything. Use it to
+  # check a branch before cutting a release.
+  workflow_dispatch:
 
 permissions:
   contents: read
@@ -72,6 +76,7 @@ jobs:
   publish:
     name: Publish to PyPI
     needs: [build_sdist, build_wheels]
+    if: github.event_name == 'release'  # never upload from manual runs
     runs-on: ubuntu-latest
     permissions:
       id-token: write  # trusted publishing
