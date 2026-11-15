@@ -10,7 +10,6 @@ from sklearn.base import BaseEstimator, OutlierMixin
 from sklearn.preprocessing import minmax_scale
 from sklearn.utils.validation import check_array, check_is_fitted
 
-from ._dispatch import pairwise_distance
 from .classifier import DistanceMetricClassifier, initialize_metric_function
 from .distances import _UNIQUE_METRICS
 
@@ -149,24 +148,10 @@ class DistanceAnomaly(OutlierMixin, BaseEstimator):
         check_is_fitted(self)
         X = check_array(X)
 
-        clf = self.clf_
         metric_args = [initialize_metric_function(m)[1] for m in self.metrics_]
 
-        # Compute the distance matrix (n_samples, n_classes) for every metric.
-        # The per-class scaling of X is metric-independent, so loop classes
-        # on the outside and reuse each scaled copy across all metrics.
-        if clf.scale:
-            per_metric_cols = [[] for _ in metric_args]
-            for cl in clf.classes_:
-                XA, XB = clf._class_transform(X, cl)
-                for cols, metric_arg in zip(per_metric_cols, metric_args):
-                    cols.append(pairwise_distance(XA, XB, metric_arg))
-            dist_arrs = [np.column_stack(cols) for cols in per_metric_cols]
-        else:
-            XB = clf.df_centroid_.to_numpy()
-            dist_arrs = [
-                pairwise_distance(X, XB, metric_arg) for metric_arg in metric_args
-            ]
+        # Distance matrix (n_samples, n_classes) for every metric
+        dist_arrs = self.clf_._distance_matrices(X, metric_args)
 
         metric_scores = []
 

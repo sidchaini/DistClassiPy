@@ -427,6 +427,21 @@ class DistanceMetricClassifier(ClassifierMixin, BaseEstimator):
 
         raise ValueError(f"Unknown dispersion_stat: {self.dispersion_stat}")
 
+    def _distance_matrices(self, X: np.ndarray, metric_args: list) -> list:
+        """Distance from every row of X to every class, for each metric.
+
+        Returns one ``(n_samples, n_classes)`` array per entry of
+        ``metric_args``. Each class's scaling of X is metric-independent, so
+        classes are looped on the outside and each scaled copy is reused
+        across all metrics.
+        """
+        cols = [[] for _ in metric_args]
+        for cl in self.classes_:
+            XA, XB = self._class_transform(X, cl)
+            for col, metric_arg in zip(cols, metric_args):
+                col.append(pairwise_distance(XA, XB, metric_arg))
+        return [np.column_stack(col) for col in cols]
+
     def _cdf_transform(self, X: np.ndarray, cl) -> np.ndarray:
         """Empirical-CDF map for one class: feature values -> [0, 1] ranks."""
         grid = self.cdf_grid_[cl]
@@ -486,16 +501,7 @@ class DistanceMetricClassifier(ClassifierMixin, BaseEstimator):
             metric_to_use = "euclidean"
         metric_fn_, metric_arg_ = initialize_metric_function(metric_to_use)
 
-        if not self.scale:
-            dist_arr = pairwise_distance(X, self.df_centroid_.to_numpy(), metric_arg_)
-
-        else:
-            dist_arr_list = []
-            for cl in self.classes_:
-                XA, XB = self._class_transform(X, cl)
-                cl_dist = pairwise_distance(XA, XB, metric_arg_)
-                dist_arr_list.append(cl_dist)
-            dist_arr = np.column_stack(dist_arr_list)
+        dist_arr = self._distance_matrices(X, [metric_arg_])[0]
 
         y_pred = self.classes_[dist_arr.argmin(axis=1)]
         return y_pred
@@ -551,16 +557,7 @@ class DistanceMetricClassifier(ClassifierMixin, BaseEstimator):
             metric_to_use = "euclidean"
         metric_fn_, metric_arg_ = initialize_metric_function(metric_to_use)
 
-        if not self.scale:
-            dist_arr = pairwise_distance(X, self.df_centroid_.to_numpy(), metric_arg_)
-
-        else:
-            dist_arr_list = []
-            for cl in self.classes_:
-                XA, XB = self._class_transform(X, cl)
-                cl_dist = pairwise_distance(XA, XB, metric_arg_)
-                dist_arr_list.append(cl_dist)
-            dist_arr = np.column_stack(dist_arr_list)
+        dist_arr = self._distance_matrices(X, [metric_arg_])[0]
 
         self.centroid_dist_df_ = pd.DataFrame(
             data=dist_arr, index=np.arange(X.shape[0]), columns=self.classes_
