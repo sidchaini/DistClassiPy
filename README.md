@@ -51,6 +51,25 @@ ensemble_clf.fit(X, y)
 print(ensemble_clf.predict(X))
 ```
 
+## Using the distance metrics without the classifier
+All of DistClassiPy's distance metrics can also be used on their own. `dcpy.cdist` works just like `scipy.spatial.distance.cdist`, but also accepts every DistClassiPy metric, computed in compiled C code:
+```python
+import numpy as np
+
+XA = np.random.rand(5, 4)
+XB = np.random.rand(3, 4)
+dist = dcpy.cdist(XA, XB, metric="hellinger")  # shape (5, 3)
+```
+
+Since many scikit-learn estimators accept precomputed distances, this also lets you use any DistClassiPy metric with them, for example k-nearest neighbours:
+```python
+from sklearn.neighbors import KNeighborsClassifier
+
+knn = KNeighborsClassifier(metric="precomputed")
+knn.fit(dcpy.cdist(X, X, metric="clark"), y)
+print(knn.predict(dcpy.cdist([[0, 0, 0, 0]], X, metric="clark")))
+```
+
 ## Features
 - **Distance Metric-Based Classification**: Utilizes a variety of distance metrics for classification.
 - **Customizable for Scientific Goals**: Allows fine-tuning based on scientific objectives by selecting appropriate distance metrics and features, enhancing both computational efficiency and model performance.
@@ -59,6 +78,7 @@ print(ensemble_clf.predict(X))
 - **Open Source and Accessible**: Available as an open-source Python package on PyPI, encouraging broad application in astronomy and beyond.
 - **(NEW) Ensemble Distance Classification**: Leverages an ensemble approach to use different distance metrics for each quantile, improving classification performance across diverse data distributions.
 - **(NEW) Expanded Distance Metrics**: DistClassiPy now offers 43 built-in distance metrics, an increase from the previous 18. Additionally, users can still define and use custom distance metrics as needed.
+- **(NEW) Fast Distance Metrics**: All of DistClassiPy's own metrics are now compiled (via Cython), running at speeds comparable to SciPy's built-in metrics, and are available on their own through `dcpy.cdist`.
 
 ## Documentation
 
