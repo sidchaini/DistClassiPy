@@ -184,6 +184,15 @@ class DistanceAnomaly(OutlierMixin, BaseEstimator):
             metric_scores.append(score_for_metric)
 
         metric_scores_arr = np.array(metric_scores).T  # shape (n_samples, n_metrics)
+        # Drop metrics that are undefined for every object. This happens for
+        # correlation-type metrics under dispersion_stat="cdf", where the
+        # transformed centroid is a constant vector and the correlation is
+        # therefore undefined; such a column carries no information and would
+        # otherwise propagate NaNs through the aggregation.
+        usable = np.isfinite(metric_scores_arr).any(axis=0)
+        if not usable.all():
+            metric_scores_arr = metric_scores_arr[:, usable]
+
         # remove infinities
         metric_scores_arr[metric_scores_arr == np.inf] = 1e9  # A large number
         metric_scores_arr[metric_scores_arr == -np.inf] = (
