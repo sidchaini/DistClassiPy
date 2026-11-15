@@ -96,7 +96,6 @@ class DistanceAnomaly(OutlierMixin, BaseEstimator):
         contamination: float = 0.1,
         reference: str = "centroid",
         n_neighbors: int = 5,
-        **kwargs,
     ):
         self.metrics = metrics
         self.cluster_agg = cluster_agg
@@ -108,7 +107,6 @@ class DistanceAnomaly(OutlierMixin, BaseEstimator):
         self.contamination = contamination
         self.reference = reference
         self.n_neighbors = n_neighbors
-        self.kwargs = kwargs
 
     def fit(self, X: np.ndarray, y: np.ndarray) -> "DistanceAnomaly":
         """

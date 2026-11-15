@@ -124,7 +124,7 @@ def test_knn_anomaly_threshold_is_calibrated_for_new_data(k):
         contamination=0.1,
         normalize_scores=False,
     ).fit(X, y)
-    assert det.clf_.reference == "knn"  # not silently swallowed by **kwargs
+    assert det.clf_.reference == "knn"  # reaches the internal classifier
     flagged = np.mean(det.predict(Xnew) == -1)
     assert 0.05 < flagged < 0.16  # self-matches would give ~1.0 (k=1), ~0.23 (k=5)
 
