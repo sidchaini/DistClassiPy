@@ -9,7 +9,7 @@ from sklearn.datasets import make_classification
 import distclassipy as dcpy
 from distclassipy.anomaly import DistanceAnomaly
 
-STATS = ["std", "iqr", "aiqr", "cdf"]
+STATS = ["std", "iqr", "aiqr", "astd", "cdf"]
 
 
 @pytest.fixture
@@ -98,6 +98,57 @@ def test_aiqr_uses_side_specific_scale(skewed_data):
     np.testing.assert_allclose(XA[0], 2.0, atol=1e-6)
     np.testing.assert_allclose(XA[1], 0.0, atol=1e-6)
     np.testing.assert_allclose(XB, 1.0, atol=1e-6)  # centroid -> reference
+
+
+def test_astd_semideviations_match_definition(skewed_data):
+    """Upper/lower spreads are RMS deviations of the points on each side."""
+    X, y = skewed_data
+    clf = dcpy.DistanceMetricClassifier(dispersion_stat="astd").fit(X, y)
+    for cl in clf.classes_:
+        Xc = X[y == cl]
+        c = clf.df_centroid_.loc[cl].to_numpy()
+        for j in range(X.shape[1]):
+            d = Xc[:, j] - c[j]
+            np.testing.assert_allclose(
+                clf.df_semistd_hi_.loc[cl].iloc[j], np.sqrt(np.mean(d[d > 0] ** 2))
+            )
+            np.testing.assert_allclose(
+                clf.df_semistd_lo_.loc[cl].iloc[j], np.sqrt(np.mean(d[d < 0] ** 2))
+            )
+
+
+def test_astd_uses_side_specific_scale(skewed_data):
+    """A point above the centroid is scaled by the upper spread, below by the lower."""
+    X, y = skewed_data
+    clf = dcpy.DistanceMetricClassifier(dispersion_stat="astd").fit(X, y)
+    cl = clf.classes_[0]
+    c = clf.df_centroid_.loc[cl].to_numpy()
+    lo = clf.df_semistd_lo_.loc[cl].to_numpy()
+    hi = clf.df_semistd_hi_.loc[cl].to_numpy()
+    assert np.any(hi / lo > 1.5)  # genuinely skewed fixture
+    XA, XB = clf._class_transform(np.vstack([c + hi, c - lo]), cl)
+    # same unit-reference convention as aiqr: one spread above -> 2, below -> 0
+    np.testing.assert_allclose(XA[0], 2.0, atol=1e-6)
+    np.testing.assert_allclose(XA[1], 0.0, atol=1e-6)
+    np.testing.assert_allclose(XB, 1.0, atol=1e-6)  # centroid -> reference
+
+
+def test_astd_symmetric_class_has_equal_sides():
+    """On symmetric data both spreads coincide (astd reduces to a std scale)."""
+    z = np.random.default_rng(3).normal(size=(200, 3))
+    X = np.vstack([z, -z]) + 5.0  # exactly symmetric about 5 in every feature
+    y = np.zeros(len(X), dtype=int)
+    clf = dcpy.DistanceMetricClassifier(dispersion_stat="astd").fit(X, y)
+    np.testing.assert_allclose(clf.df_semistd_lo_, clf.df_semistd_hi_)
+
+
+def test_astd_one_sided_feature_is_floored():
+    """A side with no training points gets a finite (floored) scale."""
+    X = np.column_stack([np.r_[np.zeros(30), np.arange(1.0, 11.0)], np.arange(40.0)])
+    y = np.zeros(len(X), dtype=int)  # feature 0: median 0, nothing below it
+    clf = dcpy.DistanceMetricClassifier(dispersion_stat="astd").fit(X, y)
+    XA, _ = clf._class_transform(np.array([[-1.0, 20.0]]), 0)
+    assert np.all(np.isfinite(XA))
 
 
 @pytest.mark.parametrize("stat", STATS)

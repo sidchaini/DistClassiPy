@@ -60,8 +60,9 @@ class DistanceAnomaly(OutlierMixin, BaseEstimator):
     central_stat : {"mean", "median"}, default="median"
         The statistic for calculating the class centroids.
 
-    dispersion_stat : {"std", "iqr"}, default="std"
-        The statistic for calculating class dispersion for scaling.
+    dispersion_stat : {"std", "iqr", "aiqr", "astd", "cdf"}, default="std"
+        The statistic for calculating class dispersion for scaling. See
+        DistanceMetricClassifier for details.
 
     contamination : float, default=0.1
         The proportion of outliers expected in the data set. Used for the `predict`

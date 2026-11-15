@@ -61,7 +61,26 @@ METRIC_SOURCES_ = {
 
 # Accepted values for DistanceMetricClassifier parameters (checked in fit)
 _CENTRAL_STATS = ("median", "mean")
-_DISPERSION_STATS = ("std", "iqr", "aiqr", "cdf")
+_DISPERSION_STATS = ("std", "iqr", "aiqr", "astd", "cdf")
+
+
+def _side_rms(d: np.ndarray, mask: np.ndarray) -> np.ndarray:
+    """Per-column root-mean-square of ``d`` over ``mask`` entries (0 if none)."""
+    n = mask.sum(axis=0)
+    ss = np.where(mask, d**2, 0.0).sum(axis=0)
+    return np.sqrt(np.divide(ss, n, out=np.zeros_like(ss), where=n > 0))
+
+
+def _asymmetric_rescale(A, centre, lo, hi):
+    """Express ``A`` in side-specific spreads around a *unit* reference.
+
+    Deviations above ``centre`` are measured in units of ``hi`` and those below
+    it in units of ``lo``. The result is offset to 1 rather than 0: keeping the
+    raw centre as an additive offset would make ratio-type metrics (Canberra,
+    Clark, ...) evaluate |d| / (2*centre + d), which saturates to zero
+    sensitivity whenever the centre is large.
+    """
+    return 1.0 + (A - centre) / np.where(A > centre, hi, lo)
 
 
 def initialize_metric_function(metric):
@@ -144,7 +163,7 @@ class DistanceMetricClassifier(ClassifierMixin, BaseEstimator):
     central_stat : {"mean", "median"}, default="median"
         The statistic used to calculate the central tendency of the data to construct
         the feature-space centroid. Supported statistics are "mean" and "median".
-    dispersion_stat : {"std", "iqr", "aiqr", "cdf"}, default="std"
+    dispersion_stat : {"std", "iqr", "aiqr", "astd", "cdf"}, default="std"
         How each class's feature space is rescaled before the distance is taken.
 
         - "std" : divide by the per-feature standard deviation (the original
@@ -157,6 +176,12 @@ class DistanceMetricClassifier(ClassifierMixin, BaseEstimator):
           its kink at the median), i.e. a fixed reparametrisation of each
           feature per class, so as with "cdf" the metric axioms hold in the
           transformed space.
+        - "astd" : *asymmetric* standard deviation. Like "aiqr", but the two
+          sides are measured in units of the class's semi-deviations: the
+          root-mean-square deviation of its training objects above, and
+          below, the centroid. This keeps the second-moment sensitivity of
+          "std" while allowing skew; on symmetric data both sides equal the
+          standard deviation.
         - "cdf" : map each feature through the class's empirical CDF, making
           the class uniform on [0, 1]. This generalises the scaling from the
           second moment to the whole marginal distribution, and so absorbs
@@ -168,7 +193,7 @@ class DistanceMetricClassifier(ClassifierMixin, BaseEstimator):
 
         .. versionadded:: 0.1.0
         .. versionchanged:: 0.4.0
-           Added "aiqr" and "cdf".
+           Added "aiqr", "astd" and "cdf".
 
     cdf_grid_size : int, default=1001
         Number of quantile grid points stored per class and feature when
@@ -297,6 +322,22 @@ class DistanceMetricClassifier(ClassifierMixin, BaseEstimator):
             self.df_q1_ = pd.DataFrame(q1, index=self.classes_, columns=feat_labels)
             self.df_q2_ = pd.DataFrame(q2, index=self.classes_, columns=feat_labels)
             self.df_q3_ = pd.DataFrame(q3, index=self.classes_, columns=feat_labels)
+        elif self.scale and self.dispersion_stat == "astd":
+            # Asymmetric standard deviation: RMS deviation of the class's
+            # training objects above / below the centroid, per feature. A side
+            # with no objects gets 0 here and is floored in _class_transform,
+            # against the full standard deviation (also stored for that).
+            lo_list, hi_list, std_list = [], [], []
+            for cur_class, centre in zip(self.classes_, centroid_list):
+                cur_X = X[y == cur_class]
+                d = cur_X - centre
+                hi_list.append(_side_rms(d, d > 0))
+                lo_list.append(_side_rms(d, d < 0))
+                std_list.append(np.std(cur_X, axis=0, ddof=1).ravel())
+            self.df_semistd_lo_, self.df_semistd_hi_, self.df_std_ = (
+                pd.DataFrame(np.array(a), index=self.classes_, columns=feat_labels)
+                for a in (lo_list, hi_list, std_list)
+            )
         elif self.scale and self.dispersion_stat == "cdf":
             # Full per-class marginal: each feature is mapped through that
             # class's empirical CDF, so the class becomes uniform on [0, 1]
@@ -364,14 +405,22 @@ class DistanceMetricClassifier(ClassifierMixin, BaseEstimator):
             floor = 0.05 * iqr
             lo = np.maximum(q2 - q1, floor)
             hi = np.maximum(q3 - q2, floor)
-            # Express the result in half-widths around a *unit* reference
-            # rather than around the raw median. Keeping q2 as an additive
-            # offset would make ratio-type metrics (Canberra, Clark, ...)
-            # evaluate |d| / (2*q2 + d), which saturates to zero sensitivity
-            # whenever the median is large.
-            ref = 1.0
-            rescale = lambda A: ref + (A - q2) / np.where(A > q2, hi, lo)  # noqa: E731
-            return rescale(X), rescale(XB)
+            return (
+                _asymmetric_rescale(X, q2, lo, hi),
+                _asymmetric_rescale(XB, q2, lo, hi),
+            )
+
+        if self.dispersion_stat == "astd":
+            centre = XB.ravel()
+            # Same flooring rationale as aiqr, against the full std
+            std = np.clip(self.df_std_.loc[cl].to_numpy(), a_min=eps, a_max=None)
+            floor = 0.05 * std
+            lo = np.maximum(self.df_semistd_lo_.loc[cl].to_numpy(), floor)
+            hi = np.maximum(self.df_semistd_hi_.loc[cl].to_numpy(), floor)
+            return (
+                _asymmetric_rescale(X, centre, lo, hi),
+                _asymmetric_rescale(XB, centre, lo, hi),
+            )
 
         if self.dispersion_stat == "cdf":
             return self._cdf_transform(X, cl), self._cdf_transform(XB, cl)
