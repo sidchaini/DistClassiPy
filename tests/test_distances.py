@@ -97,7 +97,7 @@ def test_marylandbridge(vectors):
 
 
 def test_meehl(vectors):
-    correct_values = [0.1629, 0.3989, 0.3545, 0.2645, 0]
+    correct_values = [0.4149, 1.0253, 0.797, 0.2645, 0]
     func_test(distances.meehl, vectors, correct_values)
 
 

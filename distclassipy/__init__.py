@@ -1,9 +1,13 @@
-"""A module for using distance metrics for classification.
+"""A module for using distance metrics for classification and anomaly detection.
 
 Classes:
     DistanceMetricClassifier - A classifier that uses a specified distance metric for
                                classification.
-    Distance - A class that provides various distance metrics for use in classification.
+    EnsembleDistanceClassifier - An ensemble classifier across distance metrics.
+    DistanceAnomaly - A multi-metric distance-based anomaly detector.
+
+Functions:
+    cdist - scipy-style pairwise distances, supporting all custom metrics at C speed.
 
 
 Copyright (C) 2024  Siddharth Chaini
@@ -22,18 +26,21 @@ You should have received a copy of the GNU General Public License
 along with this program.  If not, see <https://www.gnu.org/licenses/>.
 """
 
+from ._dispatch import cdist
+from .anomaly import DistanceAnomaly
 from .classifier import (
     DistanceMetricClassifier,
     EnsembleDistanceClassifier,
 )
 from .distances import _ALL_METRICS, _UNIQUE_METRICS
 
-__version__ = "0.2.3"
+__version__ = "0.3.0"
 
 __all__ = [
     "DistanceMetricClassifier",
     "EnsembleDistanceClassifier",
-    "Distance",
+    "DistanceAnomaly",
+    "cdist",
     "_ALL_METRICS",
     "_UNIQUE_METRICS",
 ]
