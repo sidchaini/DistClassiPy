@@ -3,51 +3,53 @@
 This module includes implementations of various distance metrics, including both
 common and less common measures. It allows for the calculation of distances between
 data points in a vectorized manner using numpy arrays.
-A part of this code is based on the work of Andrzej Zielezinski, originally retrieved
-on 20 November 2022 from
-https://github.com/aziele/statistical-distances/blob/04412b3155c59fc7238b3d8ecf6f3723ac5befff/distance.py, # noqa
-which was released via the GNU General Public License v3.0.
 
-It was originally modified by Siddharth Chaini on 27 November 2022.
+A part of this code is based on the work of Andrzej Zielezinski, originally retrieved
+on 20 November 2022 from `statistical-distances`_, which was released via the GNU
+General Public License v3.0. It was originally modified by Siddharth Chaini on
+27 November 2022.
+
+.. _statistical-distances:
+   https://github.com/aziele/statistical-distances/blob/
+   04412b3155c59fc7238b3d8ecf6f3723ac5befff/distance.py
 
 Notes
 -----
-    Modifications by Siddharth Chaini include the addition of the following distance
-    measures:
-        1. Meehl distance
-        2. Sorensen distance
-        3. Ruzicka distance
-        4. Inner product distance
-        5. Harmonic mean distance
-        6. Fidelity
-        7. Minimimum Symmetric Chi Squared
-        8. Probabilistic Symmetric Chi Squared
+Modifications by Siddharth Chaini include the addition of the following distance
+measures:
 
-    In addition, the following code was added to all functions for array conversion:
-        u,v = np.asarray(u), np.asarray(v)
+1. Meehl distance
+2. Sorensen distance
+3. Ruzicka distance
+4. Inner product distance
+5. Harmonic mean distance
+6. Fidelity
+7. Minimum Symmetric Chi Squared
+8. Probabilistic Symmetric Chi Squared
 
-    Equivalent metrics
-    ------------------
-    Several metrics in this module are formula-equivalent and always return
-    identical values; ensembles built from ``_ALL_METRICS`` will double-weight
-    these geometries (``_UNIQUE_METRICS`` already deduplicates them):
-        - sorensen == czekanowski
-        - soergel == tanimoto == ruzicka
-        - prob_chisq == 2 * squared_chisq
-        - topsoe == 2 * jensenshannon_divergence
-        - squaredchord == matusita ** 2
-        - divergence == 2 * clark ** 2
+In addition, the following code was added to all functions for array conversion::
 
-    Performance
-    -----------
-    All metrics in this module without native SciPy ``cdist`` support are also
-    implemented as compiled C kernels in ``distclassipy._cdistances``. The
-    classifier and ``distclassipy.cdist`` route metric *names* (and these
-    module-level function objects) to the compiled kernels automatically; the
-    pure-Python functions here serve as the reference implementations.
+    u, v = np.asarray(u), np.asarray(v)
+
+**Equivalent metrics.** Several metrics in this module are formula-equivalent and
+always return identical values; ensembles built from ``_ALL_METRICS`` will
+double-weight these geometries (``_UNIQUE_METRICS`` already deduplicates them):
+
+- ``sorensen == czekanowski``
+- ``soergel == tanimoto == ruzicka``
+- ``prob_chisq == 2 * squared_chisq``
+- ``topsoe == 2 * jensenshannon_divergence``
+- ``squaredchord == matusita ** 2``
+- ``divergence == 2 * clark ** 2``
+
+**Performance.** All metrics in this module without native SciPy ``cdist`` support
+are also implemented as compiled C kernels in ``distclassipy._cdistances``. The
+classifier and ``distclassipy.cdist`` route metric *names* (and these module-level
+function objects) to the compiled kernels automatically; the pure-Python functions
+here serve as the reference implementations.
 
 Copyright (C) 2024  Siddharth Chaini
------
+
 This program is free software: you can redistribute it and/or modify
 it under the terms of the GNU General Public License as published by
 the Free Software Foundation, either version 3 of the License, or
@@ -144,18 +146,26 @@ def euclidean(u, v, w=None):
 
     Parameters
     ----------
-    - u, v: Input vectors between which the distance is to be calculated.
+    u, v : array_like
+        Input vectors between which the distance is to be calculated.
+    w : array_like, optional
+        The weights for each value in `u` and `v`. Default is None, which gives each
+        value a weight of 1.0.
 
     Returns
     -------
-    - The Euclidean distance between the two vectors.
+    float
+        The Euclidean distance between the two vectors.
+
+    See Also
+    --------
+    scipy.spatial.distance.euclidean : The underlying SciPy implementation.
 
     References
     ----------
-        1. Sung-Hyuk C. (2007) Comprehensive Survey on Distance/Similarity
-           Measures between Probability Density Functions. International
-           Journal of Mathematical Models and Methods in Applied Sciences.
-           1(4), 300-307.
+    1. Cha SH (2007) Comprehensive Survey on Distance/Similarity Measures between
+       Probability Density Functions. International Journal of Mathematical Models
+       and Methods in Applied Sciences, 1(4), 300-307.
     """
     u, v = np.asarray(u), np.asarray(v)
     return scipy.spatial.distance.euclidean(u, v, w)
@@ -170,28 +180,36 @@ def braycurtis(u, v, w=None):
     related to the Sørensen distance and is also known as Bray-Curtis
     dissimilarity.
 
-    Notes
-    -----
-        When used for comparing two probability density functions (pdfs),
-        the Bray-Curtis distance equals the Cityblock distance divided by 2.
-
     Parameters
     ----------
-    - u, v: Input vectors between which the distance is to be calculated.
+    u, v : array_like
+        Input vectors between which the distance is to be calculated.
+    w : array_like, optional
+        The weights for each value in `u` and `v`. Default is None, which gives each
+        value a weight of 1.0.
 
     Returns
     -------
-    - The Bray-Curtis distance between the two vectors.
+    float
+        The Bray-Curtis distance between the two vectors.
+
+    See Also
+    --------
+    scipy.spatial.distance.braycurtis : The underlying SciPy implementation.
+
+    Notes
+    -----
+    When used for comparing two probability density functions (pdfs),
+    the Bray-Curtis distance equals the Cityblock distance divided by 2.
 
     References
     ----------
-        1. Bray JR, Curtis JT (1957) An ordination of the upland forest of
-           southern Wisconsin. Ecological Monographs, 27, 325-349.
-        2. Sung-Hyuk C. (2007) Comprehensive Survey on Distance/Similarity
-           Measures between Probability Density Functions. International
-           Journal of Mathematical Models and Methods in Applied Sciences.
-           1(4), 300-307.
-        3. https://en.wikipedia.org/wiki/Bray–Curtis_dissimilarity
+    1. Bray JR, Curtis JT (1957) An ordination of the upland forest of southern
+       Wisconsin. Ecological Monographs, 27, 325-349.
+    2. Cha SH (2007) Comprehensive Survey on Distance/Similarity Measures between
+       Probability Density Functions. International Journal of Mathematical Models
+       and Methods in Applied Sciences, 1(4), 300-307.
+    3. https://en.wikipedia.org/wiki/Bray–Curtis_dissimilarity
     """
     u, v = np.asarray(u), np.asarray(v)
     return scipy.spatial.distance.braycurtis(u, v, w)
@@ -203,25 +221,33 @@ def canberra(u, v, w=None):
     The Canberra distance is a weighted version of the Manhattan distance, used
     in numerical analysis.
 
-    Notes
-    -----
-        When `u[i]` and `v[i]` are 0 for given i, then the fraction 0/0 = 0
-        is used in the calculation.
-
     Parameters
     ----------
-    - u, v: Input vectors between which the distance is to be calculated.
+    u, v : array_like
+        Input vectors between which the distance is to be calculated.
+    w : array_like, optional
+        The weights for each value in `u` and `v`. Default is None, which gives each
+        value a weight of 1.0.
 
     Returns
     -------
-    - The Canberra distance between the two vectors.
+    float
+        The Canberra distance between the two vectors.
+
+    See Also
+    --------
+    scipy.spatial.distance.canberra : The underlying SciPy implementation.
+
+    Notes
+    -----
+    When `u[i]` and `v[i]` are 0 for given i, then the fraction 0/0 = 0
+    is used in the calculation.
 
     References
     ----------
-        1. Sung-Hyuk C. (2007) Comprehensive Survey on Distance/Similarity
-           Measures between Probability Density Functions. International
-           Journal of Mathematical Models and Methods in Applied Sciences.
-           1(4), 300-307.
+    1. Cha SH (2007) Comprehensive Survey on Distance/Similarity Measures between
+       Probability Density Functions. International Journal of Mathematical Models
+       and Methods in Applied Sciences, 1(4), 300-307.
     """
     u, v = np.asarray(u), np.asarray(v)
     return scipy.spatial.distance.canberra(u, v, w)
@@ -230,35 +256,41 @@ def canberra(u, v, w=None):
 def cityblock(u, v, w=None):
     """Calculate the Cityblock (Manhattan) distance between two vectors.
 
+    Also known as: City block distance, Manhattan distance, Rectilinear distance,
+    Taxicab norm.
+
     Parameters
     ----------
-    - u, v: Input vectors between which the distance is to be calculated.
+    u, v : array_like
+        Input vectors between which the distance is to be calculated.
+    w : array_like, optional
+        The weights for each value in `u` and `v`. Default is None, which gives each
+        value a weight of 1.0.
 
     Returns
     -------
-    - The Cityblock distance between the two vectors.
+    float
+        The Cityblock distance between the two vectors.
 
-    References
-    ----------
-        1. Sung-Hyuk C. (2007) Comprehensive Survey on Distance/Similarity
-           Measures between Probability Density Functions. International
-           Journal of Mathematical Models and Methods in Applied Sciences.
-           1(4):300-307.
-
-    Synonyms:
-        City block distance
-        Manhattan distance
-        Rectilinear distance
-        Taxicab norm
+    See Also
+    --------
+    scipy.spatial.distance.cityblock : The underlying SciPy implementation.
 
     Notes
     -----
-        Cityblock distance between two probability density functions
-        (pdfs) equals:
-        1. Non-intersection distance multiplied by 2.
-        2. Gower distance multiplied by vector length.
-        3. Bray-Curtis distance multiplied by 2.
-        4. Google distance multiplied by 2.
+    Cityblock distance between two probability density functions
+    (pdfs) equals:
+
+    1. Non-intersection distance multiplied by 2.
+    2. Gower distance multiplied by vector length.
+    3. Bray-Curtis distance multiplied by 2.
+    4. Google distance multiplied by 2.
+
+    References
+    ----------
+    1. Cha SH (2007) Comprehensive Survey on Distance/Similarity Measures between
+       Probability Density Functions. International Journal of Mathematical Models
+       and Methods in Applied Sciences, 1(4), 300-307.
     """
     u, v = np.asarray(u), np.asarray(v)
     return scipy.spatial.distance.cityblock(u, v, w)
@@ -268,29 +300,34 @@ def chebyshev(u, v, w=None):
     """Calculate the Chebyshev distance between two vectors.
 
     The Chebyshev distance is a metric defined on a vector space where the distance
-    between two vectors
-    is the greatest of their differences along any coordinate dimension.
+    between two vectors is the greatest of their differences along any coordinate
+    dimension.
 
-    Synonyms:
-        Chessboard distance
-        King-move metric
-        Maximum value distance
-        Minimax approximation
+    Also known as: Chessboard distance, King-move metric, Maximum value distance,
+    Minimax approximation.
 
     Parameters
     ----------
-    - u, v: Input vectors between which the distance is to be calculated.
+    u, v : array_like
+        Input vectors between which the distance is to be calculated.
+    w : array_like, optional
+        The weights for each value in `u` and `v`. Default is None, which gives each
+        value a weight of 1.0.
 
     Returns
     -------
-    - The Chebyshev distance between the two vectors.
+    float
+        The Chebyshev distance between the two vectors.
+
+    See Also
+    --------
+    scipy.spatial.distance.chebyshev : The underlying SciPy implementation.
 
     References
     ----------
-        1. Sung-Hyuk C. (2007) Comprehensive Survey on Distance/Similarity
-           Measures between Probability Density Functions. International
-           Journal of Mathematical Models and Methods in Applied Sciences.
-           1(4), 300-307.
+    1. Cha SH (2007) Comprehensive Survey on Distance/Similarity Measures between
+       Probability Density Functions. International Journal of Mathematical Models
+       and Methods in Applied Sciences, 1(4), 300-307.
     """
     u, v = np.asarray(u), np.asarray(v)
     return scipy.spatial.distance.chebyshev(u, v, w)
@@ -303,11 +340,27 @@ def correlation(u, v, w=None, centered=True):
 
     Parameters
     ----------
-    - u, v: Input vectors between which the distance is to be calculated.
+    u, v : array_like
+        Input vectors between which the distance is to be calculated.
+    w : array_like, optional
+        The weights for each value in `u` and `v`. Default is None, which gives each
+        value a weight of 1.0.
+    centered : bool, optional
+        If True, `u` and `v` will be centered. Default is True.
 
     Returns
     -------
-    - The Pearson correlation distance between the two vectors.
+    float
+        The Pearson correlation distance between the two vectors.
+
+    See Also
+    --------
+    scipy.spatial.distance.correlation : The underlying SciPy implementation.
+
+    Notes
+    -----
+    If either vector has fewer than two elements, or is constant, a ``RuntimeWarning``
+    is issued and 0 is returned instead of nan.
     """
     u, v = np.asarray(u), np.asarray(v)
     if len(u) < 2 or len(v) < 2:
@@ -334,15 +387,20 @@ def cosine(u, v, w=None):
 
     Parameters
     ----------
-    - u, v: Input vectors between which the distance is to be calculated.
+    u, v : array_like
+        Input vectors between which the distance is to be calculated.
+    w : array_like, optional
+        The weights for each value in `u` and `v`. Default is None, which gives each
+        value a weight of 1.0.
 
     Returns
     -------
-    - The cosine distance between the two vectors.
+    float
+        The cosine distance between the two vectors.
 
-    References
-    ----------
-        1. SciPy.
+    See Also
+    --------
+    scipy.spatial.distance.cosine : The underlying SciPy implementation.
     """
     u, v = np.asarray(u), np.asarray(v)
     return scipy.spatial.distance.cosine(u, v, w)
@@ -353,25 +411,26 @@ def clark(u, v):
 
     The Clark distance equals the square root of half of the divergence.
 
-    Notes
-    -----
-        When `u[i]` and `v[i]` are 0 for given i, then the fraction 0/0 = 0
-        is used in the calculation.
-
     Parameters
     ----------
-    - u, v: Input vectors between which the distance is to be calculated.
+    u, v : array_like
+        Input vectors between which the distance is to be calculated.
 
     Returns
     -------
-    - The Clark distance between the two vectors.
+    float
+        The Clark distance between the two vectors.
+
+    Notes
+    -----
+    When `u[i]` and `v[i]` are 0 for given i, then the fraction 0/0 = 0
+    is used in the calculation.
 
     References
     ----------
-        1. Sung-Hyuk C. (2007) Comprehensive Survey on Distance/Similarity
-           Measures between Probability Density Functions. International
-           Journal of Mathematical Models and Methods in Applied Sciences.
-           1(4), 300-307.
+    1. Cha SH (2007) Comprehensive Survey on Distance/Similarity Measures between
+       Probability Density Functions. International Journal of Mathematical Models
+       and Methods in Applied Sciences, 1(4), 300-307.
     """
     u, v = np.asarray(u), np.asarray(v)
     with np.errstate(divide="ignore", invalid="ignore"):
@@ -386,24 +445,25 @@ def hellinger(u, v):
 
     Parameters
     ----------
-    - u, v: Input vectors between which the distance is to be calculated.
+    u, v : array_like
+        Input vectors between which the distance is to be calculated.
 
     Returns
     -------
-    - The Hellinger distance between the two vectors.
+    float
+        The Hellinger distance between the two vectors.
 
     Notes
     -----
-        This implementation produces values two times larger than values
-        obtained by Hellinger distance described in Wikipedia and also
-        in https://gist.github.com/larsmans/3116927.
+    This implementation produces values two times larger than values
+    obtained by Hellinger distance described in Wikipedia and also
+    in https://gist.github.com/larsmans/3116927.
 
     References
     ----------
-       1. Sung-Hyuk C. (2007) Comprehensive Survey on Distance/Similarity
-          Measures between Probability Density Functions. International
-          Journal of Mathematical Models and Methods in Applied Sciences.
-          1(4), 300-307.
+    1. Cha SH (2007) Comprehensive Survey on Distance/Similarity Measures between
+       Probability Density Functions. International Journal of Mathematical Models
+       and Methods in Applied Sciences, 1(4), 300-307.
     """
     u, v = np.asarray(u), np.asarray(v)
     # Clip negative values to zero for valid sqrt
@@ -420,18 +480,19 @@ def jaccard(u, v):
 
     Parameters
     ----------
-    - u, v: Input vectors between which the distance is to be calculated.
+    u, v : array_like
+        Input vectors between which the distance is to be calculated.
 
     Returns
     -------
-    - The Jaccard distance between the two vectors.
+    float
+        The Jaccard distance between the two vectors.
 
     References
     ----------
-       1. Sung-Hyuk C. (2007) Comprehensive Survey on Distance/Similarity
-          Measures between Probability Density Functions. International
-          Journal of Mathematical Models and Methods in Applied Sciences.
-          1(4), 300-307.
+    1. Cha SH (2007) Comprehensive Survey on Distance/Similarity Measures between
+       Probability Density Functions. International Journal of Mathematical Models
+       and Methods in Applied Sciences, 1(4), 300-307.
     """
     u, v = np.asarray(u), np.asarray(v)
     uv = np.dot(u, v)
@@ -443,23 +504,24 @@ def lorentzian(u, v):
 
     Parameters
     ----------
-    - u, v: Input vectors between which the distance is to be calculated.
+    u, v : array_like
+        Input vectors between which the distance is to be calculated.
 
     Returns
     -------
-    - The Lorentzian distance between the two vectors.
-
-    References
-    ----------
-        1. Sung-Hyuk C. (2007) Comprehensive Survey on Distance/Similarity
-           Measures between Probability Density Functions. International
-           Journal of Mathematical Models and Methods in Applied Sciences.
-           1(4):300-307.
+    float
+        The Lorentzian distance between the two vectors.
 
     Notes
     -----
-        One (1) is added to guarantee the non-negativity property and to
-        eschew the log of zero.
+    One (1) is added to guarantee the non-negativity property and to
+    eschew the log of zero.
+
+    References
+    ----------
+    1. Cha SH (2007) Comprehensive Survey on Distance/Similarity Measures between
+       Probability Density Functions. International Journal of Mathematical Models
+       and Methods in Applied Sciences, 1(4), 300-307.
     """
     u, v = np.asarray(u), np.asarray(v)
     with np.errstate(divide="ignore", invalid="ignore"):
@@ -471,16 +533,18 @@ def marylandbridge(u, v):
 
     Parameters
     ----------
-    - u, v: Input vectors between which the distance is to be calculated.
+    u, v : array_like
+        Input vectors between which the distance is to be calculated.
 
     Returns
     -------
-    - The Maryland Bridge distance between the two vectors.
+    float
+        The Maryland Bridge distance between the two vectors.
 
     References
     ----------
-        1. Deza M, Deza E (2009) Encyclopedia of Distances.
-           Springer-Verlag Berlin Heidelberg. 1-590.
+    1. Deza M, Deza E (2009) Encyclopedia of Distances. Springer-Verlag Berlin
+       Heidelberg. 1-590.
     """
     u, v = np.asarray(u), np.asarray(v)
     uvdot = np.dot(u, v)
@@ -492,21 +556,22 @@ def meehl(u, v):
 
     Parameters
     ----------
-    - u, v: Input vectors between which the distance is to be calculated.
+    u, v : array_like
+        Input vectors between which the distance is to be calculated.
 
     Returns
     -------
-    - The Meehl distance between the two vectors.
+    float
+        The Meehl distance between the two vectors.
 
     Notes
     -----
-        Added by SC.
+    Added by Siddharth Chaini; not part of Zielezinski's original collection.
 
     References
     ----------
-        1. Deza M. and Deza E. (2013) Encyclopedia of Distances.
-           Berlin, Heidelberg: Springer Berlin Heidelberg.
-           https://doi.org/10.1007/978-3-642-30958-8.
+    1. Deza M, Deza E (2013) Encyclopedia of Distances. Springer, Berlin,
+       Heidelberg. https://doi.org/10.1007/978-3-642-30958-8
     """
     u, v = np.asarray(u), np.asarray(v)
 
@@ -524,22 +589,23 @@ def motyka(u, v):
 
     Parameters
     ----------
-    - u, v: Input vectors between which the distance is to be calculated.
+    u, v : array_like
+        Input vectors between which the distance is to be calculated.
 
     Returns
     -------
-    - The Motyka distance between the two vectors.
+    float
+        The Motyka distance between the two vectors.
 
     Notes
     -----
-        The distance between identical vectors is not equal to 0 but 0.5.
+    The distance between identical vectors is not equal to 0 but 0.5.
 
     References
     ----------
-        1. Sung-Hyuk C. (2007) Comprehensive Survey on Distance/Similarity
-           Measures between Probability Density Functions. International
-           Journal of Mathematical Models and Methods in Applied Sciences.
-           1(4), 300-307.
+    1. Cha SH (2007) Comprehensive Survey on Distance/Similarity Measures between
+       Probability Density Functions. International Journal of Mathematical Models
+       and Methods in Applied Sciences, 1(4), 300-307.
     """
     u, v = np.asarray(u), np.asarray(v)
     return np.sum(np.maximum(u, v)) / np.sum(u + v)
@@ -550,22 +616,23 @@ def soergel(u, v):
 
     Parameters
     ----------
-    - u, v: Input vectors between which the distance is to be calculated.
+    u, v : array_like
+        Input vectors between which the distance is to be calculated.
 
     Returns
     -------
-    - The Soergel distance between the two vectors.
+    float
+        The Soergel distance between the two vectors.
 
     Notes
     -----
-        Equals Tanimoto distance.
+    Equals the Tanimoto distance.
 
     References
     ----------
-        1. Sung-Hyuk C. (2007) Comprehensive Survey on Distance/Similarity
-           Measures between Probability Density Functions. International
-           Journal of Mathematical Models and Methods in Applied Sciences.
-           1(4), 300-307.
+    1. Cha SH (2007) Comprehensive Survey on Distance/Similarity Measures between
+       Probability Density Functions. International Journal of Mathematical Models
+       and Methods in Applied Sciences, 1(4), 300-307.
     """
     u, v = np.asarray(u), np.asarray(v)
     return np.sum(np.abs(u - v)) / np.sum(np.maximum(u, v))
@@ -576,18 +643,19 @@ def wave_hedges(u, v):
 
     Parameters
     ----------
-    - u, v: Input vectors between which the distance is to be calculated.
+    u, v : array_like
+        Input vectors between which the distance is to be calculated.
 
     Returns
     -------
-    - The Wave Hedges distance between the two vectors.
+    float
+        The Wave Hedges distance between the two vectors.
 
     References
     ----------
-        1. Sung-Hyuk C (2007) Comprehensive Survey on Distance/Similarity
-           Measures between Probability Density Functions. International
-           Journal of Mathematical Models and Methods in Applied Sciences.
-           1(4), 300-307
+    1. Cha SH (2007) Comprehensive Survey on Distance/Similarity Measures between
+       Probability Density Functions. International Journal of Mathematical Models
+       and Methods in Applied Sciences, 1(4), 300-307.
     """
     u, v = np.asarray(u), np.asarray(v)
     with np.errstate(divide="ignore", invalid="ignore"):
@@ -601,25 +669,26 @@ def kulczynski(u, v):
 
     Parameters
     ----------
-    - u, v: Input vectors between which the distance is to be calculated.
+    u, v : array_like
+        Input vectors between which the distance is to be calculated.
 
     Returns
     -------
-    - The Kulczynski distance between the two vectors.
+    float
+        The Kulczynski distance between the two vectors.
 
     References
     ----------
-        1. Sung-Hyuk C. (2007) Comprehensive Survey on Distance/Similarity
-           Measures between Probability Density Functions. International
-           Journal of Mathematical Models and Methods in Applied Sciences.
-           1(4):300-307.
+    1. Cha SH (2007) Comprehensive Survey on Distance/Similarity Measures between
+       Probability Density Functions. International Journal of Mathematical Models
+       and Methods in Applied Sciences, 1(4), 300-307.
     """
     u, v = np.asarray(u), np.asarray(v)
     return np.sum(np.abs(u - v)) / np.sum(np.minimum(u, v))
 
 
 def add_chisq(u, v):
-    """Compute the Additive Symmetric Chi-square distance between two vectors.
+    """Calculate the Additive Symmetric Chi-square distance between two vectors.
 
     The Additive Symmetric Chi-square distance is a measure that
     can be used to compare two vectors. This function calculates it based
@@ -627,19 +696,19 @@ def add_chisq(u, v):
 
     Parameters
     ----------
-    - u, v: Input vectors between which the distance is to be calculated.
+    u, v : array_like
+        Input vectors between which the distance is to be calculated.
 
     Returns
     -------
-    - The Additive Symmetric Chi-square distance between the two vectors.
+    float
+        The Additive Symmetric Chi-square distance between the two vectors.
 
     References
     ----------
-        1. Sung-Hyuk C (2007) Comprehensive Survey on Distance/Similarity
-           Measures between Probability Density Functions.
-           International Journal of Mathematical Models and Methods in
-           Applied Sciences.
-           vol. 1(4), pp. 300-307.
+    1. Cha SH (2007) Comprehensive Survey on Distance/Similarity Measures between
+       Probability Density Functions. International Journal of Mathematical Models
+       and Methods in Applied Sciences, 1(4), 300-307.
     """
     u, v = np.asarray(u), np.asarray(v)
     uvmult = u * v
@@ -660,20 +729,21 @@ def acc(u, v):
 
     Parameters
     ----------
-    - u, v: Input vectors between which the distance is to be calculated.
+    u, v : array_like
+        Input vectors between which the distance is to be calculated.
 
     Returns
     -------
-    - The ACC distance between the two vectors.
+    float
+        The ACC distance between the two vectors.
 
     References
     ----------
-        1. Krause EF (2012) Taxicab Geometry An Adventure in Non-Euclidean
-           Geometry. Dover Publications.
-        2. Sung-Hyuk C (2007) Comprehensive Survey on Distance/Similarity
-           Measures between Probability Density Functions. International
-           Journal of Mathematical Models and Methods in Applied Sciences.
-           vol. 1(4), pp. 300-307.
+    1. Krause EF (2012) Taxicab Geometry An Adventure in Non-Euclidean Geometry.
+       Dover Publications.
+    2. Cha SH (2007) Comprehensive Survey on Distance/Similarity Measures between
+       Probability Density Functions. International Journal of Mathematical Models
+       and Methods in Applied Sciences, 1(4), 300-307.
     """
     return (cityblock(u, v) + chebyshev(u, v)) / 2
 
@@ -716,11 +786,13 @@ def chebyshev_min(u, v):
 
     Parameters
     ----------
-    - u, v: Input vectors between which the distance is to be calculated.
+    u, v : array_like
+        Input vectors between which the distance is to be calculated.
 
     Returns
     -------
-    - The minimum value distance between the two vectors.
+    float
+        The minimum value distance between the two vectors.
     """
     u, v = np.asarray(u), np.asarray(v)
     return np.amin(np.abs(u - v))
@@ -731,18 +803,19 @@ def czekanowski(u, v):
 
     Parameters
     ----------
-    - u, v: Input vectors between which the distance is to be calculated.
+    u, v : array_like
+        Input vectors between which the distance is to be calculated.
 
     Returns
     -------
-    - The Czekanowski distance between the two vectors.
+    float
+        The Czekanowski distance between the two vectors.
 
     References
     ----------
-        1. Sung-Hyuk C. (2007) Comprehensive Survey on Distance/Similarity
-           Measures between Probability Density Functions. International
-           Journal of Mathematical Models and Methods in Applied Sciences.
-           1(4), 300-307.
+    1. Cha SH (2007) Comprehensive Survey on Distance/Similarity Measures between
+       Probability Density Functions. International Journal of Mathematical Models
+       and Methods in Applied Sciences, 1(4), 300-307.
     """
     u, v = np.asarray(u), np.asarray(v)
     return np.sum(np.abs(u - v)) / np.sum(u + v)
@@ -751,25 +824,23 @@ def czekanowski(u, v):
 def dice(u, v):
     """Calculate the Dice dissimilarity between two vectors.
 
-    Synonyms:
-        Sorensen distance
-
     Parameters
     ----------
-    - u, v: Input vectors between which the distance is to be calculated.
+    u, v : array_like
+        Input vectors between which the distance is to be calculated.
 
     Returns
     -------
-    - The Dice dissimilarity between the two vectors.
+    float
+        The Dice dissimilarity between the two vectors.
 
     References
     ----------
-        1. Dice LR (1945) Measures of the amount of ecologic association
-           between species. Ecology. 26, 297-302.
-        2. Sung-Hyuk C. (2007) Comprehensive Survey on Distance/Similarity
-           Measures between Probability Density Functions. International
-           Journal of Mathematical Models and Methods in Applied Sciences.
-           1(4), 300-307.
+    1. Dice LR (1945) Measures of the amount of ecologic association between
+       species. Ecology. 26, 297-302.
+    2. Cha SH (2007) Comprehensive Survey on Distance/Similarity Measures between
+       Probability Density Functions. International Journal of Mathematical Models
+       and Methods in Applied Sciences, 1(4), 300-307.
     """
     u, v = np.asarray(u), np.asarray(v)
     u_v = u - v
@@ -783,18 +854,19 @@ def divergence(u, v):
 
     Parameters
     ----------
-    - u, v: Input vectors between which the distance is to be calculated.
+    u, v : array_like
+        Input vectors between which the distance is to be calculated.
 
     Returns
     -------
-    - The divergence between the two vectors.
+    float
+        The divergence between the two vectors.
 
     References
     ----------
-        1. Sung-Hyuk C. (2007) Comprehensive Survey on Distance/Similarity
-           Measures between Probability Density Functions. International
-           Journal of Mathematical Models and Methods in Applied Sciences.
-           1(4), 300-307.
+    1. Cha SH (2007) Comprehensive Survey on Distance/Similarity Measures between
+       Probability Density Functions. International Journal of Mathematical Models
+       and Methods in Applied Sciences, 1(4), 300-307.
     """
     u, v = np.asarray(u), np.asarray(v)
     with np.errstate(invalid="ignore"):
@@ -809,21 +881,23 @@ def google(u, v):
 
     Parameters
     ----------
-    - u, v: Input vectors between which the distance is to be calculated.
+    u, v : array_like
+        Input vectors between which the distance is to be calculated.
 
     Returns
     -------
-    - The Normalized Google Distance between the two vectors.
+    float
+        The Normalized Google Distance between the two vectors.
 
     Notes
     -----
-        When used for comparing two probability density functions (pdfs),
-        Google distance equals half of Cityblock distance.
+    When used for comparing two probability density functions (pdfs),
+    Google distance equals half of Cityblock distance.
 
     References
     ----------
-        1. Lee & Rashid (2008) Information Technology, ITSim 2008.
-            doi:10.1109/ITSIM.2008.4631601.
+    1. Lee & Rashid (2008) Information Technology, ITSim 2008.
+       doi:10.1109/ITSIM.2008.4631601.
     """
     u, v = np.asarray(u), np.asarray(v)
     # Keep numpy scalars so the all-zero edge case yields IEEE nan (0/0),
@@ -842,20 +916,21 @@ def gower(u, v):
 
     Parameters
     ----------
-    - u, v: Input vectors between which the distance is to be calculated.
+    u, v : array_like
+        Input vectors between which the distance is to be calculated.
 
     Returns
     -------
-    - The Gower distance between the two vectors.
+    float
+        The Gower distance between the two vectors.
 
     References
     ----------
-        1. Gower JC. (1971) General Coefficient of Similarity
-            and Some of Its Properties, Biometrics 27, 857-874.
-        2. Sung-Hyuk C. (2007) Comprehensive Survey on Distance/Similarity
-            Measures between Probability Density Functions. International
-            Journal of Mathematical Models and Methods in Applied Sciences.
-            1(4), 300-307.
+    1. Gower JC (1971) General Coefficient of Similarity and Some of Its Properties,
+       Biometrics 27, 857-874.
+    2. Cha SH (2007) Comprehensive Survey on Distance/Similarity Measures between
+       Probability Density Functions. International Journal of Mathematical Models
+       and Methods in Applied Sciences, 1(4), 300-307.
     """
     u, v = np.asarray(u), np.asarray(v)
     return np.sum(np.abs(u - v)) / u.size
@@ -869,20 +944,21 @@ def jeffreys(u, v):
 
     Parameters
     ----------
-    - u, v: Input vectors between which the divergence is to be calculated.
+    u, v : array_like
+        Input vectors between which the divergence is to be calculated.
 
     Returns
     -------
-    - The Jeffreys divergence between the two vectors.
+    float
+        The Jeffreys divergence between the two vectors.
 
     References
     ----------
-        1. Jeffreys H (1946) An Invariant Form for the Prior Probability
-            in Estimation Problems. Proc.Roy.Soc.Lon., Ser. A 186, 453-461.
-        2. Sung-Hyuk C. (2007) Comprehensive Survey on Distance/Similarity
-            Measures between Probability Density Functions. International
-            Journal of Mathematical Models and Methods in Applied Sciences.
-            1(4), 300-307.
+    1. Jeffreys H (1946) An Invariant Form for the Prior Probability in Estimation
+       Problems. Proc.Roy.Soc.Lon., Ser. A 186, 453-461.
+    2. Cha SH (2007) Comprehensive Survey on Distance/Similarity Measures between
+       Probability Density Functions. International Journal of Mathematical Models
+       and Methods in Applied Sciences, 1(4), 300-307.
     """
     # Copy so the epsilon replacement below never mutates the caller's arrays
     u, v = np.array(u, dtype=np.float64), np.array(v, dtype=np.float64)
@@ -907,28 +983,33 @@ def jensenshannon_divergence(u, v):
 
     Parameters
     ----------
-    - u, v: Input vectors between which the divergence is to be calculated.
+    u, v : array_like
+        Input vectors between which the divergence is to be calculated.
 
     Returns
     -------
-    - The Jensen-Shannon divergence between the two vectors.
+    float
+        The Jensen-Shannon divergence between the two vectors.
 
-    References
-    ----------
-        1. Lin J. (1991) Divergence measures based on the Shannon entropy.
-            IEEE Transactions on Information Theory, 37(1):145–151.
-        2. Sung-Hyuk C. (2007) Comprehensive Survey on Distance/Similarity
-            Measures between Probability Density Functions. International
-            Journal of Mathematical Models and Methods in Applied Sciences.
-            1(4), 300-307.
-    Comments:
-        Equals Jensen difference in Sung-Hyuk (2007):
+    Notes
+    -----
+    Equals the Jensen difference of Cha (2007) (see `jensen_difference`), which can be
+    written as::
+
         u = np.where(u==0, EPSILON, u)
         v = np.where(v==0, EPSILON, v)
         el1 = (u * np.log(u) + v * np.log(v)) / 2
         el2 = (u + v)/2
         el3 = np.log(el2)
         return np.sum(el1 - el2 * el3)
+
+    References
+    ----------
+    1. Lin J (1991) Divergence measures based on the Shannon entropy. IEEE
+       Transactions on Information Theory, 37(1):145–151.
+    2. Cha SH (2007) Comprehensive Survey on Distance/Similarity Measures between
+       Probability Density Functions. International Journal of Mathematical Models
+       and Methods in Applied Sciences, 1(4), 300-307.
     """
     # Copy so the epsilon replacement below never mutates the caller's arrays
     u, v = np.array(u, dtype=np.float64), np.array(v, dtype=np.float64)
@@ -952,24 +1033,24 @@ def jensen_difference(u, v):
 
     Parameters
     ----------
-    - u, v: Input vectors between which the distance is to be calculated.
+    u, v : array_like
+        Input vectors between which the distance is to be calculated.
 
     Returns
     -------
-    - The Jensen difference between the two vectors.
+    float
+        The Jensen difference between the two vectors.
 
     Notes
     -----
-        1. Equals half of Topsøe distance
-        2. Equals squared jensenshannon_distance.
-
+    1. Equals half of the Topsøe distance.
+    2. Equals the squared Jensen-Shannon distance.
 
     References
     ----------
-        1. Sung-Hyuk C. (2007) Comprehensive Survey on Distance/Similarity
-            Measures between Probability Density Functions. International
-            Journal of Mathematical Models and Methods in Applied Sciences.
-            1(4), 300-307.
+    1. Cha SH (2007) Comprehensive Survey on Distance/Similarity Measures between
+       Probability Density Functions. International Journal of Mathematical Models
+       and Methods in Applied Sciences, 1(4), 300-307.
     """
     u, v = np.asarray(u), np.asarray(v)
 
@@ -987,21 +1068,21 @@ def kumarjohnson(u, v):
 
     Parameters
     ----------
-    - u, v: Input vectors between which the distance is to be calculated.
+    u, v : array_like
+        Input vectors between which the distance is to be calculated.
 
     Returns
     -------
-    - The Kumar-Johnson distance between the two vectors.
+    float
+        The Kumar-Johnson distance between the two vectors.
 
     References
     ----------
-        1. Kumar P, Johnson A. (2005) On a symmetric divergence measure
-            and information inequalities, Journal of Inequalities in pure
-            and applied Mathematics. 6(3).
-        2. Sung-Hyuk C. (2007) Comprehensive Survey on Distance/Similarity
-            Measures between Probability Density Functions. International
-            Journal of Mathematical Models and Methods in Applied Sciences.
-            1(4):300-307.
+    1. Kumar P, Johnson A (2005) On a symmetric divergence measure and information
+       inequalities, Journal of Inequalities in pure and applied Mathematics. 6(3).
+    2. Cha SH (2007) Comprehensive Survey on Distance/Similarity Measures between
+       Probability Density Functions. International Journal of Mathematical Models
+       and Methods in Applied Sciences, 1(4), 300-307.
     """
     u, v = np.asarray(u), np.asarray(v)
     uvmult = u * v
@@ -1016,22 +1097,23 @@ def matusita(u, v):
 
     Parameters
     ----------
-    - u, v: Input vectors between which the distance is to be calculated.
+    u, v : array_like
+        Input vectors between which the distance is to be calculated.
 
     Returns
     -------
-    - The Matusita distance between the two vectors.
-
-    References
-    ----------
-        1. Sung-Hyuk C. (2007) Comprehensive Survey on Distance/Similarity
-            Measures between Probability Density Functions. International
-            Journal of Mathematical Models and Methods in Applied Sciences.
-            1(4):300-307.
+    float
+        The Matusita distance between the two vectors.
 
     Notes
     -----
-        Equals square root of Squared-chord distance.
+    Equals the square root of the Squared-chord distance.
+
+    References
+    ----------
+    1. Cha SH (2007) Comprehensive Survey on Distance/Similarity Measures between
+       Probability Density Functions. International Journal of Mathematical Models
+       and Methods in Applied Sciences, 1(4), 300-307.
     """
     u, v = np.asarray(u), np.asarray(v)
     with np.errstate(divide="ignore", invalid="ignore"):
@@ -1043,23 +1125,25 @@ def minkowski(u, v, p=2):
 
     Parameters
     ----------
-    - u, v: Input vectors between which the distance is to be calculated.
-    - p: The order of the norm of the difference.
+    u, v : array_like
+        Input vectors between which the distance is to be calculated.
+    p : int or float, default=2
+        The order of the norm of the difference.
 
     Returns
     -------
-    - The Minkowski distance between the two vectors.
+    float
+        The Minkowski distance between the two vectors.
 
     Notes
     -----
-        When p goes to infinite, the Chebyshev distance is derived.
+    When p goes to infinity, the Chebyshev distance is derived.
 
     References
     ----------
-        1. Sung-Hyuk C. (2007) Comprehensive Survey on Distance/Similarity
-            Measures between Probability Density Functions. International
-            Journal of Mathematical Models and Methods in Applied Sciences.
-            1(4):300-307.
+    1. Cha SH (2007) Comprehensive Survey on Distance/Similarity Measures between
+       Probability Density Functions. International Journal of Mathematical Models
+       and Methods in Applied Sciences, 1(4), 300-307.
     """
     u, v = np.asarray(u), np.asarray(v)
     return np.linalg.norm(u - v, ord=p)
@@ -1070,16 +1154,18 @@ def penroseshape(u, v):
 
     Parameters
     ----------
-    - u, v: Input vectors between which the distance is to be calculated.
+    u, v : array_like
+        Input vectors between which the distance is to be calculated.
 
     Returns
     -------
-    - The Penrose shape distance between the two vectors.
+    float
+        The Penrose shape distance between the two vectors.
 
     References
     ----------
-        1. Deza M, Deza E (2009) Encyclopedia of Distances.
-            Springer-Verlag Berlin Heidelberg. 1-590.
+    1. Deza M, Deza E (2009) Encyclopedia of Distances. Springer-Verlag Berlin
+       Heidelberg. 1-590.
     """
     u, v = np.asarray(u), np.asarray(v)
     umu = np.mean(u)
@@ -1093,15 +1179,17 @@ def prob_chisq(u, v):
 
     Parameters
     ----------
-    - u, v: Input vectors between which the distance is to be calculated.
+    u, v : array_like
+        Input vectors between which the distance is to be calculated.
 
     Returns
     -------
-    - The Probabilistic chi-square distance between the two vectors.
+    float
+        The Probabilistic chi-square distance between the two vectors.
 
     Notes
     -----
-        Added by SC.
+    Added by Siddharth Chaini; not part of Zielezinski's original collection.
     """
     u, v = np.asarray(u), np.asarray(v)
     uvsum = u + v
@@ -1114,15 +1202,17 @@ def ruzicka(u, v):
 
     Parameters
     ----------
-    - u, v: Input vectors between which the distance is to be calculated.
+    u, v : array_like
+        Input vectors between which the distance is to be calculated.
 
     Returns
     -------
-    - The Ruzicka distance between the two vectors.
+    float
+        The Ruzicka distance between the two vectors.
 
     Notes
     -----
-        Added by SC.
+    Added by Siddharth Chaini; not part of Zielezinski's original collection.
     """
     u, v = np.asarray(u), np.asarray(v)
     den = np.sum(np.maximum(u, v))
@@ -1135,18 +1225,20 @@ def sorensen(u, v):
 
     Parameters
     ----------
-    - u, v: Input vectors between which the distance is to be calculated.
+    u, v : array_like
+        Input vectors between which the distance is to be calculated.
 
     Returns
     -------
-    - The Sorensen distance between the two vectors.
+    float
+        The Sorensen distance between the two vectors.
 
     Notes
     -----
-        The Sorensen distance equals the Manhattan distance divided by the sum of
-        the two vectors.
+    The Sorensen distance equals the Manhattan distance divided by the sum of
+    the two vectors.
 
-        Added by SC.
+    Added by Siddharth Chaini; not part of Zielezinski's original collection.
     """
     u, v = np.asarray(u), np.asarray(v)
     return np.sum(np.abs(u - v)) / np.sum(u + v)
@@ -1157,18 +1249,19 @@ def squared_chisq(u, v):
 
     Parameters
     ----------
-    - u, v: Input vectors between which the distance is to be calculated.
+    u, v : array_like
+        Input vectors between which the distance is to be calculated.
 
     Returns
     -------
-    - The Squared chi-square distance between the two vectors.
+    float
+        The Squared chi-square distance between the two vectors.
 
     References
     ----------
-        1. Sung-Hyuk C. (2007) Comprehensive Survey on Distance/Similarity
-            Measures between Probability Density Functions. International
-            Journal of Mathematical Models and Methods in Applied Sciences.
-            1(4), 300-307.
+    1. Cha SH (2007) Comprehensive Survey on Distance/Similarity Measures between
+       Probability Density Functions. International Journal of Mathematical Models
+       and Methods in Applied Sciences, 1(4), 300-307.
     """
     u, v = np.asarray(u), np.asarray(v)
     uvsum = u + v
@@ -1181,25 +1274,25 @@ def squaredchord(u, v):
 
     Parameters
     ----------
-    - u, v: Input vectors between which the distance is to be calculated.
+    u, v : array_like
+        Input vectors between which the distance is to be calculated.
 
     Returns
     -------
-    - The Squared-chord distance between the two vectors.
-
-    References
-    ----------
-        1. Gavin DG et al. (2003) A statistical approach to evaluating
-            distance metrics and analog assignments for pollen records.
-            Quaternary Research 60:356–367.
-        2. Sung-Hyuk C. (2007) Comprehensive Survey on Distance/Similarity
-            Measures between Probability Density Functions. International
-            Journal of Mathematical Models and Methods in Applied Sciences.
-            1(4), 300-307.
+    float
+        The Squared-chord distance between the two vectors.
 
     Notes
     -----
-        Equals to squared Matusita distance.
+    Equals the squared Matusita distance.
+
+    References
+    ----------
+    1. Gavin DG et al. (2003) A statistical approach to evaluating distance metrics
+       and analog assignments for pollen records. Quaternary Research 60:356–367.
+    2. Cha SH (2007) Comprehensive Survey on Distance/Similarity Measures between
+       Probability Density Functions. International Journal of Mathematical Models
+       and Methods in Applied Sciences, 1(4), 300-307.
     """
     u, v = np.asarray(u), np.asarray(v)
     with np.errstate(divide="ignore", invalid="ignore"):
@@ -1211,25 +1304,25 @@ def squared_euclidean(u, v):
 
     Parameters
     ----------
-    - u, v: Input vectors between which the distance is to be calculated.
+    u, v : array_like
+        Input vectors between which the distance is to be calculated.
 
     Returns
     -------
-    - The Squared Euclidean distance between the two vectors.
-
-    References
-    ----------
-        1. Gavin DG et al. (2003) A statistical approach to evaluating
-            distance metrics and analog assignments for pollen records.
-            Quaternary Research 60:356–367.
-        2. Sung-Hyuk C. (2007) Comprehensive Survey on Distance/Similarity
-            Measures between Probability Density Functions. International
-            Journal of Mathematical Models and Methods in Applied Sciences.
-            1(4), 300-307.
+    float
+        The Squared Euclidean distance between the two vectors.
 
     Notes
     -----
-        Equals to squared Euclidean distance.
+    Equals the square of the Euclidean distance.
+
+    References
+    ----------
+    1. Gavin DG et al. (2003) A statistical approach to evaluating distance metrics
+       and analog assignments for pollen records. Quaternary Research 60:356–367.
+    2. Cha SH (2007) Comprehensive Survey on Distance/Similarity Measures between
+       Probability Density Functions. International Journal of Mathematical Models
+       and Methods in Applied Sciences, 1(4), 300-307.
     """
     u, v = np.asarray(u), np.asarray(v)
     return np.dot((u - v), (u - v))
@@ -1240,21 +1333,22 @@ def taneja(u, v):
 
     Parameters
     ----------
-    - u, v: Input vectors between which the distance is to be calculated.
+    u, v : array_like
+        Input vectors between which the distance is to be calculated.
 
     Returns
     -------
-    - The Taneja distance between the two vectors.
+    float
+        The Taneja distance between the two vectors.
 
     References
     ----------
-        1. Taneja IJ. (1995), New Developments in Generalized Information
-            Measures, Chapter in: Advances in Imaging and Electron Physics,
-            Ed. P.W. Hawkes, 91, 37-135.
-        2. Sung-Hyuk C. (2007) Comprehensive Survey on Distance/Similarity
-            Measures between Probability Density Functions. International
-            Journal of Mathematical Models and Methods in Applied Sciences.
-            1(4), 300-307.
+    1. Taneja IJ (1995) New Developments in Generalized Information Measures,
+       Chapter in: Advances in Imaging and Electron Physics, Ed. P.W. Hawkes, 91,
+       37-135.
+    2. Cha SH (2007) Comprehensive Survey on Distance/Similarity Measures between
+       Probability Density Functions. International Journal of Mathematical Models
+       and Methods in Applied Sciences, 1(4), 300-307.
     """
     # Copy so the epsilon replacement below never mutates the caller's arrays
     u, v = np.array(u, dtype=np.float64), np.array(v, dtype=np.float64)
@@ -1271,22 +1365,23 @@ def tanimoto(u, v):
 
     Parameters
     ----------
-    - u, v: Input vectors between which the distance is to be calculated.
+    u, v : array_like
+        Input vectors between which the distance is to be calculated.
 
     Returns
     -------
-    - The Tanimoto distance between the two vectors.
-
-    References
-    ----------
-        1. Sung-Hyuk C. (2007) Comprehensive Survey on Distance/Similarity
-            Measures between Probability Density Functions. International
-            Journal of Mathematical Models and Methods in Applied Sciences.
-            1(4), 300-307.
+    float
+        The Tanimoto distance between the two vectors.
 
     Notes
     -----
-        Equals Soergel distance.
+    Equals the Soergel distance.
+
+    References
+    ----------
+    1. Cha SH (2007) Comprehensive Survey on Distance/Similarity Measures between
+       Probability Density Functions. International Journal of Mathematical Models
+       and Methods in Applied Sciences, 1(4), 300-307.
     """
     u, v = np.asarray(u), np.asarray(v)
     # return np.sum(abs(u-v)) / np.sum(np.maximum(u, v))
@@ -1301,22 +1396,23 @@ def topsoe(u, v):
 
     Parameters
     ----------
-    - u, v: Input vectors between which the distance is to be calculated.
+    u, v : array_like
+        Input vectors between which the distance is to be calculated.
 
     Returns
     -------
-    - The Topsøe distance between the two vectors.
-
-    References
-    ----------
-        1. Sung-Hyuk C (2007) Comprehensive Survey on Distance/Similarity
-            Measures between Probability Density Functions. International
-            Journal of Mathematical Models and Methods in Applied Sciences.
-            1(4), 300-307.
+    float
+        The Topsøe distance between the two vectors.
 
     Notes
     -----
-        Equals two times Jensen-Shannon divergence.
+    Equals two times Jensen-Shannon divergence.
+
+    References
+    ----------
+    1. Cha SH (2007) Comprehensive Survey on Distance/Similarity Measures between
+       Probability Density Functions. International Journal of Mathematical Models
+       and Methods in Applied Sciences, 1(4), 300-307.
     """
     # Copy so the epsilon replacement below never mutates the caller's arrays
     u, v = np.array(u, dtype=np.float64), np.array(v, dtype=np.float64)
@@ -1331,22 +1427,23 @@ def topsoe(u, v):
 
 
 def vicis_symmetric_chisq(u, v):
-    """Calculate the Vicis Symmetric chi-square distance.
+    """Calculate the Vicis Symmetric chi-square distance between two vectors.
 
     Parameters
     ----------
-    - u, v: Input vectors between which the distance is to be calculated.
+    u, v : array_like
+        Input vectors between which the distance is to be calculated.
 
     Returns
     -------
-    - The Vicis Symmetric chi-square distance between the two vectors.
+    float
+        The Vicis Symmetric chi-square distance between the two vectors.
 
     References
     ----------
-        1. Sung-Hyuk C (2007) Comprehensive Survey on Distance/Similarity
-            Measures between Probability Density Functions. International
-            Journal of Mathematical Models and Methods in Applied Sciences.
-            1(4), 300-307
+    1. Cha SH (2007) Comprehensive Survey on Distance/Similarity Measures between
+       Probability Density Functions. International Journal of Mathematical Models
+       and Methods in Applied Sciences, 1(4), 300-307.
     """
     u, v = np.asarray(u), np.asarray(v)
     with np.errstate(divide="ignore", invalid="ignore"):
@@ -1360,18 +1457,19 @@ def vicis_wave_hedges(u, v):
 
     Parameters
     ----------
-    - u, v: Input vectors between which the distance is to be calculated.
+    u, v : array_like
+        Input vectors between which the distance is to be calculated.
 
     Returns
     -------
-    - The Vicis-Wave Hedges distance between the two vectors.
+    float
+        The Vicis-Wave Hedges distance between the two vectors.
 
     References
     ----------
-        1. Sung-Hyuk C (2007) Comprehensive Survey on Distance/Similarity
-            Measures between Probability Density Functions. International
-            Journal of Mathematical Models and Methods in Applied Sciences.
-            1(4), 300-307.
+    1. Cha SH (2007) Comprehensive Survey on Distance/Similarity Measures between
+       Probability Density Functions. International Journal of Mathematical Models
+       and Methods in Applied Sciences, 1(4), 300-307.
     """
     u, v = np.asarray(u), np.asarray(v)
     with np.errstate(divide="ignore", invalid="ignore"):
