@@ -824,8 +824,6 @@ def czekanowski(u, v):
 def dice(u, v):
     """Calculate the Dice dissimilarity between two vectors.
 
-    Also known as: Sorensen distance.
-
     Parameters
     ----------
     u, v : array_like
