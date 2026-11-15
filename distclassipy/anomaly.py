@@ -66,6 +66,22 @@ class DistanceAnomaly(OutlierMixin, BaseEstimator):
     contamination : float, default=0.1
         The proportion of outliers expected in the data set. Used for the `predict`
         method to determine the threshold for marking outliers.
+
+    reference : {"centroid", "knn"}, default="centroid"
+        Whether an object's distance to a class is measured to the class
+        centroid, or as the mean distance to its ``n_neighbors`` nearest training
+        objects (a local density estimate). See DistanceMetricClassifier. With
+        "knn", the training scores used to set the ``predict`` threshold are
+        computed leave-one-out, so training objects do not count themselves as
+        neighbours.
+
+        .. versionadded:: 0.4.0
+
+    n_neighbors : int, default=5
+        Number of nearest training objects averaged per class when
+        ``reference="knn"``. Ignored otherwise.
+
+        .. versionadded:: 0.4.0
     """
 
     def __init__(
@@ -78,6 +94,8 @@ class DistanceAnomaly(OutlierMixin, BaseEstimator):
         central_stat: str = "median",
         dispersion_stat: str = "std",
         contamination: float = 0.1,
+        reference: str = "centroid",
+        n_neighbors: int = 5,
         **kwargs,
     ):
         self.metrics = metrics
@@ -88,6 +106,8 @@ class DistanceAnomaly(OutlierMixin, BaseEstimator):
         self.central_stat = central_stat
         self.dispersion_stat = dispersion_stat
         self.contamination = contamination
+        self.reference = reference
+        self.n_neighbors = n_neighbors
         self.kwargs = kwargs
 
     def fit(self, X: np.ndarray, y: np.ndarray) -> "DistanceAnomaly":
@@ -113,6 +133,8 @@ class DistanceAnomaly(OutlierMixin, BaseEstimator):
             scale=self.scale,
             central_stat=self.central_stat,
             dispersion_stat=self.dispersion_stat,
+            reference=self.reference,
+            n_neighbors=self.n_neighbors,
         )
         self.clf_.fit(X, y)
 
@@ -121,8 +143,10 @@ class DistanceAnomaly(OutlierMixin, BaseEstimator):
         else:
             self.metrics_ = self.metrics
 
-        # Calculate anomaly threshold based on train scores
-        train_scores = self.decision_function(X)
+        # Calculate anomaly threshold based on train scores. Leave-one-out for
+        # reference="knn": otherwise every training object is its own nearest
+        # neighbour, its score is biased low, and so is the threshold.
+        train_scores = self._scores(X, exclude_self=True)
 
         self.offset_ = np.quantile(train_scores, 1.0 - self.contamination)
 
@@ -146,12 +170,18 @@ class DistanceAnomaly(OutlierMixin, BaseEstimator):
             The anomaly score for each sample. Higher is more anomalous.
         """
         check_is_fitted(self)
+        return self._scores(X)
+
+    def _scores(self, X: np.ndarray, exclude_self: bool = False) -> np.ndarray:
+        """Anomaly scores; ``exclude_self`` marks X as the fit data (see fit)."""
         X = check_array(X)
 
         metric_args = [initialize_metric_function(m)[1] for m in self.metrics_]
 
         # Distance matrix (n_samples, n_classes) for every metric
-        dist_arrs = self.clf_._distance_matrices(X, metric_args)
+        dist_arrs = self.clf_._distance_matrices(
+            X, metric_args, exclude_self=exclude_self
+        )
 
         metric_scores = []
 

@@ -35,6 +35,7 @@ along with this program.  If not, see <https://www.gnu.org/licenses/>.
 """
 
 import numbers
+import warnings
 from typing import Callable, Tuple
 
 import numpy as np
@@ -62,6 +63,24 @@ METRIC_SOURCES_ = {
 # Accepted values for DistanceMetricClassifier parameters (checked in fit)
 _CENTRAL_STATS = ("median", "mean")
 _DISPERSION_STATS = ("std", "iqr", "aiqr", "astd", "cdf")
+_REFERENCES = ("centroid", "knn")
+
+# reference="knn": at most this many query-to-training distances are held in
+# memory at once (query rows are processed in blocks); 2**22 float64 = 32 MiB.
+_KNN_BLOCK_ELEMS = 2**22
+
+
+def _mean_k_smallest(D: np.ndarray, k: int) -> np.ndarray:
+    """Row-wise mean of the ``k`` smallest entries of ``D``, ignoring NaN.
+
+    NaN entries (undefined distances, or a training object's distance to
+    itself when excluded) sort last, so they are only averaged over when fewer
+    than ``k`` finite values exist, and then skipped by the nan-mean.
+    """
+    smallest = np.partition(D, k - 1, axis=1)[:, :k]
+    with warnings.catch_warnings():  # all-NaN rows -> NaN, silently
+        warnings.simplefilter("ignore", RuntimeWarning)
+        return np.nanmean(smallest, axis=1)
 
 
 def _side_rms(d: np.ndarray, mask: np.ndarray) -> np.ndarray:
@@ -202,6 +221,30 @@ class DistanceMetricClassifier(ClassifierMixin, BaseEstimator):
 
         .. versionadded:: 0.4.0
 
+    reference : {"centroid", "knn"}, default="centroid"
+        What a test object's distance to each class is measured against, in
+        that class's scaled feature space.
+
+        - "centroid" : the class centroid (see ``central_stat``). The original
+          behaviour.
+        - "knn" : the class's own training objects. The distance to a class is
+          the mean distance to its ``n_neighbors`` nearest training objects, so
+          it follows the shape of the class's distribution (several modes,
+          curved or elongated classes) instead of a single prototype, and acts
+          as a local density estimate. ``n_neighbors=1`` is the distance to the
+          nearest training object; ``n_neighbors`` >= the class size gives the
+          mean distance to all of its objects. The training data is stored, and
+          prediction costs one distance per (test object, training object)
+          pair.
+
+        .. versionadded:: 0.4.0
+
+    n_neighbors : int, default=5
+        Number of nearest training objects averaged per class when
+        ``reference="knn"`` (capped at the class size). Ignored otherwise.
+
+        .. versionadded:: 0.4.0
+
     References
     ----------
     .. [1] "Light Curve Classification with DistClassiPy: a new distance-based
@@ -228,6 +271,8 @@ class DistanceMetricClassifier(ClassifierMixin, BaseEstimator):
         central_stat: str = "median",
         dispersion_stat: str = "std",
         cdf_grid_size: int = 1001,
+        reference: str = "centroid",
+        n_neighbors: int = 5,
     ) -> None:
         """Initialize the classifier with specified parameters."""
         self.metric = metric
@@ -235,6 +280,8 @@ class DistanceMetricClassifier(ClassifierMixin, BaseEstimator):
         self.central_stat = central_stat
         self.dispersion_stat = dispersion_stat
         self.cdf_grid_size = cdf_grid_size
+        self.reference = reference
+        self.n_neighbors = n_neighbors
 
     def fit(
         self, X: np.array, y: np.array, feat_labels: list[str] = None
@@ -280,6 +327,12 @@ class DistanceMetricClassifier(ClassifierMixin, BaseEstimator):
             data=np.array(centroid_list), index=self.classes_, columns=feat_labels
         )
         self.df_centroid_ = df_centroid
+
+        if self.reference == "knn":
+            # Each class's training objects, plus their row positions in X
+            # (lets DistanceAnomaly score the training set leave-one-out).
+            self.train_X_ = {c: X[y == c] for c in self.classes_}
+            self._train_rows = {c: np.flatnonzero(y == c) for c in self.classes_}
 
         if self.scale and self.dispersion_stat == "std":
             std_list = []
@@ -374,6 +427,18 @@ class DistanceMetricClassifier(ClassifierMixin, BaseEstimator):
             raise ValueError(
                 f"cdf_grid_size must be an integer >= 2, got {self.cdf_grid_size!r}."
             )
+        if self.reference not in _REFERENCES:
+            raise ValueError(
+                f"Unknown reference: {self.reference!r}; expected one of {_REFERENCES}."
+            )
+        if not (
+            isinstance(self.n_neighbors, numbers.Integral)
+            and not isinstance(self.n_neighbors, bool)
+            and self.n_neighbors >= 1
+        ):
+            raise ValueError(
+                f"n_neighbors must be an integer >= 1, got {self.n_neighbors!r}."
+            )
 
     def _class_transform(self, X: np.ndarray, cl) -> tuple:
         """Map X and class `cl`'s centroid into that class's scaled space.
@@ -427,20 +492,60 @@ class DistanceMetricClassifier(ClassifierMixin, BaseEstimator):
 
         raise ValueError(f"Unknown dispersion_stat: {self.dispersion_stat}")
 
-    def _distance_matrices(self, X: np.ndarray, metric_args: list) -> list:
+    def _distance_matrices(
+        self, X: np.ndarray, metric_args: list, exclude_self: bool = False
+    ) -> list:
         """Distance from every row of X to every class, for each metric.
 
         Returns one ``(n_samples, n_classes)`` array per entry of
-        ``metric_args``. Each class's scaling of X is metric-independent, so
-        classes are looped on the outside and each scaled copy is reused
-        across all metrics.
+        ``metric_args``: the distance to each class's centroid, or with
+        ``reference="knn"`` the mean distance to its ``n_neighbors`` nearest
+        training objects (both in the class's scaled space). Each class's
+        scaling of X is metric-independent, so classes are looped on the
+        outside and each scaled copy is reused across all metrics.
+
+        ``exclude_self=True`` means X is the training data passed to ``fit``:
+        each training object's distance to itself is ignored (leave-one-out).
+        It only affects ``reference="knn"``.
         """
+        knn = self.reference == "knn"
+        if knn and exclude_self:
+            n_train = sum(len(rows) for rows in self._train_rows.values())
+            if X.shape[0] != n_train:
+                raise ValueError("exclude_self=True requires X to be the fit data.")
         cols = [[] for _ in metric_args]
         for cl in self.classes_:
             XA, XB = self._class_transform(X, cl)
+            if knn:
+                XB = self._class_transform(self.train_X_[cl], cl)[0]
+                self_rows = self._train_rows[cl] if exclude_self else None
             for col, metric_arg in zip(cols, metric_args):
-                col.append(pairwise_distance(XA, XB, metric_arg))
+                if knn:
+                    d = self._knn_distance(XA, XB, metric_arg, self_rows)
+                    col.append(d[:, None])
+                else:
+                    col.append(pairwise_distance(XA, XB, metric_arg))
         return [np.column_stack(col) for col in cols]
+
+    def _knn_distance(self, XA, XT, metric_arg, self_rows=None) -> np.ndarray:
+        """Mean distance from each row of XA to its nearest rows of XT.
+
+        ``self_rows[j]`` is the row of XA that *is* training object ``XT[j]``;
+        that pair is skipped. Query rows are processed in blocks so at most
+        ``_KNN_BLOCK_ELEMS`` distances are held in memory at once.
+        """
+        n_train = XT.shape[0]
+        k = min(self.n_neighbors, n_train)
+        step = max(1, _KNN_BLOCK_ELEMS // n_train)
+        out = np.empty(XA.shape[0])
+        for start in range(0, XA.shape[0], step):
+            stop = min(start + step, XA.shape[0])
+            D = np.asarray(pairwise_distance(XA[start:stop], XT, metric_arg), float)
+            if self_rows is not None:
+                j = np.flatnonzero((self_rows >= start) & (self_rows < stop))
+                D[self_rows[j] - start, j] = np.nan
+            out[start:stop] = _mean_k_smallest(D, k)
+        return out
 
     def _cdf_transform(self, X: np.ndarray, cl) -> np.ndarray:
         """Empirical-CDF map for one class: feature values -> [0, 1] ranks."""
@@ -459,8 +564,9 @@ class DistanceMetricClassifier(ClassifierMixin, BaseEstimator):
         """Predict the class labels for the provided X.
 
         The prediction is based on the distance of each data point in the input sample
-        to the centroid for each class in the feature space. The predicted class is the
-        one whose centroid is the closest to the input sample.
+        to the centroid for each class in the feature space (or, with
+        ``reference="knn"``, to the class's nearest training objects). The predicted
+        class is the closest one.
 
         Parameters
         ----------
@@ -514,8 +620,9 @@ class DistanceMetricClassifier(ClassifierMixin, BaseEstimator):
         """Predict the class labels for the provided X and perform analysis.
 
         The prediction is based on the distance of each data point in the input sample
-        to the centroid for each class in the feature space. The predicted class is the
-        one whose centroid is the closest to the input sample.
+        to the centroid for each class in the feature space (or, with
+        ``reference="knn"``, to the class's nearest training objects). The predicted
+        class is the closest one.
 
         The analysis involves saving all calculated distances and confidences as an
         attribute for inspection and analysis later.
