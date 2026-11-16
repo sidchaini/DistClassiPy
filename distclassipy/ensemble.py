@@ -69,6 +69,7 @@ def _forward_sfs(estimator, X, y, cv, max_features, n_jobs) -> pd.DataFrame:
                 y,
                 cv=folds,
                 scoring="f1_macro",
+                error_score="raise",  # a NaN score would win np.argmax below
             )
             for j in candidates
         )

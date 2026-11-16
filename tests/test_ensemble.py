@@ -265,3 +265,9 @@ def test_invalid_params_raise_in_fit(data, params, match):
     X, y = data
     with pytest.raises(ValueError, match=match):
         EnsembleDistanceClassifier(metrics=["clark"], **params).fit(X, y)
+
+
+def test_unknown_metric_raises_clearly_during_feature_selection(data):
+    X, y = data
+    with pytest.raises(ValueError, match="metric not found"):
+        EnsembleDistanceClassifier(metrics=["clrak"], max_features=2).fit(X, y)
