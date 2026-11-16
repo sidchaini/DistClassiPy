@@ -147,6 +147,10 @@ class EnsembleDistanceClassifier(ClassifierMixin, BaseEstimator):
     macro F1 score. No single metric has to be chosen, and better metrics
     count more.
 
+    .. versionchanged:: 0.4.1
+       Replaces the experimental per-quantile ensemble (``feat_idx``,
+       ``n_quantiles``), which used one metric per quantile of one feature.
+
     Parameters
     ----------
     metrics : list of str, optional
