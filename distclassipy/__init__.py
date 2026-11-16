@@ -3,7 +3,8 @@
 Classes:
     DistanceMetricClassifier - A classifier that uses a specified distance metric for
                                classification.
-    EnsembleDistanceClassifier - An ensemble classifier across distance metrics.
+    EnsembleDistanceClassifier - Combines per-metric classifiers, each on its own
+                                 features, by a calibrated weighted vote.
     DistanceAnomaly - A multi-metric distance-based anomaly detector.
 
 Functions:
@@ -28,11 +29,9 @@ along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
 from ._dispatch import cdist
 from .anomaly import DistanceAnomaly
-from .classifier import (
-    DistanceMetricClassifier,
-    EnsembleDistanceClassifier,
-)
+from .classifier import DistanceMetricClassifier
 from .distances import _ALL_METRICS, _UNIQUE_METRICS
+from .ensemble import EnsembleDistanceClassifier
 
 __version__ = "0.3.1"
 
