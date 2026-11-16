@@ -74,6 +74,7 @@ API Documentation
    :caption: API Reference
 
    classifier
+   ensemble
    distances
 
 .. toctree::

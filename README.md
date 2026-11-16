@@ -45,10 +45,10 @@ clf = dcpy.DistanceMetricClassifier()
 clf.fit(X, y)
 print(clf.predict([[0, 0, 0, 0]], metric="canberra"))
 
-# Example usage of EnsembleDistanceClassifier
-ensemble_clf = dcpy.EnsembleDistanceClassifier(feat_idx=0)
+# Example usage of EnsembleDistanceClassifier (combines all metrics: no need to choose one)
+ensemble_clf = dcpy.EnsembleDistanceClassifier()
 ensemble_clf.fit(X, y)
-print(ensemble_clf.predict(X))
+print(ensemble_clf.predict([[0, 0, 0, 0]]))
 ```
 
 ## Using the distance metrics without the classifier
@@ -76,7 +76,7 @@ print(knn.predict(dcpy.cdist([[0, 0, 0, 0]], X, metric="clark")))
 - **Interpretable Results**: Offers improved interpretability of classification outcomes by directly using distance metrics and feature importance, making it ideal for scientific applications.
 - **Efficient and Scalable**: Demonstrates lower computational requirements compared to traditional methods like Random Forests, making it suitable for large datasets.
 - **Open Source and Accessible**: Available as an open-source Python package on PyPI, encouraging broad application in astronomy and beyond.
-- **(NEW) Ensemble Distance Classification**: Leverages an ensemble approach to use different distance metrics for each quantile, improving classification performance across diverse data distributions.
+- **(NEW) Ensemble Distance Classification**: Combines all distance metrics, each using the features that suit it, into one vote weighted by each metric's cross-validated performance, so there is no need to choose a metric.
 - **(NEW) Expanded Distance Metrics**: DistClassiPy now offers 43 built-in distance metrics, an increase from the previous 18. Additionally, users can still define and use custom distance metrics as needed.
 - **(NEW) Fast Distance Metrics**: All of DistClassiPy's own metrics are now compiled (via Cython), running at speeds comparable to SciPy's built-in metrics, and are available on their own through `dcpy.cdist`.
 
