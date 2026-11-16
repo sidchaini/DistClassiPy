@@ -33,7 +33,7 @@ from .classifier import DistanceMetricClassifier
 from .distances import _ALL_METRICS, _UNIQUE_METRICS
 from .ensemble import EnsembleDistanceClassifier
 
-__version__ = "0.3.1"
+__version__ = "0.4.0"
 
 __all__ = [
     "DistanceMetricClassifier",
